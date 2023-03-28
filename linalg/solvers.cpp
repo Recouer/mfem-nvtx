@@ -2254,7 +2254,7 @@ void LBFGSSolver::Mult(const Vector &b, Vector &x) const
       mfem::out << "LBFGS: No convergence!\n";
    }
 
-4#ifdef MFEM_USE_CUDA
+#ifdef MFEM_USE_CUDA
   nvtxRangePop();
 #endif
 
