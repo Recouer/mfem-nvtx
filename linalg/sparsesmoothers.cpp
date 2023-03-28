@@ -78,6 +78,9 @@ void DSmoother::Mult(const Vector &x, Vector &y) const
    if (!iterative_mode && type == 0 && iterations == 1)
    {
       oper->DiagScale(x, y, scale, use_abs_diag);
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
       return;
    }
 

@@ -452,13 +452,12 @@ void Vector::Neg()
 
 void add(const Vector &v1, const Vector &v2, Vector &v)
 {
+   MFEM_ASSERT(v.size == v1.size && v.size == v2.size,
+               "incompatible Vectors!");
+
 #ifdef MFEM_USE_CUDA
    nvtxRangePush(__FUNCTION__);
 #endif
-
-
-   MFEM_ASSERT(v.size == v1.size && v.size == v2.size,
-               "incompatible Vectors!");
 
 #if !defined(MFEM_USE_LEGACY_OPENMP)
    const bool use_dev = v1.UseDevice() || v2.UseDevice() || v.UseDevice();
@@ -1139,10 +1138,20 @@ double Vector::Normlp(double p) const
 
    if (p == 1.0)
    {
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return Norml1();
    }
    if (p == 2.0)
    {
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return Norml2();
    }
    if (p < infinity())
@@ -1152,11 +1161,21 @@ double Vector::Normlp(double p) const
       // argument of each call to std::pow is <= 1 to avoid overflow.
       if (0 == size)
       {
+   
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
          return 0.0;
       } // end if 0 == size
 
       if (1 == size)
       {
+   
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
          return std::abs(data[0]);
       } // end if 1 == size
 
@@ -1456,6 +1475,11 @@ double Vector::operator*(const Vector &v) const
 #ifdef MFEM_USE_OCCA
    if (DeviceCanUseOcca())
    {
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return occa::linalg::dot<double,double,double>(
                 OccaMemoryRead(data, size), OccaMemoryRead(v.data, size));
    }
@@ -1464,6 +1488,11 @@ double Vector::operator*(const Vector &v) const
 #ifdef MFEM_USE_CUDA
    if (Device::Allows(Backend::CUDA_MASK))
    {
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return cuVectorDot(size, m_data, v_data);
    }
 #endif
@@ -1471,6 +1500,11 @@ double Vector::operator*(const Vector &v) const
 #ifdef MFEM_USE_HIP
    if (Device::Allows(Backend::HIP_MASK))
    {
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return hipVectorDot(size, m_data, v_data);
    }
 #endif
@@ -1499,6 +1533,11 @@ double Vector::operator*(const Vector &v) const
          #pragma omp barrier
          th_dot(tid) = my_dot;
       }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return th_dot.Sum();
 #else
       // The standard way of computing the dot product is non-deterministic
@@ -1508,6 +1547,11 @@ double Vector::operator*(const Vector &v) const
       {
          prod += m_data[i] * v_data[i];
       }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return prod;
 #endif // MFEM_USE_OPENMP_DETERMINISTIC_DOT
    }
@@ -1523,6 +1567,11 @@ double Vector::operator*(const Vector &v) const
       dot = 0.0;
       MFEM_FORALL(i, N, d_dot[0] += m_data_[i] * v_data_[i];);
       dot.HostReadWrite();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return dot[0];
    }
 vector_dot_cpu:
@@ -1550,6 +1599,11 @@ double Vector::Min() const
 #ifdef MFEM_USE_OCCA
    if (DeviceCanUseOcca())
    {
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return occa::linalg::min<double,double>(OccaMemoryRead(data, size));
    }
 #endif
@@ -1557,6 +1611,11 @@ double Vector::Min() const
 #ifdef MFEM_USE_CUDA
    if (Device::Allows(Backend::CUDA_MASK))
    {
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return cuVectorMin(size, m_data);
    }
 #endif
@@ -1564,6 +1623,11 @@ double Vector::Min() const
 #ifdef MFEM_USE_HIP
    if (Device::Allows(Backend::HIP_MASK))
    {
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return hipVectorMin(size, m_data);
    }
 #endif
@@ -1577,6 +1641,11 @@ double Vector::Min() const
       {
          minimum = std::min(minimum, m_data[i]);
       }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return minimum;
    }
 #endif
@@ -1591,6 +1660,11 @@ double Vector::Min() const
       auto d_min = min.ReadWrite();
       MFEM_FORALL(i, N, d_min[0] = (d_min[0]<m_data_[i])?d_min[0]:m_data_[i];);
       min.HostReadWrite();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return min[0];
    }
 

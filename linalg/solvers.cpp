@@ -332,15 +332,14 @@ void OperatorJacobiSmoother::Setup(const Vector &diag)
 
 void OperatorJacobiSmoother::Mult(const Vector &x, Vector &y) const
 {
-#ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
-#endif
-
-
    // For empty MPI ranks, height may be 0:
    // MFEM_VERIFY(Height() > 0, "The diagonal hasn't been computed.");
    MFEM_ASSERT(x.Size() == Width(), "invalid input vector");
    MFEM_ASSERT(y.Size() == Height(), "invalid output vector");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    if (iterative_mode)
    {
@@ -365,7 +364,6 @@ void OperatorJacobiSmoother::Mult(const Vector &x, Vector &y) const
 #ifdef MFEM_USE_CUDA
   nvtxRangePop();
 #endif
-
 }
 
 OperatorChebyshevSmoother::OperatorChebyshevSmoother(const Operator &oper_,
@@ -521,10 +519,6 @@ void OperatorChebyshevSmoother::Setup()
 
 void OperatorChebyshevSmoother::Mult(const Vector& x, Vector &y) const
 {
-#ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
-#endif
-
    if (iterative_mode)
    {
       MFEM_ABORT("Chebyshev smoother not implemented for iterative mode");
@@ -534,6 +528,10 @@ void OperatorChebyshevSmoother::Mult(const Vector& x, Vector &y) const
    {
       MFEM_ABORT("Chebyshev smoother requires operator");
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    residual = x;
    helperVector.SetSize(x.Size());
@@ -594,6 +592,9 @@ void SLISolver::Mult(const Vector &b, Vector &x) const
       }
       converged = true;
       final_iter = i;
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
       return;
    }
 
@@ -611,6 +612,9 @@ void SLISolver::Mult(const Vector &b, Vector &x) const
       }
       converged = true;
       final_iter = i;
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
       return;
    }
 
@@ -652,6 +656,9 @@ void SLISolver::Mult(const Vector &b, Vector &x) const
       converged = true;
       final_iter = 0;
       final_norm = nom;
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
       return;
    }
 
@@ -819,6 +826,9 @@ void CGSolver::Mult(const Vector &b, Vector &x) const
       final_iter = 0;
       initial_norm = nom;
       final_norm = nom;
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
       return;
    }
    r0 = std::max(nom*rel_tol*rel_tol, abs_tol*abs_tol);
@@ -827,6 +837,9 @@ void CGSolver::Mult(const Vector &b, Vector &x) const
       converged = true;
       final_iter = 0;
       final_norm = sqrt(nom);
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
       return;
    }
 
@@ -845,6 +858,9 @@ void CGSolver::Mult(const Vector &b, Vector &x) const
          converged = false;
          final_iter = 0;
          final_norm = sqrt(nom);
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
          return;
       }
    }
@@ -1270,6 +1286,9 @@ void FGMRESSolver::Mult(const Vector &b, Vector &x) const
       final_norm = beta;
       final_iter = 0;
       converged = true;
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
       return;
    }
 
@@ -1363,6 +1382,9 @@ void FGMRESSolver::Mult(const Vector &b, Vector &x) const
                if (v[i]) { delete v[i]; }
                if (z[i]) { delete z[i]; }
             }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
             return;
          }
       }
@@ -1498,6 +1520,9 @@ void BiCGSTABSolver::Mult(const Vector &b, Vector &x) const
       final_norm = resid;
       final_iter = 0;
       converged = true;
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
       return;
    }
 
@@ -1525,6 +1550,9 @@ void BiCGSTABSolver::Mult(const Vector &b, Vector &x) const
          {
             mfem::out << "BiCGStab: No convergence!\n";
          }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
          return;
       }
       if (i == 1)
@@ -1565,6 +1593,9 @@ void BiCGSTABSolver::Mult(const Vector &b, Vector &x) const
          {
             mfem::out << "BiCGStab: Number of iterations: " << final_iter << '\n';
          }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
          return;
       }
       if (print_options.iterations)
@@ -1629,6 +1660,9 @@ void BiCGSTABSolver::Mult(const Vector &b, Vector &x) const
          {
             mfem::out << "BiCGStab: No convergence!\n";
          }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
          return;
       }
    }
@@ -2300,6 +2334,9 @@ int aGMRES(const Operator &A, Vector &x, const Vector &b,
    {
       tol = resid * resid;
       max_iter = 0;
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
       return 0;
    }
 
@@ -2371,6 +2408,9 @@ int aGMRES(const Operator &A, Vector &x, const Vector &b,
             {
                delete v[i];
             }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
             return 0;
          }
       }
@@ -2394,6 +2434,9 @@ int aGMRES(const Operator &A, Vector &x, const Vector &b,
          {
             delete v[i];
          }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
          return 0;
       }
 
@@ -2417,11 +2460,10 @@ int aGMRES(const Operator &A, Vector &x, const Vector &b,
    {
       delete v[i];
    }
-   return 1;
-
 #ifdef MFEM_USE_CUDA
   nvtxRangePop();
 #endif
+   return 1;
 }
 
 OptimizationProblem::OptimizationProblem(const int insize,
