@@ -456,6 +456,10 @@ void SparseMatrix::SetWidth(int newWidth)
 
 void SparseMatrix::SortColumnIndices()
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_VERIFY(Finalized(), "Matrix is not Finalized!");
 
    if (isSorted)
@@ -572,6 +576,10 @@ void SparseMatrix::SortColumnIndices()
       }
    }
    isSorted = true;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::MoveDiagonalFirst()
@@ -732,9 +740,17 @@ void SparseMatrix::ToDenseMatrix(DenseMatrix & B) const
 
 void SparseMatrix::Mult(const Vector &x, Vector &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (Finalized()) { y.UseDevice(true); }
    y = 0.0;
    AddMult(x, y);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::AddMult(const Vector &x, Vector &y, const double a) const
@@ -743,6 +759,11 @@ void SparseMatrix::AddMult(const Vector &x, Vector &y, const double a) const
                << ") must match matrix width (" << width << ")");
    MFEM_ASSERT(height == y.Size(), "Output vector size (" << y.Size()
                << ") must match matrix height (" << height << ")");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
 
    if (!Finalized())
    {
@@ -761,6 +782,11 @@ void SparseMatrix::AddMult(const Vector &x, Vector &y, const double a) const
          *yp += a * b;
          yp++;
       }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return;
    }
 
@@ -774,7 +800,12 @@ void SparseMatrix::AddMult(const Vector &x, Vector &y, const double a) const
    auto d_y = y.ReadWrite();
 
    // Skip if matrix has no non-zeros
-   if (nnz == 0) {return;}
+   if (nnz == 0) {
+#ifdef MFEM_USE_CUDA
+        nvtxRangePop();
+#endif
+         return;
+      }
    if ((Device::Allows(Backend::CUDA_MASK | Backend::HIP_MASK)) && useGPUSparse)
    {
 #ifdef MFEM_USE_CUDA_OR_HIP
@@ -903,13 +934,24 @@ void SparseMatrix::AddMult(const Vector &x, Vector &y, const double a) const
       yp[i] += a * d;
    }
 #endif // MFEM_USE_LEGACY_OPENMP
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::MultTranspose(const Vector &x, Vector &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (Finalized()) { y.UseDevice(true); }
    y = 0.0;
    AddMultTranspose(x, y);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::AddMultTranspose(const Vector &x, Vector &y,
@@ -919,6 +961,10 @@ void SparseMatrix::AddMultTranspose(const Vector &x, Vector &y,
                << ") must match matrix height (" << height << ")");
    MFEM_ASSERT(width == y.Size(), "Output vector size (" << y.Size()
                << ") must match matrix width (" << width << ")");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    if (!Finalized())
    {
@@ -934,6 +980,10 @@ void SparseMatrix::AddMultTranspose(const Vector &x, Vector &y,
             yp[row->Column] += row->Value * b;
          }
       }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return;
    }
 
@@ -955,6 +1005,10 @@ void SparseMatrix::AddMultTranspose(const Vector &x, Vector &y,
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::BuildTranspose() const
@@ -984,6 +1038,10 @@ void SparseMatrix::PartMult(
 {
    MFEM_VERIFY(Finalized(), "Matrix must be finalized.");
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const int n = rows.Size();
    const int nnz = J.Capacity();
    auto d_rows = rows.Read();
@@ -1003,12 +1061,20 @@ void SparseMatrix::PartMult(
       }
       d_y[r] = a;
    });
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::PartAddMult(
    const Array<int> &rows, const Vector &x, Vector &y, const double a) const
 {
    MFEM_VERIFY(Finalized(), "Matrix must be finalized.");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    for (int i = 0; i < rows.Size(); i++)
    {
@@ -1021,6 +1087,9 @@ void SparseMatrix::PartAddMult(
       }
       y(r) += a * val;
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::BooleanMult(const Array<int> &x, Array<int> &y) const
@@ -1028,6 +1097,10 @@ void SparseMatrix::BooleanMult(const Array<int> &x, Array<int> &y) const
    MFEM_ASSERT(Finalized(), "Matrix must be finalized.");
    MFEM_ASSERT(x.Size() == Width(), "Input vector size (" << x.Size()
                << ") must match matrix width (" << Width() << ")");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    y.SetSize(Height(), Device::GetDeviceMemoryType());
 
@@ -1051,11 +1124,19 @@ void SparseMatrix::BooleanMult(const Array<int> &x, Array<int> &y) const
       }
       d_y[i] = d_yi;
    });
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::BooleanMultTranspose(const Array<int> &x,
                                         Array<int> &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_ASSERT(Finalized(), "Matrix must be finalized.");
    MFEM_ASSERT(x.Size() == Height(), "Input vector size (" << x.Size()
                << ") must match matrix height (" << Height() << ")");
@@ -1074,6 +1155,10 @@ void SparseMatrix::BooleanMultTranspose(const Array<int> &x,
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::AbsMult(const Vector &x, Vector &y) const
@@ -1082,6 +1167,10 @@ void SparseMatrix::AbsMult(const Vector &x, Vector &y) const
                << ") must match matrix width (" << width << ")");
    MFEM_ASSERT(height == y.Size(), "Output vector size (" << y.Size()
                << ") must match matrix height (" << height << ")");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    if (Finalized()) { y.UseDevice(true); }
    y = 0.0;
@@ -1103,6 +1192,10 @@ void SparseMatrix::AbsMult(const Vector &x, Vector &y) const
          *yp += b;
          yp++;
       }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return;
    }
 
@@ -1123,6 +1216,10 @@ void SparseMatrix::AbsMult(const Vector &x, Vector &y) const
       }
       d_y[i] += d;
    });
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::AbsMultTranspose(const Vector &x, Vector &y) const
@@ -1131,6 +1228,10 @@ void SparseMatrix::AbsMultTranspose(const Vector &x, Vector &y) const
                << ") must match matrix height (" << height << ")");
    MFEM_ASSERT(width == y.Size(), "Output vector size (" << y.Size()
                << ") must match matrix width (" << width << ")");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    y = 0.0;
 
@@ -1147,6 +1248,10 @@ void SparseMatrix::AbsMultTranspose(const Vector &x, Vector &y) const
             yp[row->Column] += fabs(row->Value) * b;
          }
       }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return;
    }
 
@@ -1168,6 +1273,9 @@ void SparseMatrix::AbsMultTranspose(const Vector &x, Vector &y) const
          }
       }
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 double SparseMatrix::InnerProduct(const Vector &x, const Vector &y) const
@@ -1176,6 +1284,10 @@ double SparseMatrix::InnerProduct(const Vector &x, const Vector &y) const
                << " must be equal to Width() = " << Width());
    MFEM_ASSERT(y.Size() == Height(), "y.Size() = " << y.Size()
                << " must be equal to Height() = " << Height());
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    x.HostRead();
    y.HostRead();
@@ -1207,12 +1319,19 @@ double SparseMatrix::InnerProduct(const Vector &x, const Vector &y) const
       }
       prod += a * y(i);
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return prod;
 }
 
 void SparseMatrix::GetRowSums(Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    for (int i = 0; i < height; i++)
    {
       double a = 0.0;
@@ -1232,12 +1351,19 @@ void SparseMatrix::GetRowSums(Vector &x) const
       }
       x(i) = a;
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 double SparseMatrix::GetRowNorml1(int irow) const
 {
    MFEM_VERIFY(irow < height,
                "row " << irow << " not in matrix with height " << height);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    double a = 0.0;
    if (A)
@@ -1254,12 +1380,19 @@ double SparseMatrix::GetRowNorml1(int irow) const
          a += fabs(np->Value);
       }
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return a;
 }
 
 void SparseMatrix::Threshold(double tol, bool fix_empty_rows)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_ASSERT(Finalized(), "Matrix must be finalized.");
    double atol;
    atol = std::abs(tol);
@@ -1317,10 +1450,18 @@ void SparseMatrix::Threshold(double tol, bool fix_empty_rows)
    I.Wrap(newI, height+1, true);
    J.Wrap(newJ, I[height], true);
    A.Wrap(newA, I[height], true);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::Finalize(int skip_zeros, bool fix_empty_rows)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int i, j, nr, nz;
    RowNode *aux;
 
@@ -1432,10 +1573,18 @@ void SparseMatrix::Finalize(int skip_zeros, bool fix_empty_rows)
 
    delete [] Rows;
    Rows = NULL;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::GetBlocks(Array2D<SparseMatrix *> &blocks) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int br = blocks.NumRows(), bc = blocks.NumCols();
    int nr = (height + br - 1)/br, nc = (width + bc - 1)/bc;
 
@@ -1522,10 +1671,18 @@ void SparseMatrix::GetBlocks(Array2D<SparseMatrix *> &blocks) const
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 double SparseMatrix::IsSymmetric() const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (height != width)
    {
       return infinity();
@@ -1563,12 +1720,21 @@ double SparseMatrix::IsSymmetric() const
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return symm;
 }
 
 void SparseMatrix::Symmetrize()
 {
    MFEM_VERIFY(Finalized(), "Matrix must be finalized.");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    int i, j;
    for (i = 1; i < height; i++)
@@ -1583,6 +1749,10 @@ void SparseMatrix::Symmetrize()
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 int SparseMatrix::NumNonZeroElems() const
@@ -1610,6 +1780,10 @@ int SparseMatrix::NumNonZeroElems() const
 
 double SparseMatrix::MaxNorm() const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    double m = 0.0;
 
    if (A)
@@ -1630,11 +1804,20 @@ double SparseMatrix::MaxNorm() const
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return m;
 }
 
 int SparseMatrix::CountSmallElems(double tol) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int counter = 0;
 
    if (A)
@@ -1657,12 +1840,19 @@ int SparseMatrix::CountSmallElems(double tol) const
          }
       }
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return counter;
 }
 
 int SparseMatrix::CheckFinite() const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (Empty())
    {
       return 0;
@@ -1681,8 +1871,16 @@ int SparseMatrix::CheckFinite() const
             counter += !IsFinite(aux->Value);
          }
       }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return counter;
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 MatrixInverse *SparseMatrix::Inverse() const
@@ -1692,6 +1890,10 @@ MatrixInverse *SparseMatrix::Inverse() const
 
 void SparseMatrix::EliminateRow(int row, const double sol, Vector &rhs)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    RowNode *aux;
 
    MFEM_ASSERT(row < height && row >= 0,
@@ -1704,10 +1906,18 @@ void SparseMatrix::EliminateRow(int row, const double sol, Vector &rhs)
       rhs(aux->Column) -= sol * aux->Value;
       aux->Value = 0.0;
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::EliminateRow(int row, DiagonalPolicy dpolicy)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    RowNode *aux;
 
    MFEM_ASSERT(row < height && row >= 0,
@@ -1736,6 +1946,9 @@ void SparseMatrix::EliminateRow(int row, DiagonalPolicy dpolicy)
    {
       SearchRow(row, row) = 1.;
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::EliminateCol(int col, DiagonalPolicy dpolicy)
@@ -1746,6 +1959,10 @@ void SparseMatrix::EliminateCol(int col, DiagonalPolicy dpolicy)
    MFEM_ASSERT(dpolicy != DIAG_ONE || height == width,
                "if dpolicy == DIAG_ONE, matrix must be square, not height = "
                << height << ",  width = " << width);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    if (Rows == NULL)
    {
@@ -1776,11 +1993,18 @@ void SparseMatrix::EliminateCol(int col, DiagonalPolicy dpolicy)
    {
       SearchRow(col, col) = 1.0;
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::EliminateCols(const Array<int> &cols, const Vector *x,
                                  Vector *b)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (Rows == NULL)
    {
       for (int i = 0; i < height; i++)
@@ -1815,6 +2039,9 @@ void SparseMatrix::EliminateCols(const Array<int> &cols, const Vector *x,
          }
       }
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SparseMatrix::EliminateCols(const Array<int> &col_marker, SparseMatrix &Ae)
@@ -3170,6 +3397,10 @@ SparseMatrix &SparseMatrix::operator+=(const SparseMatrix &B)
 
 void SparseMatrix::Add(const double a, const SparseMatrix &B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    for (int i = 0; i < height; i++)
    {
       B.SetColPtr(i);
@@ -3189,10 +3420,17 @@ void SparseMatrix::Add(const double a, const SparseMatrix &B)
       }
       B.ClearColPtr();
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 SparseMatrix &SparseMatrix::operator=(double a)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (Rows == NULL)
    {
       const int nnz = J.Capacity();
@@ -3213,12 +3451,19 @@ SparseMatrix &SparseMatrix::operator=(double a)
          }
       }
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return (*this);
 }
 
 SparseMatrix &SparseMatrix::operator*=(double a)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (Rows == NULL)
    {
       for (int i = 0, nnz = I[height]; i < nnz; i++)
@@ -3237,6 +3482,9 @@ SparseMatrix &SparseMatrix::operator*=(double a)
          }
       }
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return (*this);
 }
@@ -3639,6 +3887,10 @@ SparseMatrix *TransposeAbstractSparseMatrix (const AbstractSparseMatrix &A,
 SparseMatrix *Mult (const SparseMatrix &A, const SparseMatrix &B,
                     SparseMatrix *OAB)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int nrowsA, ncolsA, nrowsB, ncolsB;
    const int *A_i, *A_j, *B_i, *B_j;
    int *C_i, *C_j, *B_marker;
@@ -3761,20 +4013,37 @@ SparseMatrix *Mult (const SparseMatrix &A, const SparseMatrix &B,
 
    delete [] B_marker;
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return C;
 }
 
 SparseMatrix * TransposeMult(const SparseMatrix &A, const SparseMatrix &B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    SparseMatrix *At  = Transpose(A);
    SparseMatrix *AtB = Mult(*At, B);
    delete At;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return AtB;
 }
 
 SparseMatrix *MultAbstractSparseMatrix (const AbstractSparseMatrix &A,
                                         const AbstractSparseMatrix &B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int nrowsA, ncolsA, nrowsB, ncolsB;
    int *C_i, *C_j, *B_marker;
    double *C_data;
@@ -3866,11 +4135,19 @@ SparseMatrix *MultAbstractSparseMatrix (const AbstractSparseMatrix &A,
 
    delete [] B_marker;
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return C;
 }
 
 DenseMatrix *Mult (const SparseMatrix &A, DenseMatrix &B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    DenseMatrix *C = new DenseMatrix(A.Height(), B.Width());
    Vector columnB, columnC;
    for (int j = 0; j < B.Width(); ++j)
@@ -3879,6 +4156,11 @@ DenseMatrix *Mult (const SparseMatrix &A, DenseMatrix &B)
       C->GetColumnReference(j, columnC);
       A.Mult(columnB, columnC);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return C;
 }
 
@@ -4038,6 +4320,10 @@ SparseMatrix * Add(Array<SparseMatrix *> & Ai)
 {
    MFEM_ASSERT(Ai.Size() > 0, "invalid size Ai.Size() = " << Ai.Size());
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    SparseMatrix * accumulate = Ai[0];
    SparseMatrix * result = accumulate;
 
@@ -4052,6 +4338,10 @@ SparseMatrix * Add(Array<SparseMatrix *> & Ai)
       accumulate = result;
    }
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return result;
 }
 
@@ -4059,6 +4349,10 @@ SparseMatrix * Add(Array<SparseMatrix *> & Ai)
 void Add(const SparseMatrix &A,
          double alpha, DenseMatrix &B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    for (int r = 0; r < B.Height(); r++)
    {
       const int    * colA = A.GetRowColumns(r);
@@ -4068,11 +4362,19 @@ void Add(const SparseMatrix &A,
          B(r, colA[i]) += alpha * valA[i];
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 /// Produces a block matrix with blocks A_{ij}*B
 DenseMatrix *OuterProduct(const DenseMatrix &A, const DenseMatrix &B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int mA = A.Height(), nA = A.Width();
    int mB = B.Height(), nB = B.Width();
 
@@ -4085,12 +4387,21 @@ DenseMatrix *OuterProduct(const DenseMatrix &A, const DenseMatrix &B)
          C->AddMatrix(A(i,j), B, i * mB, j * nB);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return C;
 }
 
 /// Produces a block matrix with blocks A_{ij}*B
 SparseMatrix *OuterProduct(const DenseMatrix &A, const SparseMatrix &B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int mA = A.Height(), nA = A.Width();
    int mB = B.Height(), nB = B.Width();
 
@@ -4114,12 +4425,20 @@ SparseMatrix *OuterProduct(const DenseMatrix &A, const SparseMatrix &B)
    }
    C->Finalize();
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return C;
 }
 
 /// Produces a block matrix with blocks A_{ij}*B
 SparseMatrix *OuterProduct(const SparseMatrix &A, const DenseMatrix &B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int mA = A.Height(), nA = A.Width();
    int mB = B.Height(), nB = B.Width();
 
@@ -4143,12 +4462,20 @@ SparseMatrix *OuterProduct(const SparseMatrix &A, const DenseMatrix &B)
    }
    C->Finalize();
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return C;
 }
 
 /// Produces a block matrix with blocks A_{ij}*B
 SparseMatrix *OuterProduct(const SparseMatrix &A, const SparseMatrix &B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int mA = A.Height(), nA = A.Width();
    int mB = B.Height(), nB = B.Width();
 
@@ -4175,6 +4502,10 @@ SparseMatrix *OuterProduct(const SparseMatrix &A, const SparseMatrix &B)
       }
    }
    C->Finalize();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return C;
 }

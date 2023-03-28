@@ -110,6 +110,10 @@ const double &Vector::Elem(int i) const
 
 double Vector::operator*(const double *v) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    double dot = 0.0;
 #ifdef MFEM_USE_LEGACY_OPENMP
    #pragma omp parallel for reduction(+:dot)
@@ -118,17 +122,34 @@ double Vector::operator*(const double *v) const
    {
       dot += data[i] * v[i];
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return dot;
 }
 
 Vector &Vector::operator=(const double *v)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    data.CopyFromHost(v, size);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 Vector &Vector::operator=(const Vector &v)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
 #if 0
    SetSize(v.Size(), v.data.GetMemoryType());
    data.CopyFrom(v.data, v.Size());
@@ -143,34 +164,66 @@ Vector &Vector::operator=(const Vector &v)
    data.CopyFrom(v.data, v.Size());
    v.UseDevice(vuse);
 #endif
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 Vector &Vector::operator=(Vector &&v)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    data = std::move(v.data);
    // Self-assignment-safe way to move v.size to size:
    const auto size_tmp = v.size;
    v.size = 0;
    size = size_tmp;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 Vector &Vector::operator=(double value)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice();
    const int N = size;
    auto y = Write(use_dev);
    MFEM_FORALL_SWITCH(use_dev, i, N, y[i] = value;);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 Vector &Vector::operator*=(double c)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice();
    const int N = size;
    auto y = ReadWrite(use_dev);
    MFEM_FORALL_SWITCH(use_dev, i, N, y[i] *= c;);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
@@ -178,21 +231,39 @@ Vector &Vector::operator*=(const Vector &v)
 {
    MFEM_ASSERT(size == v.size, "incompatible Vectors!");
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice() || v.UseDevice();
    const int N = size;
    auto y = ReadWrite(use_dev);
    auto x = v.Read(use_dev);
    MFEM_FORALL_SWITCH(use_dev, i, N, y[i] *= x[i];);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 Vector &Vector::operator/=(double c)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice();
    const int N = size;
    const double m = 1.0/c;
    auto y = ReadWrite(use_dev);
    MFEM_FORALL_SWITCH(use_dev, i, N, y[i] *= m;);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
@@ -200,20 +271,38 @@ Vector &Vector::operator/=(const Vector &v)
 {
    MFEM_ASSERT(size == v.size, "incompatible Vectors!");
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice() || v.UseDevice();
    const int N = size;
    auto y = ReadWrite(use_dev);
    auto x = v.Read(use_dev);
    MFEM_FORALL_SWITCH(use_dev, i, N, y[i] /= x[i];);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 Vector &Vector::operator-=(double c)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice();
    const int N = size;
    auto y = ReadWrite(use_dev);
    MFEM_FORALL_SWITCH(use_dev, i, N, y[i] -= c;);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
@@ -221,20 +310,38 @@ Vector &Vector::operator-=(const Vector &v)
 {
    MFEM_ASSERT(size == v.size, "incompatible Vectors!");
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice() || v.UseDevice();
    const int N = size;
    auto y = ReadWrite(use_dev);
    auto x = v.Read(use_dev);
    MFEM_FORALL_SWITCH(use_dev, i, N, y[i] -= x[i];);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 Vector &Vector::operator+=(double c)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice();
    const int N = size;
    auto y = ReadWrite(use_dev);
    MFEM_FORALL_SWITCH(use_dev, i, N, y[i] += c;);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
@@ -242,17 +349,30 @@ Vector &Vector::operator+=(const Vector &v)
 {
    MFEM_ASSERT(size == v.size, "incompatible Vectors!");
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice() || v.UseDevice();
    const int N = size;
    auto y = ReadWrite(use_dev);
    auto x = v.Read(use_dev);
    MFEM_FORALL_SWITCH(use_dev, i, N, y[i] += x[i];);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 Vector &Vector::Add(const double a, const Vector &Va)
 {
    MFEM_ASSERT(size == Va.size, "incompatible Vectors!");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    if (a != 0.0)
    {
@@ -262,6 +382,10 @@ Vector &Vector::Add(const double a, const Vector &Va)
       auto x = Va.Read(use_dev);
       MFEM_FORALL_SWITCH(use_dev, i, N, y[i] += a * x[i];);
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
@@ -294,6 +418,10 @@ void Vector::AddSubVector(const Vector &v, int offset)
 {
    MFEM_ASSERT(v.Size() + offset <= size, "invalid sub-vector");
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const int vs = v.Size();
    const double *vp = v.data;
    double *p = data + offset;
@@ -301,14 +429,25 @@ void Vector::AddSubVector(const Vector &v, int offset)
    {
       p[i] += vp[i];
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::Neg()
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice();
    const int N = size;
    auto y = ReadWrite(use_dev);
    MFEM_FORALL_SWITCH(use_dev, i, N, y[i] = -y[i];);
+   
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void add(const Vector &v1, const Vector &v2, Vector &v)
@@ -336,12 +475,20 @@ void add(const Vector &v1, const Vector &v2, Vector &v)
       v.data[i] = v1.data[i] + v2.data[i];
    }
 #endif
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void add(const Vector &v1, double alpha, const Vector &v2, Vector &v)
 {
    MFEM_ASSERT(v.size == v1.size && v.size == v2.size,
                "incompatible Vectors!");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    if (alpha == 0.0)
    {
@@ -381,13 +528,12 @@ void add(const Vector &v1, double alpha, const Vector &v2, Vector &v)
 
 void add(const double a, const Vector &x, const Vector &y, Vector &z)
 {
+   MFEM_ASSERT(x.size == y.size && x.size == z.size,
+               "incompatible Vectors!");
+
 #ifdef MFEM_USE_CUDA
   nvtxRangePush(__FUNCTION__);
 #endif
-
-
-   MFEM_ASSERT(x.size == y.size && x.size == z.size,
-               "incompatible Vectors!");
 
    if (a == 0.0)
    {
@@ -599,6 +745,10 @@ void Vector::median(const Vector &lo, const Vector &hi)
 
 void Vector::GetSubVector(const Array<int> &dofs, Vector &elemvect) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const int n = dofs.Size();
    elemvect.SetSize(n);
    const bool use_dev = dofs.UseDevice() || elemvect.UseDevice();
@@ -610,10 +760,18 @@ void Vector::GetSubVector(const Array<int> &dofs, Vector &elemvect) const
       const int dof_i = d_dofs[i];
       d_y[i] = dof_i >= 0 ? d_X[dof_i] : -d_X[-dof_i-1];
    });
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::GetSubVector(const Array<int> &dofs, double *elem_data) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    data.Read(MemoryClass::HOST, size);
    const int n = dofs.Size();
    for (int i = 0; i < n; i++)
@@ -621,10 +779,18 @@ void Vector::GetSubVector(const Array<int> &dofs, double *elem_data) const
       const int j = dofs[i];
       elem_data[i] = (j >= 0) ? data[j] : -data[-1-j];
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::SetSubVector(const Array<int> &dofs, const double value)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = dofs.UseDevice();
    const int n = dofs.Size();
    // Use read+write access for *this - we only modify some of its entries
@@ -642,6 +808,10 @@ void Vector::SetSubVector(const Array<int> &dofs, const double value)
          d_X[-1-j] = -value;
       }
    });
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::SetSubVector(const Array<int> &dofs, const Vector &elemvect)
@@ -649,6 +819,10 @@ void Vector::SetSubVector(const Array<int> &dofs, const Vector &elemvect)
    MFEM_ASSERT(dofs.Size() <= elemvect.Size(),
                "Size mismatch: length of dofs is " << dofs.Size()
                << ", length of elemvect is " << elemvect.Size());
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    const bool use_dev = dofs.UseDevice() || elemvect.UseDevice();
    const int n = dofs.Size();
@@ -668,10 +842,18 @@ void Vector::SetSubVector(const Array<int> &dofs, const Vector &elemvect)
          d_X[-1-dof_i] = -d_y[i];
       }
    });
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::SetSubVector(const Array<int> &dofs, double *elem_data)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    // Use read+write access because we overwrite only part of the data.
    data.ReadWrite(MemoryClass::HOST, size);
    const int n = dofs.Size();
@@ -687,6 +869,10 @@ void Vector::SetSubVector(const Array<int> &dofs, double *elem_data)
          operator()(-1-j) = -elem_data[i];
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::AddElementVector(const Array<int> &dofs, const Vector &elemvect)
@@ -694,6 +880,10 @@ void Vector::AddElementVector(const Array<int> &dofs, const Vector &elemvect)
    MFEM_ASSERT(dofs.Size() <= elemvect.Size(), "Size mismatch: "
                "length of dofs is " << dofs.Size() <<
                ", length of elemvect is " << elemvect.Size());
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    const bool use_dev = dofs.UseDevice() || elemvect.UseDevice();
    const int n = dofs.Size();
@@ -712,10 +902,18 @@ void Vector::AddElementVector(const Array<int> &dofs, const Vector &elemvect)
          d_X[-1-j] -= d_y[i];
       }
    });
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::AddElementVector(const Array<int> &dofs, double *elem_data)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    data.ReadWrite(MemoryClass::HOST, size);
    const int n = dofs.Size();
    for (int i = 0; i < n; i++)
@@ -730,6 +928,10 @@ void Vector::AddElementVector(const Array<int> &dofs, double *elem_data)
          operator()(-1-j) -= elem_data[i];
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::AddElementVector(const Array<int> &dofs, const double a,
@@ -738,6 +940,10 @@ void Vector::AddElementVector(const Array<int> &dofs, const double a,
    MFEM_ASSERT(dofs.Size() <= elemvect.Size(), "Size mismatch: "
                "length of dofs is " << dofs.Size() <<
                ", length of elemvect is " << elemvect.Size());
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    const bool use_dev = dofs.UseDevice() || elemvect.UseDevice();
    const int n = dofs.Size();
@@ -756,10 +962,18 @@ void Vector::AddElementVector(const Array<int> &dofs, const double a,
          d_y[-1-j] -= a * d_x[i];
       }
    });
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::SetSubVectorComplement(const Array<int> &dofs, const double val)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice() || dofs.UseDevice();
    const int n = dofs.Size();
    const int N = size;
@@ -772,6 +986,10 @@ void Vector::SetSubVectorComplement(const Array<int> &dofs, const double val)
    MFEM_FORALL_SWITCH(use_dev, i, n, d_dofs_vals[i] = d_data[d_dofs[i]];);
    MFEM_FORALL_SWITCH(use_dev, i, N, d_data[i] = val;);
    MFEM_FORALL_SWITCH(use_dev, i, n, d_data[d_dofs[i]] = d_dofs_vals[i];);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::Print(std::ostream &os, int width) const
@@ -873,29 +1091,51 @@ double Vector::Norml2() const
 
 double Vector::Normlinf() const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    HostRead();
    double max = 0.0;
    for (int i = 0; i < size; i++)
    {
       max = std::max(std::abs(data[i]), max);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return max;
 }
 
 double Vector::Norml1() const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    HostRead();
    double sum = 0.0;
    for (int i = 0; i < size; i++)
    {
       sum += std::abs(data[i]);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return sum;
 }
 
 double Vector::Normlp(double p) const
 {
    MFEM_ASSERT(p > 0.0, "Vector::Normlp");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    if (p == 1.0)
    {
@@ -937,8 +1177,16 @@ double Vector::Normlp(double p) const
             sum += std::pow(absdata / scale, p); // else scale > absdata
          } // end if data[i] != 0
       }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return scale * std::pow(sum, 1.0/p);
    } // end if p < infinity()
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return Normlinf(); // else p >= infinity()
 }
@@ -946,6 +1194,10 @@ double Vector::Normlp(double p) const
 double Vector::Max() const
 {
    if (size == 0) { return -infinity(); }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    HostRead();
    double max = data[0];
@@ -958,11 +1210,19 @@ double Vector::Max() const
       }
    }
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return max;
 }
 
 double Vector::Sum() const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    double sum = 0.0;
 
    const double *h_data = this->HostRead();
@@ -970,6 +1230,10 @@ double Vector::Sum() const
    {
       sum += h_data[i];
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return sum;
 }
@@ -1004,6 +1268,10 @@ static Array<double> cuda_reduce_buf;
 
 static double cuVectorMin(const int N, const double *X)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const int tpb = MFEM_CUDA_BLOCKS;
    const int blockSize = MFEM_CUDA_BLOCKS;
    const int gridSize = (N+blockSize-1)/blockSize;
@@ -1016,6 +1284,11 @@ static double cuVectorMin(const int N, const double *X)
    const double *h_min = buf.Read(MemoryClass::HOST, min_sz);
    double min = std::numeric_limits<double>::infinity();
    for (int i = 0; i < min_sz; i++) { min = fmin(min, h_min[i]); }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return min;
 }
 
@@ -1047,6 +1320,10 @@ static __global__ void cuKernelDot(const int N, double *gdsr,
 
 static double cuVectorDot(const int N, const double *X, const double *Y)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const int tpb = MFEM_CUDA_BLOCKS;
    const int blockSize = MFEM_CUDA_BLOCKS;
    const int gridSize = (N+blockSize-1)/blockSize;
@@ -1059,6 +1336,11 @@ static double cuVectorDot(const int N, const double *X, const double *Y)
    const double *h_dot = buf.Read(MemoryClass::HOST, dot_sz);
    double dot = 0.0;
    for (int i = 0; i < dot_sz; i++) { dot += h_dot[i]; }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return dot;
 }
 #endif // MFEM_USE_CUDA
@@ -1157,6 +1439,10 @@ double Vector::operator*(const Vector &v) const
    MFEM_ASSERT(size == v.size, "incompatible Vectors!");
    if (size == 0) { return 0.0; }
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice() || v.UseDevice();
 #if defined(MFEM_USE_CUDA) || defined(MFEM_USE_HIP) || defined(MFEM_USE_OPENMP)
    auto m_data = Read(use_dev);
@@ -1240,12 +1526,21 @@ double Vector::operator*(const Vector &v) const
       return dot[0];
    }
 vector_dot_cpu:
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return operator*(v_data);
 }
 
 double Vector::Min() const
 {
    if (size == 0) { return infinity(); }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    const bool use_dev = UseDevice();
    auto m_data = Read(use_dev);
@@ -1308,6 +1603,11 @@ vector_min_cpu:
          minimum = m_data[i];
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return minimum;
 }
 

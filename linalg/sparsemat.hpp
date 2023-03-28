@@ -21,6 +21,7 @@
 #include "../general/table.hpp"
 #include "../general/globals.hpp"
 #include "densemat.hpp"
+#include <nvToolsExt.h>
 
 #if defined(MFEM_USE_HIP)
 #if (HIP_VERSION_MAJOR * 100 + HIP_VERSION_MINOR) < 502
