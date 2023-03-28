@@ -34,6 +34,10 @@ void SparseSmoother::SetOperator(const Operator &a)
 /// Matrix vector multiplication with GS Smoother.
 void GSSmoother::Mult(const Vector &x, Vector &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (!iterative_mode)
    {
       y = 0.0;
@@ -49,6 +53,10 @@ void GSSmoother::Mult(const Vector &x, Vector &y) const
          oper->Gauss_Seidel_back(x, y);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 /// Create the Jacobi smoother.
@@ -63,6 +71,10 @@ DSmoother::DSmoother(const SparseMatrix &a, int t, double s, int it)
 /// Matrix vector multiplication with Jacobi smoother.
 void DSmoother::Mult(const Vector &x, Vector &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (!iterative_mode && type == 0 && iterations == 1)
    {
       oper->DiagScale(x, y, scale, use_abs_diag);
@@ -106,6 +118,10 @@ void DSmoother::Mult(const Vector &x, Vector &y) const
       }
       Swap<Vector*>(r, p);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 }

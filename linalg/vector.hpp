@@ -13,6 +13,7 @@
 #define MFEM_VECTOR
 
 #include "../general/array.hpp"
+#include <nvToolsExt.h>
 #ifdef MFEM_USE_ADIOS2
 #include "../general/adios2stream.hpp"
 #endif

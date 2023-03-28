@@ -313,6 +313,11 @@ void Vector::Neg()
 
 void add(const Vector &v1, const Vector &v2, Vector &v)
 {
+#ifdef MFEM_USE_CUDA
+   nvtxRangePush(__FUNCTION__);
+#endif
+
+
    MFEM_ASSERT(v.size == v1.size && v.size == v2.size,
                "incompatible Vectors!");
 
@@ -367,10 +372,20 @@ void add(const Vector &v1, double alpha, const Vector &v2, Vector &v)
       }
 #endif
    }
+
+
+#ifdef MFEM_USE_CUDA
+   nvtxRangePop();
+#endif
 }
 
 void add(const double a, const Vector &x, const Vector &y, Vector &z)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
+
    MFEM_ASSERT(x.size == y.size && x.size == z.size,
                "incompatible Vectors!");
 
@@ -404,6 +419,11 @@ void add(const double a, const Vector &x, const Vector &y, Vector &z)
       }
 #endif
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
 }
 
 void add(const double a, const Vector &x,
@@ -411,6 +431,10 @@ void add(const double a, const Vector &x,
 {
    MFEM_ASSERT(x.size == y.size && x.size == z.size,
                "incompatible Vectors!");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    if (a == 0.0)
    {
@@ -456,12 +480,20 @@ void add(const double a, const Vector &x,
       }
 #endif
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void subtract(const Vector &x, const Vector &y, Vector &z)
 {
    MFEM_ASSERT(x.size == y.size && x.size == z.size,
                "incompatible Vectors!");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
 #if !defined(MFEM_USE_LEGACY_OPENMP)
    const bool use_dev = x.UseDevice() || y.UseDevice() || z.UseDevice();
@@ -482,12 +514,20 @@ void subtract(const Vector &x, const Vector &y, Vector &z)
       zp[i] = xp[i] - yp[i];
    }
 #endif
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void subtract(const double a, const Vector &x, const Vector &y, Vector &z)
 {
    MFEM_ASSERT(x.size == y.size && x.size == z.size,
                "incompatible Vectors!");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    if (a == 0.)
    {
@@ -519,12 +559,20 @@ void subtract(const double a, const Vector &x, const Vector &y, Vector &z)
       }
 #endif
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::median(const Vector &lo, const Vector &hi)
 {
    MFEM_ASSERT(size == lo.size && size == hi.size,
                "incompatible Vectors!");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    const bool use_dev = UseDevice() || lo.UseDevice() || hi.UseDevice();
    const int N = size;
@@ -543,6 +591,10 @@ void Vector::median(const Vector &lo, const Vector &hi)
          m[i] = h[i];
       }
    });
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::GetSubVector(const Array<int> &dofs, Vector &elemvect) const

@@ -14,6 +14,7 @@
 #include "../general/forall.hpp"
 #include "../general/globals.hpp"
 #include "../fem/bilinearform.hpp"
+#include <nvToolsExt.h>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
@@ -54,16 +55,39 @@ IterativeSolver::IterativeSolver(MPI_Comm comm_)
 
 double IterativeSolver::Dot(const Vector &x, const Vector &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
 #ifndef MFEM_USE_MPI
-   return (x * y);
+
+   double tmp = (x * y);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
+   return tmp;
 #else
    if (dot_prod_type == 0)
    {
-      return (x * y);
+      double tmp = (x * y);
+
+#ifdef MFEM_USE_CUDA
+      nvtxRangePop();
+#endif
+
+      return tmp;
    }
    else
    {
-      return InnerProduct(comm, x, y);
+      double tmp = InnerProduct(comm, x, y);
+
+#ifdef MFEM_USE_CUDA
+      nvtxRangePop();
+#endif
+
+      return tmp;
    }
 #endif
 }
@@ -190,11 +214,20 @@ void IterativeSolver::SetOperator(const Operator &op)
 void IterativeSolver::Monitor(int it, double norm, const Vector& r,
                               const Vector& x, bool final) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (monitor != nullptr)
    {
       monitor->MonitorResidual(it, norm, r, final);
       monitor->MonitorSolution(it, norm, x, final);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
 }
 
 OperatorJacobiSmoother::OperatorJacobiSmoother(const double dmpng)
@@ -299,6 +332,11 @@ void OperatorJacobiSmoother::Setup(const Vector &diag)
 
 void OperatorJacobiSmoother::Mult(const Vector &x, Vector &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
+
    // For empty MPI ranks, height may be 0:
    // MFEM_VERIFY(Height() > 0, "The diagonal hasn't been computed.");
    MFEM_ASSERT(x.Size() == Width(), "invalid input vector");
@@ -323,6 +361,11 @@ void OperatorJacobiSmoother::Mult(const Vector &x, Vector &y) const
    {
       Y[i] += DI[i] * R[i];
    });
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
 }
 
 OperatorChebyshevSmoother::OperatorChebyshevSmoother(const Operator &oper_,
@@ -478,6 +521,10 @@ void OperatorChebyshevSmoother::Setup()
 
 void OperatorChebyshevSmoother::Mult(const Vector& x, Vector &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (iterative_mode)
    {
       MFEM_ABORT("Chebyshev smoother not implemented for iterative mode");
@@ -514,6 +561,10 @@ void OperatorChebyshevSmoother::Mult(const Vector& x, Vector &y) const
       auto C = coeffs.Read();
       MFEM_FORALL(i, n, Y[i] += C[k] * R[i]; );
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SLISolver::UpdateVectors()
@@ -524,6 +575,10 @@ void SLISolver::UpdateVectors()
 
 void SLISolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int i;
 
    // Optimized preconditioned SLI with fixed number of iterations and given
@@ -666,6 +721,10 @@ void SLISolver::Mult(const Vector &b, Vector &x) const
    }
 
    final_norm = nom;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void SLI(const Operator &A, const Vector &b, Vector &x,
@@ -711,6 +770,10 @@ void CGSolver::UpdateVectors()
 
 void CGSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int i;
    double r0, den, nom, nom0, betanom, alpha, beta;
 
@@ -887,6 +950,10 @@ void CGSolver::Mult(const Vector &b, Vector &x) const
    final_norm = sqrt(betanom);
 
    Monitor(final_iter, final_norm, r, x, true);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void CG(const Operator &A, const Vector &b, Vector &x,
@@ -973,6 +1040,10 @@ inline void Update(Vector &x, int k, DenseMatrix &h, Vector &s,
 
 void GMRESSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    // Generalized Minimum Residual method following the algorithm
    // on p. 20 of the SIAM Templates book.
 
@@ -1157,10 +1228,18 @@ finish:
    {
       delete v[i];
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void FGMRESSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    DenseMatrix H(m+1,m);
    Vector s(m+1), cs(m+1), sn(m+1);
    Vector r(b.Size());
@@ -1332,6 +1411,10 @@ void FGMRESSolver::Mult(const Vector &b, Vector &x) const
    {
       mfem::out << "FGMRES: No convergence!\n";
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -1375,6 +1458,10 @@ void BiCGSTABSolver::UpdateVectors()
 
 void BiCGSTABSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    // BiConjugate Gradient Stabilized method following the algorithm
    // on p. 27 of the SIAM Templates book.
 
@@ -1563,6 +1650,10 @@ void BiCGSTABSolver::Mult(const Vector &b, Vector &x) const
    {
       mfem::out << "BiCGStab: No convergence!\n";
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 int BiCGSTAB(const Operator &A, Vector &x, const Vector &b, Solver &M,
@@ -1611,6 +1702,10 @@ void MINRESSolver::SetOperator(const Operator &op)
 
 void MINRESSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    // Based on the MINRES algorithm on p. 86, Fig. 6.9 in
    // "Iterative Krylov Methods for Large Linear Systems",
    // by Henk A. van der Vorst, 2003.
@@ -1773,6 +1868,10 @@ loop_end:
    {
       mfem::out << "MINRES: No convergence!\n";
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void MINRES(const Operator &A, const Vector &b, Vector &x, int print_it,
@@ -1816,6 +1915,10 @@ void NewtonSolver::SetOperator(const Operator &op)
 
 void NewtonSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_ASSERT(oper != NULL, "the Operator is not set (use SetOperator).");
    MFEM_ASSERT(prec != NULL, "the Solver is not set (use SetSolver).");
 
@@ -1920,6 +2023,10 @@ void NewtonSolver::Mult(const Vector &b, Vector &x) const
    {
       mfem::out << "Newton: No convergence!\n";
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void NewtonSolver::SetAdaptiveLinRtol(const int type,
@@ -2004,6 +2111,10 @@ void NewtonSolver::AdaptiveLinRtolPostSolve(const Vector &x,
 
 void LBFGSSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_VERIFY(oper != NULL, "the Operator is not set (use SetOperator).");
 
    // Quadrature points that are checked for negative Jacobians etc.
@@ -2142,6 +2253,11 @@ void LBFGSSolver::Mult(const Vector &b, Vector &x) const
    {
       mfem::out << "LBFGS: No convergence!\n";
    }
+
+4#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
 }
 
 int aGMRES(const Operator &A, Vector &x, const Vector &b,
@@ -2149,6 +2265,11 @@ int aGMRES(const Operator &A, Vector &x, const Vector &b,
            int m_max, int m_min, int m_step, double cf,
            double &tol, double &atol, int printit)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
+
    int n = A.Width();
 
    int m = m_max;
@@ -2297,6 +2418,10 @@ int aGMRES(const Operator &A, Vector &x, const Vector &b,
       delete v[i];
    }
    return 1;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 OptimizationProblem::OptimizationProblem(const int insize,
@@ -2379,6 +2504,11 @@ inline void SLBQPOptimizer::print_iteration(int it, double r, double l) const
 
 void SLBQPOptimizer::Mult(const Vector& xt, Vector& x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
+
    // Based on code provided by Denis Ridzal, dridzal@sandia.gov.
    // Algorithm adapted from Dai and Fletcher, "New Algorithms for
    // Singly Linearly Constrained Quadratic Programs Subject to Lower
@@ -2545,6 +2675,10 @@ slbqp_done:
    {
       mfem::out << "SLBQP: No convergence!" << '\n';
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 struct WeightMinHeap
@@ -2993,6 +3127,10 @@ void BlockILU::Factorize()
 
 void BlockILU::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_ASSERT(height > 0, "BlockILU(0) preconditioner is not constructed");
    int nblockrows = Height()/block_size;
    y.SetSize(Height());
@@ -3039,6 +3177,10 @@ void BlockILU::Mult(const Vector &b, Vector &x) const
       // x_i = D_ii^{-1} x_i
       A_ii_inv.Solve(block_size, 1, xi.GetData());
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -3191,6 +3333,11 @@ void UMFPackSolver::SetOperator(const Operator &op)
 
 void UMFPackSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
+
    if (mat == NULL)
       mfem_error("UMFPackSolver::Mult : matrix is not set!"
                  " Call SetOperator first!");
@@ -3222,10 +3369,19 @@ void UMFPackSolver::Mult(const Vector &b, Vector &x) const
          mfem_error("UMFPackSolver::Mult : umfpack_dl_solve() failed!");
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void UMFPackSolver::MultTranspose(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
+
    if (mat == NULL)
       mfem_error("UMFPackSolver::MultTranspose : matrix is not set!"
                  " Call SetOperator first!");
@@ -3259,6 +3415,10 @@ void UMFPackSolver::MultTranspose(const Vector &b, Vector &x) const
                     " umfpack_dl_solve() failed!");
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 UMFPackSolver::~UMFPackSolver()
@@ -3316,6 +3476,10 @@ void KLUSolver::SetOperator(const Operator &op)
 
 void KLUSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_VERIFY(mat != NULL,
                "KLUSolver::Mult : matrix is not set!  Call SetOperator first!");
 
@@ -3326,10 +3490,18 @@ void KLUSolver::Mult(const Vector &b, Vector &x) const
    // Solve the transpose, since KLU thinks the matrix is compressed column
    // format.
    klu_tsolve( Symbolic, Numeric, n, numRhs, x.GetData(), &Common);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void KLUSolver::MultTranspose(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_VERIFY(mat != NULL,
                "KLUSolver::Mult : matrix is not set!  Call SetOperator first!");
 
@@ -3340,6 +3512,10 @@ void KLUSolver::MultTranspose(const Vector &b, Vector &x) const
    // Solve the regular matrix, not the transpose, since KLU thinks the matrix
    // is compressed column format.
    klu_solve( Symbolic, Numeric, n, numRhs, x.GetData(), &Common);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 KLUSolver::~KLUSolver()
@@ -3357,6 +3533,10 @@ DirectSubBlockSolver::DirectSubBlockSolver(const SparseMatrix &A,
    : Solver(A.NumRows()), block_dof(const_cast<SparseMatrix&>(block_dof_)),
      block_solvers(new DenseMatrixInverse[block_dof.NumRows()])
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    DenseMatrix sub_A;
    for (int i = 0; i < block_dof.NumRows(); ++i)
    {
@@ -3365,10 +3545,18 @@ DirectSubBlockSolver::DirectSubBlockSolver(const SparseMatrix &A,
       A.GetSubMatrix(local_dofs, local_dofs, sub_A);
       block_solvers[i].SetOperator(sub_A);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void DirectSubBlockSolver::Mult(const Vector &x, Vector &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    y.SetSize(x.Size());
    y = 0.0;
 
@@ -3380,10 +3568,18 @@ void DirectSubBlockSolver::Mult(const Vector &x, Vector &y) const
       block_solvers[i].Mult(sub_rhs, sub_sol);
       y.AddElementVector(local_dofs, sub_sol);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void ProductSolver::Mult(const Vector & x, Vector & y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    y.SetSize(x.Size());
    y = 0.0;
    S0->Mult(x, y);
@@ -3397,10 +3593,18 @@ void ProductSolver::Mult(const Vector & x, Vector & y) const
    S1z = 0.0;
    S1->Mult(z, S1z);
    y += S1z;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void ProductSolver::MultTranspose(const Vector & x, Vector & y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    y.SetSize(x.Size());
    y = 0.0;
    S1->MultTranspose(x, y);
@@ -3414,6 +3618,10 @@ void ProductSolver::MultTranspose(const Vector & x, Vector & y) const
    S0Tz = 0.0;
    S0->MultTranspose(z, S0Tz);
    y += S0Tz;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 OrthoSolver::OrthoSolver()
@@ -3449,6 +3657,10 @@ void OrthoSolver::SetOperator(const Operator &op)
 
 void OrthoSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_VERIFY(solver, "Solver hasn't been set, call SetSolver() first.");
    MFEM_VERIFY(height == solver->Height(),
                "solver was modified externally! call SetSolver() again!");
@@ -3466,10 +3678,18 @@ void OrthoSolver::Mult(const Vector &b, Vector &x) const
 
    // Orthogonalize output
    Orthogonalize(x, x);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 }
 
 void OrthoSolver::Orthogonalize(const Vector &v, Vector &v_ortho) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (global_size == -1)
    {
       global_size = height;
@@ -3501,6 +3721,10 @@ void OrthoSolver::Orthogonalize(const Vector &v, Vector &v_ortho) const
    {
       v_ortho(i) = v(i) - ratio;
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 }
 
 #ifdef MFEM_USE_MPI

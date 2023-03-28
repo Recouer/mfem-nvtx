@@ -50,22 +50,42 @@ void Operator::InitTVectors(const Operator *Po, const Operator *Ri,
 
 void Operator::AddMult(const Vector &x, Vector &y, const double a) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    mfem::Vector z(y.Size());
    Mult(x, z);
    y.Add(a, z);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Operator::AddMultTranspose(const Vector &x, Vector &y,
                                 const double a) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    mfem::Vector z(y.Size());
    MultTranspose(x, z);
    y.Add(a, z);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Operator::ArrayMult(const Array<const Vector *> &X,
                          Array<Vector *> &Y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_ASSERT(X.Size() == Y.Size(),
                "Number of columns mismatch in Operator::Mult!");
    for (int i = 0; i < X.Size(); i++)
@@ -73,11 +93,19 @@ void Operator::ArrayMult(const Array<const Vector *> &X,
       MFEM_ASSERT(X[i] && Y[i], "Missing Vector in Operator::Mult!");
       Mult(*X[i], *Y[i]);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Operator::ArrayMultTranspose(const Array<const Vector *> &X,
                                   Array<Vector *> &Y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_ASSERT(X.Size() == Y.Size(),
                "Number of columns mismatch in Operator::MultTranspose!");
    for (int i = 0; i < X.Size(); i++)
@@ -85,11 +113,19 @@ void Operator::ArrayMultTranspose(const Array<const Vector *> &X,
       MFEM_ASSERT(X[i] && Y[i], "Missing Vector in Operator::MultTranspose!");
       MultTranspose(*X[i], *Y[i]);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Operator::ArrayAddMult(const Array<const Vector *> &X, Array<Vector *> &Y,
                             const double a) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_ASSERT(X.Size() == Y.Size(),
                "Number of columns mismatch in Operator::AddMult!");
    for (int i = 0; i < X.Size(); i++)
@@ -97,6 +133,10 @@ void Operator::ArrayAddMult(const Array<const Vector *> &X, Array<Vector *> &Y,
       MFEM_ASSERT(X[i] && Y[i], "Missing Vector in Operator::AddMult!");
       AddMult(*X[i], *Y[i], a);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Operator::ArrayAddMultTranspose(const Array<const Vector *> &X,
@@ -104,11 +144,20 @@ void Operator::ArrayAddMultTranspose(const Array<const Vector *> &X,
 {
    MFEM_ASSERT(X.Size() == Y.Size(),
                "Number of columns mismatch in Operator::AddMultTranspose!");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    for (int i = 0; i < X.Size(); i++)
    {
       MFEM_ASSERT(X[i] && Y[i], "Missing Vector in Operator::AddMultTranspose!");
       AddMultTranspose(*X[i], *Y[i], a);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Operator::FormLinearSystem(const Array<int> &ess_tdof_list,
@@ -147,6 +196,10 @@ void Operator::FormRectangularLinearSystem(
 
 void Operator::RecoverFEMSolution(const Vector &X, const Vector &b, Vector &x)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    // Same for Rectangular and Square operators
    const Operator *P = this->GetProlongation();
    if (!IsIdentityProlongation(P))
@@ -163,6 +216,10 @@ void Operator::RecoverFEMSolution(const Vector &X, const Vector &b, Vector &x)
       // to device memory) then we need to tell x about that.
       x.SyncMemory(X);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 Operator * Operator::SetupRAP(const Operator *Pi, const Operator *Po)
@@ -519,6 +576,10 @@ void ConstrainedOperator::AssembleDiagonal(Vector &diag) const
 
 void ConstrainedOperator::EliminateRHS(const Vector &x, Vector &b) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    w = 0.0;
    const int csz = constraint_list.Size();
    auto idx = constraint_list.Read();
@@ -542,10 +603,18 @@ void ConstrainedOperator::EliminateRHS(const Vector &x, Vector &b) const
       const int id = idx[i];
       d_b[id] = d_x[id];
    });
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void ConstrainedOperator::Mult(const Vector &x, Vector &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const int csz = constraint_list.Size();
    if (csz == 0)
    {
@@ -589,6 +658,10 @@ void ConstrainedOperator::Mult(const Vector &x, Vector &y) const
          mfem_error("ConstrainedOperator::Mult #2");
          break;
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 RectangularConstrainedOperator::RectangularConstrainedOperator(
@@ -613,6 +686,10 @@ RectangularConstrainedOperator::RectangularConstrainedOperator(
 void RectangularConstrainedOperator::EliminateRHS(const Vector &x,
                                                   Vector &b) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    w = 0.0;
    const int trial_csz = trial_constraints.Size();
    auto trial_idx = trial_constraints.Read();
@@ -633,10 +710,18 @@ void RectangularConstrainedOperator::EliminateRHS(const Vector &x,
    auto test_idx = test_constraints.Read();
    auto d_b = b.ReadWrite();
    MFEM_FORALL(i, test_csz, d_b[test_idx[i]] = 0.0;);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void RectangularConstrainedOperator::Mult(const Vector &x, Vector &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const int trial_csz = trial_constraints.Size();
    const int test_csz = test_constraints.Size();
    if (trial_csz == 0)
@@ -661,11 +746,19 @@ void RectangularConstrainedOperator::Mult(const Vector &x, Vector &y) const
       auto d_y = y.ReadWrite();
       MFEM_FORALL(i, test_csz, d_y[idx[i]] = 0.0;);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void RectangularConstrainedOperator::MultTranspose(const Vector &x,
                                                    Vector &y) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const int trial_csz = trial_constraints.Size();
    const int test_csz = test_constraints.Size();
    if (test_csz == 0)
@@ -690,11 +783,19 @@ void RectangularConstrainedOperator::MultTranspose(const Vector &x,
       auto d_y = y.ReadWrite();
       MFEM_FORALL(i, trial_csz, d_y[idx[i]] = 0.0;);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 double PowerMethod::EstimateLargestEigenvalue(Operator& opr, Vector& v0,
                                               int numSteps, double tolerance, int seed)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    v1.SetSize(v0.Size());
    if (seed != 0)
    {
@@ -746,6 +847,10 @@ double PowerMethod::EstimateLargestEigenvalue(Operator& opr, Vector& v0,
          break;
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return eigenvalue;
 }
