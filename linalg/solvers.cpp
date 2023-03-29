@@ -870,6 +870,9 @@ void CGSolver::Mult(const Vector &b, Vector &x) const
    final_iter = max_iter;
    for (i = 1; true; )
    {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush("iteration");
+#endif
       alpha = nom/den;
       add(x,  alpha, d, x);     //  x = x + alpha d
       add(r, -alpha, z, r);     //  r = r - alpha A d
@@ -893,6 +896,9 @@ void CGSolver::Mult(const Vector &b, Vector &x) const
          }
          converged = false;
          final_iter = i;
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
          break;
       }
 
@@ -908,11 +914,17 @@ void CGSolver::Mult(const Vector &b, Vector &x) const
       {
          converged = true;
          final_iter = i;
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
          break;
       }
 
       if (++i > max_iter)
       {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
          break;
       }
 
@@ -938,10 +950,16 @@ void CGSolver::Mult(const Vector &b, Vector &x) const
          if (den == 0.0)
          {
             final_iter = i;
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
             break;
          }
       }
       nom = betanom;
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
    }
    if (print_options.first_and_last && !print_options.iterations)
    {
