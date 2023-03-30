@@ -91,12 +91,21 @@ template<typename TargetT, typename SourceT>
 static TargetT *DuplicateAs(const SourceT *array, int size,
                             bool cplusplus = true)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    TargetT *target_array = cplusplus ? (TargetT*) Memory<TargetT>(size)
                            /*     */ : mfem_hypre_TAlloc_host(TargetT, size);
    for (int i = 0; i < size; i++)
    {
       target_array[i] = array[i];
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return target_array;
 }
 
@@ -120,6 +129,10 @@ bool CanShallowCopy(const Memory<T> &src, MemoryClass mc)
 
 inline void HypreParVector::_SetDataAndSize_()
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    hypre_Vector *x_loc = hypre_ParVectorLocalVector(x);
 #if !defined(HYPRE_USING_GPU)
    SetDataAndSize(hypre_VectorData(x_loc),
@@ -136,6 +149,10 @@ inline void HypreParVector::_SetDataAndSize_()
    {
       data.Reset();
    }
+#endif
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
 #endif
 }
 
@@ -339,6 +356,10 @@ void HypreParVector::HypreWrite()
 
 void HypreParVector::WrapMemoryRead(const Memory<double> &mem)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_ASSERT(CanShallowCopy(mem, GetHypreMemoryClass()), "");
    MFEM_ASSERT(mem.Capacity() >= size, "");
 
@@ -350,10 +371,18 @@ void HypreParVector::WrapMemoryRead(const Memory<double> &mem)
    hypre_VectorMemoryLocation(x_loc) = HYPRE_MEMORY_DEVICE;
 #endif
    data.MakeAlias(mem, 0, size);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreParVector::WrapMemoryReadWrite(Memory<double> &mem)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_ASSERT(CanShallowCopy(mem, GetHypreMemoryClass()), "");
    MFEM_ASSERT(mem.Capacity() >= size, "");
 
@@ -364,10 +393,18 @@ void HypreParVector::WrapMemoryReadWrite(Memory<double> &mem)
    hypre_VectorMemoryLocation(x_loc) = HYPRE_MEMORY_DEVICE;
 #endif
    data.MakeAlias(mem, 0, size);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreParVector::WrapMemoryWrite(Memory<double> &mem)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_ASSERT(CanShallowCopy(mem, GetHypreMemoryClass()), "");
    MFEM_ASSERT(mem.Capacity() >= size, "");
 
@@ -378,6 +415,10 @@ void HypreParVector::WrapMemoryWrite(Memory<double> &mem)
    hypre_VectorMemoryLocation(x_loc) = HYPRE_MEMORY_DEVICE;
 #endif
    data.MakeAlias(mem, 0, size);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 HYPRE_Int HypreParVector::Randomize(HYPRE_Int seed)
@@ -413,17 +454,41 @@ HypreParVector::~HypreParVector()
 
 double InnerProduct(HypreParVector *x, HypreParVector *y)
 {
-   return hypre_ParVectorInnerProd(*x, *y);
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
+   double tmp = hypre_ParVectorInnerProd(*x, *y);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
+   return tmp;
 }
 
 double InnerProduct(HypreParVector &x, HypreParVector &y)
 {
-   return hypre_ParVectorInnerProd(x, y);
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
+   double tmp = hypre_ParVectorInnerProd(x, y);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
+   return tmp;
 }
 
 
 double ParNormlp(const Vector &vec, double p, MPI_Comm comm)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    double norm = 0.0;
    if (p == 1.0)
    {
@@ -451,6 +516,11 @@ double ParNormlp(const Vector &vec, double p, MPI_Comm comm)
       double loc_norm = vec.Normlinf();
       MPI_Allreduce(&loc_norm, &norm, 1, MPI_DOUBLE, MPI_MAX, comm);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return norm;
 }
 
@@ -475,6 +545,10 @@ template <typename T>
 void CopyMemory(Memory<T> &src, Memory<T> &dst, MemoryClass dst_mc,
                 bool dst_owner)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (CanShallowCopy(src, dst_mc))
    {
       // shallow copy
@@ -495,6 +569,11 @@ void CopyMemory(Memory<T> &src, Memory<T> &dst, MemoryClass dst_mc,
       dst.New(src.Capacity(), GetMemoryType(dst_mc));
       dst.CopyFrom(src, src.Capacity());
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
 }
 
 /** @brief Deep copy and convert @a src to @a dst with the goal to make the
@@ -509,12 +588,20 @@ void CopyMemory(Memory<T> &src, Memory<T> &dst, MemoryClass dst_mc,
 template <typename SrcT, typename DstT>
 void CopyConvertMemory(Memory<SrcT> &src, MemoryClass dst_mc, Memory<DstT> &dst)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    auto capacity = src.Capacity();
    dst.New(capacity, GetMemoryType(dst_mc));
    // Perform the copy using the configured mfem Device
    auto src_p = mfem::Read(src, capacity);
    auto dst_p = mfem::Write(dst, capacity);
    MFEM_FORALL(i, capacity, dst_p[i] = src_p[i];);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -632,6 +719,10 @@ signed char HypreParMatrix::CopyCSR(SparseMatrix *csr,
                                     hypre_CSRMatrix *hypre_csr,
                                     bool mem_owner)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const MemoryClass hypre_mc = GetHypreMemoryClass();
 #ifndef HYPRE_BIGINT
    // code for the case HYPRE_Int == int
@@ -652,6 +743,11 @@ signed char HypreParMatrix::CopyCSR(SparseMatrix *csr,
 
    MFEM_ASSERT(mem_csr.I.OwnsHostPtr() == mem_csr.J.OwnsHostPtr(),
                "invalid state: host ownership for I and J differ!");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    return (mem_csr.I.OwnsHostPtr()    ? 1 : 0) +
           (mem_csr.data.OwnsHostPtr() ? 2 : 0);
 }
@@ -660,6 +756,10 @@ signed char HypreParMatrix::CopyBoolCSR(Table *bool_csr,
                                         MemoryIJData &mem_csr,
                                         hypre_CSRMatrix *hypre_csr)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const MemoryClass hypre_mc = GetHypreMemoryClass();
 #ifndef HYPRE_BIGINT
    // code for the case HYPRE_Int == int
@@ -684,6 +784,11 @@ signed char HypreParMatrix::CopyBoolCSR(Table *bool_csr,
 
    MFEM_ASSERT(mem_csr.I.OwnsHostPtr() == mem_csr.J.OwnsHostPtr(),
                "invalid state: host ownership for I and J differ!");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return (mem_csr.I.OwnsHostPtr()    ? 1 : 0) +
           (mem_csr.data.OwnsHostPtr() ? 2 : 0);
 }
@@ -707,6 +812,10 @@ signed char HypreParMatrix::HypreCsrToMem(hypre_CSRMatrix *h_mat,
                                           bool own_ija,
                                           MemoryIJData &mem)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const int nr1 = internal::to_int(h_mat->num_rows) + 1;
    const int nnz = internal::to_int(h_mat->num_nonzeros);
    mem.I.Wrap(h_mat->i, nr1, h_mat_mt, own_ija);
@@ -761,8 +870,18 @@ signed char HypreParMatrix::HypreCsrToMem(hypre_CSRMatrix *h_mat,
 #if MFEM_HYPRE_VERSION >= 21800
       h_mat->memory_location = HYPRE_MEMORY_DEVICE;
 #endif
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return 3;
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return own_ija ? 3 : (h_mat_mt == GetHypreMemoryType() ? -2 : -1);
 }
 
@@ -1607,6 +1726,10 @@ void HypreParMatrix::GetBlocks(Array2D<HypreParMatrix*> &blocks,
 
 HypreParMatrix * HypreParMatrix::Transpose() const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    hypre_ParCSRMatrix * At;
    hypre_ParCSRMatrixTranspose(A, &At, 1);
    hypre_ParCSRMatrixSetNumNonzeros(At);
@@ -1619,6 +1742,9 @@ HypreParMatrix * HypreParMatrix::Transpose() const
          row is the diagonal one. */
       hypre_CSRMatrixReorder(hypre_ParCSRMatrixDiag(At));
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return new HypreParMatrix(At);
 }
@@ -1733,9 +1859,19 @@ void HypreParMatrix::ResetTranspose() const
 HYPRE_Int HypreParMatrix::Mult(HypreParVector &x, HypreParVector &y,
                                double a, double b) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    x.HypreRead();
    (b == 0.0) ? y.HypreWrite() : y.HypreReadWrite();
-   return hypre_ParCSRMatrixMatvec(a, A, x, b, y);
+   HYPRE_Int tmp = hypre_ParCSRMatrixMatvec(a, A, x, b, y);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
+   return tmp;
 }
 
 void HypreParMatrix::Mult(double a, const Vector &x, double b, Vector &y) const
@@ -1744,6 +1880,10 @@ void HypreParMatrix::Mult(double a, const Vector &x, double b, Vector &y) const
                << ", expected size = " << Width());
    MFEM_ASSERT(y.Size() == Height(), "invalid y.Size() = " << y.Size()
                << ", expected size = " << Height());
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    if (X == NULL)
    {
@@ -1793,6 +1933,10 @@ void HypreParMatrix::Mult(double a, const Vector &x, double b, Vector &y) const
    hypre_ParCSRMatrixMatvec(a, A, *X, b, *Y);
 
    if (!yshallow) { y = *Y; }  // Deep copy
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreParMatrix::MultTranspose(double a, const Vector &x,
@@ -1802,6 +1946,10 @@ void HypreParMatrix::MultTranspose(double a, const Vector &x,
                << ", expected size = " << Height());
    MFEM_ASSERT(y.Size() == Width(), "invalid y.Size() = " << y.Size()
                << ", expected size = " << Width());
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    // Note: x has the dimensions of Y (height), and
    //       y has the dimensions of X (width)
@@ -1857,22 +2005,46 @@ void HypreParMatrix::MultTranspose(double a, const Vector &x,
    hypre_ParCSRMatrixMatvecT(a, A, *Y, b, *X);
 
    if (!yshallow) { y = *X; }  // Deep copy
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 HYPRE_Int HypreParMatrix::Mult(HYPRE_ParVector x, HYPRE_ParVector y,
                                double a, double b) const
 {
-   return hypre_ParCSRMatrixMatvec(a, A, (hypre_ParVector *) x, b,
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
+   HYPRE_Int tmp = hypre_ParCSRMatrixMatvec(a, A, (hypre_ParVector *) x, b,
                                    (hypre_ParVector *) y);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
+   return tmp;
 }
 
 HYPRE_Int HypreParMatrix::MultTranspose(HypreParVector & x, HypreParVector & y,
                                         double a, double b) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    EnsureMultTranspose();
    x.HypreRead();
    (b == 0.0) ? y.HypreWrite() : y.HypreReadWrite();
-   return hypre_ParCSRMatrixMatvecT(a, A, x, b, y);
+   HYPRE_Int tmp = hypre_ParCSRMatrixMatvecT(a, A, x, b, y);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
+   return tmp;
 }
 
 void HypreParMatrix::AbsMult(double a, const Vector &x,
@@ -1883,6 +2055,10 @@ void HypreParMatrix::AbsMult(double a, const Vector &x,
    MFEM_ASSERT(y.Size() == Height(), "invalid y.Size() = " << y.Size()
                << ", expected size = " << Height());
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    auto x_data = x.HostRead();
    auto y_data = (b == 0.0) ? y.HostWrite() : y.HostReadWrite();
 
@@ -1890,6 +2066,10 @@ void HypreParMatrix::AbsMult(double a, const Vector &x,
    internal::hypre_ParCSRMatrixAbsMatvec(A, a, const_cast<double*>(x_data),
                                          b, y_data);
    HypreRead();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreParMatrix::AbsMultTranspose(double a, const Vector &x,
@@ -1900,6 +2080,10 @@ void HypreParMatrix::AbsMultTranspose(double a, const Vector &x,
    MFEM_ASSERT(y.Size() == Width(), "invalid y.Size() = " << y.Size()
                << ", expected size = " << Width());
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    auto x_data = x.HostRead();
    auto y_data = (b == 0.0) ? y.HostWrite() : y.HostReadWrite();
 
@@ -1907,11 +2091,19 @@ void HypreParMatrix::AbsMultTranspose(double a, const Vector &x,
    internal::hypre_ParCSRMatrixAbsMatvecT(A, a, const_cast<double*>(x_data),
                                           b, y_data);
    HypreRead();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 HypreParMatrix* HypreParMatrix::LeftDiagMult(const SparseMatrix &D,
                                              HYPRE_BigInt* row_starts) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool assumed_partition = HYPRE_AssumedPartitionCheck();
    const bool row_starts_given = (row_starts != NULL);
    if (!row_starts_given)
@@ -2008,6 +2200,10 @@ HypreParMatrix* HypreParMatrix::LeftDiagMult(const SparseMatrix &D,
 #endif
    DA->colMapOwner = 1;
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return DA;
 }
 
@@ -2022,6 +2218,10 @@ void HypreParMatrix::ScaleRows(const Vector &diag)
    {
       mfem_error("Note the Vector diag is not of compatible dimensions with A\n");
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    HostReadWrite();
    diag.HostRead();
@@ -2048,6 +2248,10 @@ void HypreParMatrix::ScaleRows(const Vector &diag)
    }
 
    HypreRead();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreParMatrix::InvScaleRows(const Vector &diag)
@@ -2061,6 +2265,10 @@ void HypreParMatrix::InvScaleRows(const Vector &diag)
    {
       mfem_error("Note the Vector diag is not of compatible dimensions with A\n");
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    HostReadWrite();
    diag.HostRead();
@@ -2094,6 +2302,10 @@ void HypreParMatrix::InvScaleRows(const Vector &diag)
    }
 
    HypreRead();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreParMatrix::operator*=(double s)
@@ -2102,6 +2314,9 @@ void HypreParMatrix::operator*=(double s)
    {
       mfem_error("Row does not match");
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    HostReadWrite();
 
@@ -2123,11 +2338,19 @@ void HypreParMatrix::operator*=(double s)
    }
 
    HypreRead();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 static void get_sorted_rows_cols(const Array<int> &rows_cols,
                                  Array<HYPRE_Int> &hypre_sorted)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    rows_cols.HostRead();
    hypre_sorted.SetSize(rows_cols.Size());
    bool sorted = true;
@@ -2137,6 +2360,11 @@ static void get_sorted_rows_cols(const Array<int> &rows_cols,
       if (i && rows_cols[i-1] > rows_cols[i]) { sorted = false; }
    }
    if (!sorted) { hypre_sorted.Sort(); }
+
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreParMatrix::Threshold(double threshold)
@@ -2534,6 +2762,10 @@ void HypreParMatrix::Print(const char *fname, HYPRE_Int offi,
 
 void HypreParMatrix::Read(MPI_Comm comm, const char *fname)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    Destroy();
    Init();
 
@@ -2545,10 +2777,18 @@ void HypreParMatrix::Read(MPI_Comm comm, const char *fname)
 
    height = GetNumRows();
    width = GetNumCols();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreParMatrix::Read_IJMatrix(MPI_Comm comm, const char *fname)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    Destroy();
    Init();
 
@@ -2566,6 +2806,10 @@ void HypreParMatrix::Read_IJMatrix(MPI_Comm comm, const char *fname)
 
    height = GetNumRows();
    width = GetNumCols();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreParMatrix::PrintCommPkg(std::ostream &os) const
@@ -2793,6 +3037,10 @@ void BlockInverseScale(const HypreParMatrix *A, HypreParMatrix *C,
 HypreParMatrix *Add(double alpha, const HypreParMatrix &A,
                     double beta,  const HypreParMatrix &B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    hypre_ParCSRMatrix *C_hypre =
       internal::hypre_ParCSRMatrixAdd(const_cast<HypreParMatrix &>(A),
                                       const_cast<HypreParMatrix &>(B));
@@ -2804,14 +3052,26 @@ HypreParMatrix *Add(double alpha, const HypreParMatrix &A,
    C->Add(alpha, A);
    C->Add(beta, B);
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return C;
 }
 
 HypreParMatrix * ParAdd(const HypreParMatrix *A, const HypreParMatrix *B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    hypre_ParCSRMatrix * C = internal::hypre_ParCSRMatrixAdd(*A,*B);
 
    if (!hypre_ParCSRMatrixCommPkg(C)) { hypre_MatvecCommPkgCreate(C); }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return new HypreParMatrix(C);
 }
@@ -2821,6 +3081,10 @@ HypreParMatrix * ParAdd(const HypreParMatrix *A, const HypreParMatrix *B)
 HypreParMatrix *Add(double alpha, const HypreParMatrix &A,
                     double beta,  const HypreParMatrix &B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    hypre_ParCSRMatrix *C;
 #if MFEM_HYPRE_VERSION <= 22000
    hypre_ParcsrAdd(alpha, A, beta, B, &C);
@@ -2829,11 +3093,19 @@ HypreParMatrix *Add(double alpha, const HypreParMatrix &A,
 #endif
    if (!hypre_ParCSRMatrixCommPkg(C)) { hypre_MatvecCommPkgCreate(C); }
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return new HypreParMatrix(C);
 }
 
 HypreParMatrix * ParAdd(const HypreParMatrix *A, const HypreParMatrix *B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    hypre_ParCSRMatrix *C;
 #if MFEM_HYPRE_VERSION <= 22000
    hypre_ParcsrAdd(1.0, *A, 1.0, *B, &C);
@@ -2841,6 +3113,10 @@ HypreParMatrix * ParAdd(const HypreParMatrix *A, const HypreParMatrix *B)
    hypre_ParCSRMatrixAdd(1.0, *A, 1.0, *B, &C);
 #endif
    if (!hypre_ParCSRMatrixCommPkg(C)) { hypre_MatvecCommPkgCreate(C); }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return new HypreParMatrix(C);
 }
@@ -2850,6 +3126,10 @@ HypreParMatrix * ParAdd(const HypreParMatrix *A, const HypreParMatrix *B)
 HypreParMatrix * ParMult(const HypreParMatrix *A, const HypreParMatrix *B,
                          bool own_matrix)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    hypre_ParCSRMatrix * ab;
 #ifdef HYPRE_USING_GPU
    ab = hypre_ParCSRMatMat(*A, *B);
@@ -2865,11 +3145,20 @@ HypreParMatrix * ParMult(const HypreParMatrix *A, const HypreParMatrix *B,
       C->CopyRowStarts();
       C->CopyColStarts();
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return C;
 }
 
 HypreParMatrix * RAP(const HypreParMatrix *A, const HypreParMatrix *P)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    hypre_ParCSRMatrix * rap;
 
 #ifdef HYPRE_USING_GPU
@@ -2911,12 +3200,20 @@ HypreParMatrix * RAP(const HypreParMatrix *A, const HypreParMatrix *P)
    hypre_ParCSRMatrixSetNumNonzeros(rap);
    // hypre_MatvecCommPkgCreate(rap);
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return new HypreParMatrix(rap);
 }
 
 HypreParMatrix * RAP(const HypreParMatrix * Rt, const HypreParMatrix *A,
                      const HypreParMatrix *P)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    hypre_ParCSRMatrix * rap;
 
 #ifdef HYPRE_USING_GPU
@@ -2953,6 +3250,10 @@ HypreParMatrix * RAP(const HypreParMatrix * Rt, const HypreParMatrix *A,
 
    hypre_ParCSRMatrixSetNumNonzeros(rap);
    // hypre_MatvecCommPkgCreate(rap);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return new HypreParMatrix(rap);
 }
@@ -3636,6 +3937,10 @@ void HypreSmoother::SetFIRCoefficients(double max_eig)
 
 void HypreSmoother::Mult(const HypreParVector &b, HypreParVector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (A == NULL)
    {
       mfem_error("HypreSmoother::Mult (...) : HypreParMatrix A is missing");
@@ -3712,12 +4017,21 @@ void HypreSmoother::Mult(const HypreParVector &b, HypreParVector &x) const
                            x, *V, *Z);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
 }
 
 void HypreSmoother::Mult(const Vector &b, Vector &x) const
 {
    MFEM_ASSERT(b.Size() == NumCols(), "");
    MFEM_ASSERT(x.Size() == NumRows(), "");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    if (A == NULL)
    {
@@ -3773,15 +4087,33 @@ void HypreSmoother::Mult(const Vector &b, Vector &x) const
    Mult(*B, *X);
 
    if (!xshallow) { x = *X; }  // Deep copy
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreSmoother::MultTranspose(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (A_is_symmetric || type == 0 || type == 1 || type == 5)
    {
       Mult(b, x);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return;
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    mfem_error("HypreSmoother::MultTranspose (...) : undefined!\n");
 }
 
@@ -3906,6 +4238,10 @@ void HypreSolver::Setup(const Vector &b, Vector &x) const
 
 void HypreSolver::Mult(const HypreParVector &b, HypreParVector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    HYPRE_Int err_flag;
    if (A == NULL)
    {
@@ -3935,13 +4271,25 @@ void HypreSolver::Mult(const HypreParVector &b, HypreParVector &x) const
       MFEM_VERIFY(!err_flag, "Error during solve! Error code: " << err_flag);
    }
    hypre_error_flag = 0;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool x_shallow = WrapVectors(b, x);
    Mult(*B, *X);
    if (!x_shallow) { x = *X; }  // Deep copy if shallow copy is impossible
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 HypreSolver::~HypreSolver()
@@ -4043,6 +4391,10 @@ void HyprePCG::SetResidualConvergenceOptions(int res_frequency, double rtol)
 
 void HyprePCG::Mult(const HypreParVector &b, HypreParVector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int myid;
    HYPRE_Int time_index = 0;
    HYPRE_Int num_iterations;
@@ -4116,6 +4468,10 @@ void HyprePCG::Mult(const HypreParVector &b, HypreParVector &x) const
       }
    }
    HYPRE_ParCSRPCGSetPrintLevel(pcg_solver, print_level);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 HyprePCG::~HyprePCG()
@@ -4220,6 +4576,10 @@ void HypreGMRES::SetPreconditioner(HypreSolver &precond_)
 
 void HypreGMRES::Mult(const HypreParVector &b, HypreParVector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int myid;
    HYPRE_Int time_index = 0;
    HYPRE_Int num_iterations;
@@ -4288,6 +4648,10 @@ void HypreGMRES::Mult(const HypreParVector &b, HypreParVector &x) const
                    << endl;
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 HypreGMRES::~HypreGMRES()
@@ -4386,6 +4750,10 @@ void HypreFGMRES::SetPreconditioner(HypreSolver &precond_)
 
 void HypreFGMRES::Mult(const HypreParVector &b, HypreParVector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int myid;
    HYPRE_Int time_index = 0;
    HYPRE_Int num_iterations;
@@ -4454,6 +4822,11 @@ void HypreFGMRES::Mult(const HypreParVector &b, HypreParVector &x) const
                    << endl;
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
 }
 
 HypreFGMRES::~HypreFGMRES()
@@ -5336,6 +5709,10 @@ void HypreAMS::MakeSolver(int sdim, int cycle_type)
 void HypreAMS::MakeGradientAndInterpolation(
    ParFiniteElementSpace *edge_fespace, int cycle_type)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int dim = edge_fespace->GetMesh()->Dimension();
    int sdim = edge_fespace->GetMesh()->SpaceDimension();
    const FiniteElementCollection *edge_fec = edge_fespace->FEColl();
@@ -5492,6 +5869,10 @@ void HypreAMS::MakeGradientAndInterpolation(
       delete edge_fespace;
       delete nd_tr_fec;
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void HypreAMS::Init(ParFiniteElementSpace *edge_fespace)

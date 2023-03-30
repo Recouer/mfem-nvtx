@@ -13,6 +13,7 @@
 #define MFEM_HYPRE
 
 #include "../config/config.hpp"
+#include <nvToolsExt.h>
 
 #ifdef MFEM_USE_MPI
 
