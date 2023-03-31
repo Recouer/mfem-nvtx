@@ -658,6 +658,10 @@ PetscParVector& PetscParVector::operator=(PetscScalar d)
 PetscParVector& PetscParVector::SetValues(const Array<PetscInt>& idx,
                                           const Array<PetscScalar>& vals)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MFEM_VERIFY(idx.Size() == vals.Size(),
                "Size mismatch between indices and values");
    PetscInt n = idx.Size();
@@ -666,6 +670,11 @@ PetscParVector& PetscParVector::SetValues(const Array<PetscInt>& idx,
    ierr = VecAssemblyBegin(x); PCHKERRQ(x,ierr);
    ierr = VecAssemblyEnd(x); PCHKERRQ(x,ierr);
    SetFlagsFromMask_();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
@@ -674,47 +683,101 @@ PetscParVector& PetscParVector::AddValues(const Array<PetscInt>& idx,
 {
    MFEM_VERIFY(idx.Size() == vals.Size(),
                "Size mismatch between indices and values");
+ #ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    PetscInt n = idx.Size();
    ierr = VecSetValues(x,n,idx.GetData(),vals.GetData(),ADD_VALUES);
    PCHKERRQ(x,ierr);
    ierr = VecAssemblyBegin(x); PCHKERRQ(x,ierr);
    ierr = VecAssemblyEnd(x); PCHKERRQ(x,ierr);
    SetFlagsFromMask_();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 PetscParVector& PetscParVector::operator=(const PetscParVector &y)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    ierr = VecCopy(y.x,x); PCHKERRQ(x,ierr);
    SetFlagsFromMask_();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 PetscParVector& PetscParVector::operator+=(const PetscParVector &y)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    ierr = VecAXPY(x,1.0,y.x); PCHKERRQ(x,ierr);
    SetFlagsFromMask_();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 PetscParVector& PetscParVector::operator-=(const PetscParVector &y)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    ierr = VecAXPY(x,-1.0,y.x); PCHKERRQ(x,ierr);
    SetFlagsFromMask_();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 PetscParVector& PetscParVector::operator*=(PetscScalar s)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    ierr = VecScale(x,s); PCHKERRQ(x,ierr);
    SetFlagsFromMask_();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 PetscParVector& PetscParVector::operator+=(PetscScalar s)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    ierr = VecShift(x,s); PCHKERRQ(x,ierr);
    SetFlagsFromMask_();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
@@ -1047,6 +1110,10 @@ PetscParMatrix::PetscParMatrix(MPI_Comm comm, PetscInt global_num_rows,
 
 PetscParMatrix& PetscParMatrix::operator=(const HypreParMatrix& B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (A)
    {
       MPI_Comm comm = PetscObjectComm((PetscObject)A);
@@ -1063,11 +1130,20 @@ PetscParMatrix& PetscParMatrix::operator=(const HypreParMatrix& B)
    ierr = MatConvert_hypreParCSR_AIJ(B,&A); CCHKERRQ(B.GetComm(),ierr);
 #endif
    SetUpForDevice();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 PetscParMatrix& PetscParMatrix::operator=(const PetscParMatrix& B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (A)
    {
       MPI_Comm comm = PetscObjectComm((PetscObject)A);
@@ -1079,11 +1155,20 @@ PetscParMatrix& PetscParMatrix::operator=(const PetscParMatrix& B)
    height = B.Height();
    width  = B.Width();
    ierr   = MatDuplicate(B,MAT_COPY_VALUES,&A); CCHKERRQ(B.GetComm(),ierr);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 PetscParMatrix& PetscParMatrix::operator+=(const PetscParMatrix& B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (!A)
    {
       ierr = MatDuplicate(B,MAT_COPY_VALUES,&A); CCHKERRQ(B.GetComm(),ierr);
@@ -1094,11 +1179,20 @@ PetscParMatrix& PetscParMatrix::operator+=(const PetscParMatrix& B)
       MFEM_VERIFY(width  == B.Width(), "Invalid number of local columns");
       ierr = MatAXPY(A,1.0,B,DIFFERENT_NONZERO_PATTERN); CCHKERRQ(B.GetComm(),ierr);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 PetscParMatrix& PetscParMatrix::operator-=(const PetscParMatrix& B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    if (!A)
    {
       ierr = MatDuplicate(B,MAT_COPY_VALUES,&A); CCHKERRQ(B.GetComm(),ierr);
@@ -1110,6 +1204,11 @@ PetscParMatrix& PetscParMatrix::operator-=(const PetscParMatrix& B)
       MFEM_VERIFY(width  == B.Width(), "Invalid number of local columns");
       ierr = MatAXPY(A,-1.0,B,DIFFERENT_NONZERO_PATTERN); CCHKERRQ(B.GetComm(),ierr);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
@@ -1827,6 +1926,10 @@ void PetscParMatrix::SetUpForDevice()
 static void MatMultKernel(Mat A,PetscScalar a,Vec X,PetscScalar b,Vec Y,
                           bool transpose)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    PetscErrorCode (*f)(Mat,Vec,Vec);
    PetscErrorCode (*fadd)(Mat,Vec,Vec,Vec);
    if (transpose)
@@ -1868,6 +1971,10 @@ static void MatMultKernel(Mat A,PetscScalar a,Vec X,PetscScalar b,Vec Y,
          ierr = VecSet(Y,0.); PCHKERRQ(A,ierr);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void PetscParMatrix::MakeRef(const PetscParMatrix &master)
@@ -1926,6 +2033,10 @@ void PetscParMatrix::Mult(double a, const Vector &x, double b, Vector &y) const
    MFEM_ASSERT(y.Size() == Height(), "invalid y.Size() = " << y.Size()
                << ", expected size = " << Height());
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    PetscParVector *XX = GetX();
    PetscParVector *YY = GetY();
    bool rw = (b != 0.0);
@@ -1934,6 +2045,10 @@ void PetscParMatrix::Mult(double a, const Vector &x, double b, Vector &y) const
    MatMultKernel(A,a,XX->x,b,YY->x,false);
    XX->ResetMemory();
    YY->ResetMemory();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void PetscParMatrix::MultTranspose(double a, const Vector &x, double b,
@@ -1944,6 +2059,10 @@ void PetscParMatrix::MultTranspose(double a, const Vector &x, double b,
    MFEM_ASSERT(y.Size() == Width(), "invalid y.Size() = " << y.Size()
                << ", expected size = " << Width());
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    PetscParVector *XX = GetX();
    PetscParVector *YY = GetY();
    bool rw = (b != 0.0);
@@ -1952,6 +2071,10 @@ void PetscParMatrix::MultTranspose(double a, const Vector &x, double b,
    MatMultKernel(A,a,YY->x,b,XX->x,true);
    XX->ResetMemory();
    YY->ResetMemory();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void PetscParMatrix::Print(const char *fname, bool binary) const
@@ -2154,10 +2277,19 @@ PetscParMatrix * RAP(HypreParMatrix *hA, PetscParMatrix *P)
 
 PetscParMatrix * ParMult(const PetscParMatrix *A, const PetscParMatrix *B)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    Mat AB;
 
    ierr = MatMatMult(*A,*B,MAT_INITIAL_MATRIX,PETSC_DEFAULT,&AB);
    CCHKERRQ(A->GetComm(),ierr);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return new PetscParMatrix(AB);
 }
 
@@ -3082,6 +3214,10 @@ void PetscLinearSolver::SetPreconditioner(Solver &precond)
 
 void PetscLinearSolver::MultKernel(const Vector &b, Vector &x, bool trans) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    KSP ksp = (KSP)obj;
 
    if (!B || !X)
@@ -3118,6 +3254,10 @@ void PetscLinearSolver::MultKernel(const Vector &b, Vector &x, bool trans) const
    }
    B->ResetMemory();
    X->ResetMemory();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void PetscLinearSolver::Mult(const Vector &b, Vector &x) const
@@ -3258,6 +3398,11 @@ void PetscPreconditioner::MultKernel(const Vector &b, Vector &x,
 {
    MFEM_VERIFY(!iterative_mode,
                "Iterative mode not supported for PetscPreconditioner");
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    PC pc = (PC)obj;
 
    if (!B || !X)
@@ -3291,6 +3436,10 @@ void PetscPreconditioner::MultKernel(const Vector &b, Vector &x,
    }
    B->ResetMemory();
    X->ResetMemory();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void PetscPreconditioner::Mult(const Vector &b, Vector &x) const
@@ -3321,6 +3470,10 @@ static void func_coords(const Vector &x, Vector &y)
 
 void PetscBDDCSolver::BDDCSolverConstructor(const PetscBDDCSolverParams &opts)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    MPI_Comm comm = PetscObjectComm(obj);
 
    // get PETSc object
@@ -3798,6 +3951,10 @@ void PetscBDDCSolver::BDDCSolverConstructor(const PetscBDDCSolverParams &opts)
    }
    ierr = ISDestroy(&dir); PCHKERRQ(pc,ierr);
    ierr = ISDestroy(&neu); PCHKERRQ(pc,ierr);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 PetscBDDCSolver::PetscBDDCSolver(PetscParMatrix &A,
@@ -4046,6 +4203,10 @@ void PetscNonlinearSolver::SetUpdate(void (*update)(Operator *,int,
 
 void PetscNonlinearSolver::Mult(const Vector &b, Vector &x) const
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    SNES snes = (SNES)obj;
 
    bool b_nonempty = b.Size();
@@ -4063,6 +4224,10 @@ void PetscNonlinearSolver::Mult(const Vector &b, Vector &x) const
    ierr = SNESSolve(snes, B->x, X->x); PCHKERRQ(snes, ierr);
    X->ResetMemory();
    if (b_nonempty) { B->ResetMemory(); }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 // PetscODESolver methods
@@ -4215,6 +4380,10 @@ void PetscODESolver::SetType(PetscODESolver::Type type)
 
 void PetscODESolver::Step(Vector &x, double &t, double &dt)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    // Pass the parameters to PETSc.
    TS ts = (TS)obj;
    ierr = TSSetTime(ts, t); PCHKERRQ(ts, ierr);
@@ -4249,10 +4418,18 @@ void PetscODESolver::Step(Vector &x, double &t, double &dt)
    ierr = TSMonitor(ts, i+1, pt, *X); PCHKERRQ(ts,ierr);
 
    X->ResetMemory();
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void PetscODESolver::Run(Vector &x, double &t, double &dt, double t_final)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    // Give the parameters to PETSc.
    TS ts = (TS)obj;
    ierr = TSSetTime(ts, t); PCHKERRQ(ts, ierr);
@@ -4287,6 +4464,10 @@ void PetscODESolver::Run(Vector &x, double &t, double &dt, double t_final)
    t = pt;
    ierr = TSGetTimeStep(ts,&pt); PCHKERRQ(ts,ierr);
    dt = pt;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 }  // namespace mfem
