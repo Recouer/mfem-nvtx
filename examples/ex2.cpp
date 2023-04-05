@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
    int order = 1;
    bool static_cond = false;
    bool visualization = 1;
+    const char *device_config = "cpu";
 
    OptionsParser args(argc, argv);
    args.AddOption(&mesh_file, "-m", "--mesh",
@@ -62,6 +63,9 @@ int main(int argc, char *argv[])
    args.AddOption(&visualization, "-vis", "--visualization", "-no-vis",
                   "--no-visualization",
                   "Enable or disable GLVis visualization.");
+    args.AddOption(&device_config, "-d", "--device",
+                   "Device configuration string, see Device::Configure().");
+
    args.Parse();
    if (!args.Good())
    {
@@ -69,6 +73,9 @@ int main(int argc, char *argv[])
       return 1;
    }
    args.PrintOptions(cout);
+
+    Device device(device_config);
+    device.Print();
 
    // 2. Read the mesh from the given mesh file. We can handle triangular,
    //    quadrilateral, tetrahedral or hexahedral elements with the same code.
