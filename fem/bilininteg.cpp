@@ -157,22 +157,38 @@ void BilinearFormIntegrator::AssembleElementVector(
    const FiniteElement &el, ElementTransformation &Tr, const Vector &elfun,
    Vector &elvect)
 {
-   // Note: This default implementation is general but not efficient
-   DenseMatrix elmat;
-   AssembleElementMatrix(el, Tr, elmat);
-   elvect.SetSize(elmat.Height());
-   elmat.Mult(elfun, elvect);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    // Note: This default implementation is general but not efficient
+    DenseMatrix elmat;
+    AssembleElementMatrix(el, Tr, elmat);
+    elvect.SetSize(elmat.Height());
+    elmat.Mult(elfun, elvect);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void BilinearFormIntegrator::AssembleFaceVector(
    const FiniteElement &el1, const FiniteElement &el2,
    FaceElementTransformations &Tr, const Vector &elfun, Vector &elvect)
 {
-   // Note: This default implementation is general but not efficient
-   DenseMatrix elmat;
-   AssembleFaceMatrix(el1, el2, Tr, elmat);
-   elvect.SetSize(elmat.Height());
-   elmat.Mult(elfun, elvect);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    // Note: This default implementation is general but not efficient
+    DenseMatrix elmat;
+    AssembleFaceMatrix(el1, el2, Tr, elmat);
+    elvect.SetSize(elmat.Height());
+    elmat.Mult(elfun, elvect);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void TransposeIntegrator::SetIntRule(const IntegrationRule *ir)
@@ -184,62 +200,126 @@ void TransposeIntegrator::SetIntRule(const IntegrationRule *ir)
 void TransposeIntegrator::AssembleElementMatrix (
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   bfi -> AssembleElementMatrix (el, Trans, bfi_elmat);
-   // elmat = bfi_elmat^t
-   elmat.Transpose (bfi_elmat);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    bfi -> AssembleElementMatrix (el, Trans, bfi_elmat);
+    // elmat = bfi_elmat^t
+    elmat.Transpose (bfi_elmat);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void TransposeIntegrator::AssembleElementMatrix2 (
    const FiniteElement &trial_fe, const FiniteElement &test_fe,
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   bfi -> AssembleElementMatrix2 (test_fe, trial_fe, Trans, bfi_elmat);
-   // elmat = bfi_elmat^t
-   elmat.Transpose (bfi_elmat);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    bfi -> AssembleElementMatrix2 (test_fe, trial_fe, Trans, bfi_elmat);
+    // elmat = bfi_elmat^t
+    elmat.Transpose (bfi_elmat);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void TransposeIntegrator::AssembleFaceMatrix (
    const FiniteElement &el1, const FiniteElement &el2,
    FaceElementTransformations &Trans, DenseMatrix &elmat)
 {
-   bfi -> AssembleFaceMatrix (el1, el2, Trans, bfi_elmat);
-   // elmat = bfi_elmat^t
-   elmat.Transpose (bfi_elmat);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    bfi -> AssembleFaceMatrix (el1, el2, Trans, bfi_elmat);
+    // elmat = bfi_elmat^t
+    elmat.Transpose (bfi_elmat);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LumpedIntegrator::SetIntRule(const IntegrationRule *ir)
 {
-   IntRule = ir;
-   bfi->SetIntRule(ir);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    IntRule = ir;
+    bfi->SetIntRule(ir);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LumpedIntegrator::AssembleElementMatrix (
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   bfi -> AssembleElementMatrix (el, Trans, elmat);
-   elmat.Lump();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    bfi -> AssembleElementMatrix (el, Trans, elmat);
+    elmat.Lump();
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void InverseIntegrator::SetIntRule(const IntegrationRule *ir)
 {
-   IntRule = ir;
-   integrator->SetIntRule(ir);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    IntRule = ir;
+    integrator->SetIntRule(ir);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void InverseIntegrator::AssembleElementMatrix(
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   integrator->AssembleElementMatrix(el, Trans, elmat);
-   elmat.Invert();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    integrator->AssembleElementMatrix(el, Trans, elmat);
+    elmat.Invert();
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::SetIntRule(const IntegrationRule *ir)
 {
-   IntRule = ir;
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->SetIntRule(ir);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    IntRule = ir;
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->SetIntRule(ir);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssembleElementMatrix(
@@ -247,12 +327,20 @@ void SumIntegrator::AssembleElementMatrix(
 {
    MFEM_ASSERT(integrators.Size() > 0, "empty SumIntegrator.");
 
-   integrators[0]->AssembleElementMatrix(el, Trans, elmat);
-   for (int i = 1; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssembleElementMatrix(el, Trans, elem_mat);
-      elmat += elem_mat;
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    integrators[0]->AssembleElementMatrix(el, Trans, elmat);
+    for (int i = 1; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssembleElementMatrix(el, Trans, elem_mat);
+        elmat += elem_mat;
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssembleElementMatrix2(
@@ -261,12 +349,20 @@ void SumIntegrator::AssembleElementMatrix2(
 {
    MFEM_ASSERT(integrators.Size() > 0, "empty SumIntegrator.");
 
-   integrators[0]->AssembleElementMatrix2(el1, el2, Trans, elmat);
-   for (int i = 1; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssembleElementMatrix2(el1, el2, Trans, elem_mat);
-      elmat += elem_mat;
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    integrators[0]->AssembleElementMatrix2(el1, el2, Trans, elmat);
+    for (int i = 1; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssembleElementMatrix2(el1, el2, Trans, elem_mat);
+        elmat += elem_mat;
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssembleFaceMatrix(
@@ -274,13 +370,20 @@ void SumIntegrator::AssembleFaceMatrix(
    FaceElementTransformations &Trans, DenseMatrix &elmat)
 {
    MFEM_ASSERT(integrators.Size() > 0, "empty SumIntegrator.");
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
 
-   integrators[0]->AssembleFaceMatrix(el1, el2, Trans, elmat);
-   for (int i = 1; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssembleFaceMatrix(el1, el2, Trans, elem_mat);
-      elmat += elem_mat;
-   }
+    integrators[0]->AssembleFaceMatrix(el1, el2, Trans, elmat);
+    for (int i = 1; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssembleFaceMatrix(el1, el2, Trans, elem_mat);
+        elmat += elem_mat;
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssembleFaceMatrix(
@@ -289,102 +392,197 @@ void SumIntegrator::AssembleFaceMatrix(
    FaceElementTransformations &Trans, DenseMatrix &elmat)
 {
    MFEM_ASSERT(integrators.Size() > 0, "empty SumIntegrator.");
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
 
-   integrators[0]->AssembleFaceMatrix(tr_fe, te_fe1, te_fe2, Trans, elmat);
-   for (int i = 1; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssembleFaceMatrix(tr_fe, te_fe1, te_fe2, Trans, elem_mat);
-      elmat += elem_mat;
-   }
+    integrators[0]->AssembleFaceMatrix(tr_fe, te_fe1, te_fe2, Trans, elmat);
+    for (int i = 1; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssembleFaceMatrix(tr_fe, te_fe1, te_fe2, Trans, elem_mat);
+        elmat += elem_mat;
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssemblePA(const FiniteElementSpace& fes)
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssemblePA(fes);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssemblePA(fes);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssembleDiagonalPA(Vector &diag)
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssembleDiagonalPA(diag);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssembleDiagonalPA(diag);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssemblePAInteriorFaces(const FiniteElementSpace &fes)
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssemblePAInteriorFaces(fes);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssemblePAInteriorFaces(fes);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssemblePABoundaryFaces(const FiniteElementSpace &fes)
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssemblePABoundaryFaces(fes);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssemblePABoundaryFaces(fes);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AddMultPA(const Vector& x, Vector& y) const
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AddMultPA(x, y);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AddMultPA(x, y);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AddMultTransposePA(const Vector &x, Vector &y) const
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AddMultTransposePA(x, y);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AddMultTransposePA(x, y);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssembleMF(const FiniteElementSpace &fes)
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssembleMF(fes);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssembleMF(fes);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AddMultMF(const Vector& x, Vector& y) const
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AddMultTransposeMF(x, y);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AddMultTransposeMF(x, y);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AddMultTransposeMF(const Vector &x, Vector &y) const
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AddMultMF(x, y);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AddMultMF(x, y);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssembleDiagonalMF(Vector &diag)
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssembleDiagonalMF(diag);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssembleDiagonalMF(diag);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssembleEA(const FiniteElementSpace &fes, Vector &emat,
                                const bool add)
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssembleEA(fes, emat, add);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssembleEA(fes, emat, add);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssembleEAInteriorFaces(const FiniteElementSpace &fes,
@@ -392,31 +590,55 @@ void SumIntegrator::AssembleEAInteriorFaces(const FiniteElementSpace &fes,
                                             Vector &ea_data_ext,
                                             const bool add)
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssembleEAInteriorFaces(fes,ea_data_int,ea_data_ext,add);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssembleEAInteriorFaces(fes,ea_data_int,ea_data_ext,add);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void SumIntegrator::AssembleEABoundaryFaces(const FiniteElementSpace &fes,
                                             Vector &ea_data_bdr,
                                             const bool add)
 {
-   for (int i = 0; i < integrators.Size(); i++)
-   {
-      integrators[i]->AssembleEABoundaryFaces(fes, ea_data_bdr, add);
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    for (int i = 0; i < integrators.Size(); i++)
+    {
+        integrators[i]->AssembleEABoundaryFaces(fes, ea_data_bdr, add);
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 SumIntegrator::~SumIntegrator()
 {
-   if (own_integrators)
-   {
-      for (int i = 0; i < integrators.Size(); i++)
-      {
-         delete integrators[i];
-      }
-   }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    if (own_integrators)
+    {
+        for (int i = 0; i < integrators.Size(); i++)
+        {
+            delete integrators[i];
+        }
+    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void MixedScalarIntegrator::AssembleElementMatrix2(
@@ -426,7 +648,11 @@ void MixedScalarIntegrator::AssembleElementMatrix2(
    MFEM_ASSERT(this->VerifyFiniteElementTypes(trial_fe, test_fe),
                this->FiniteElementTypeFailureMessage());
 
-   int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
    bool same_shapes = same_calc_shape && (&trial_fe == &test_fe);
 
 #ifdef MFEM_THREAD_SAFE
@@ -476,6 +702,10 @@ void MixedScalarIntegrator::AssembleElementMatrix2(
       trial_shape.SetDataAndSize(NULL, 0);
    }
 #endif
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void MixedVectorIntegrator::AssembleElementMatrix2(
@@ -485,7 +715,11 @@ void MixedVectorIntegrator::AssembleElementMatrix2(
    MFEM_ASSERT(this->VerifyFiniteElementTypes(trial_fe, test_fe),
                this->FiniteElementTypeFailureMessage());
 
-   space_dim = Trans.GetSpaceDim();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    space_dim = Trans.GetSpaceDim();
    int     trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
    int    test_vdim = GetTestVDim(test_fe);
    int   trial_vdim = GetTrialVDim(trial_fe);
@@ -650,6 +884,10 @@ void MixedVectorIntegrator::AssembleElementMatrix2(
       trial_shape.ClearExternalData();
    }
 #endif
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void MixedScalarVectorIntegrator::AssembleElementMatrix2(
@@ -662,7 +900,11 @@ void MixedScalarVectorIntegrator::AssembleElementMatrix2(
    MFEM_VERIFY(VQ, "MixedScalarVectorIntegrator: "
                "VectorCoefficient must be set");
 
-   const FiniteElement * vec_fe = transpose?&trial_fe:&test_fe;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    const FiniteElement * vec_fe = transpose?&trial_fe:&test_fe;
    const FiniteElement * sca_fe = transpose?&test_fe:&trial_fe;
 
    space_dim = Trans.GetSpaceDim();
@@ -724,6 +966,11 @@ void MixedScalarVectorIntegrator::AssembleElementMatrix2(
       vshape.Mult(V,vshape_tmp);
       AddMultVWt(V_test, W_trial, elmat);
    }
+
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
@@ -731,7 +978,11 @@ void GradientIntegrator::AssembleElementMatrix2(
    const FiniteElement &trial_fe, const FiniteElement &test_fe,
    ElementTransformation &Trans,  DenseMatrix &elmat)
 {
-   dim = test_fe.GetDim();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    dim = test_fe.GetDim();
    int trial_dof = trial_fe.GetDof();
    int test_dof = test_fe.GetDof();
    double c;
@@ -781,6 +1032,10 @@ void GradientIntegrator::AssembleElementMatrix2(
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 const IntegrationRule &GradientIntegrator::GetRule(const FiniteElement
@@ -788,8 +1043,17 @@ const IntegrationRule &GradientIntegrator::GetRule(const FiniteElement
                                                    const FiniteElement &test_fe,
                                                    ElementTransformation &Trans)
 {
-   int order = Trans.OrderGrad(&trial_fe) + test_fe.GetOrder() + Trans.OrderJ();
-   return IntRules.Get(trial_fe.GetGeomType(), order);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int order = Trans.OrderGrad(&trial_fe) + test_fe.GetOrder() + Trans.OrderJ();
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
+
+    return IntRules.Get(trial_fe.GetGeomType(), order);
 }
 
 
@@ -797,7 +1061,11 @@ void DiffusionIntegrator::AssembleElementMatrix
 ( const FiniteElement &el, ElementTransformation &Trans,
   DenseMatrix &elmat )
 {
-   int nd = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int nd = el.GetDof();
    dim = el.GetDim();
    int spaceDim = Trans.GetSpaceDim();
    bool square = (dim == spaceDim);
@@ -866,13 +1134,21 @@ void DiffusionIntegrator::AssembleElementMatrix
          AddMult_a_AAt(w, dshapedxt, elmat);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void DiffusionIntegrator::AssembleElementMatrix2(
    const FiniteElement &trial_fe, const FiniteElement &test_fe,
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int tr_nd = trial_fe.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int tr_nd = trial_fe.GetDof();
    int te_nd = test_fe.GetDof();
    dim = trial_fe.GetDim();
    int spaceDim = Trans.GetSpaceDim();
@@ -950,13 +1226,21 @@ void DiffusionIntegrator::AssembleElementMatrix2(
          AddMultABt(te_dshapedxt, dshapedxt, elmat);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void DiffusionIntegrator::AssembleElementVector(
    const FiniteElement &el, ElementTransformation &Tr, const Vector &elfun,
    Vector &elvect)
 {
-   int nd = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int nd = el.GetDof();
    dim = el.GetDim();
    int spaceDim = Tr.GetSpaceDim();
    double w;
@@ -1032,6 +1316,10 @@ void DiffusionIntegrator::AssembleElementVector(
       invdfdx.Mult(pointflux, vec);
       dshape.AddMult(vec, elvect);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void DiffusionIntegrator::ComputeElementFlux
@@ -1039,7 +1327,11 @@ void DiffusionIntegrator::ComputeElementFlux
   Vector &u, const FiniteElement &fluxelem, Vector &flux, bool with_coef,
   const IntegrationRule *ir)
 {
-   int nd, spaceDim, fnd;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int nd, spaceDim, fnd;
 
    nd = el.GetDof();
    dim = el.GetDim();
@@ -1131,13 +1423,21 @@ void DiffusionIntegrator::ComputeElementFlux
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 double DiffusionIntegrator::ComputeFluxEnergy
 ( const FiniteElement &fluxelem, ElementTransformation &Trans,
   Vector &flux, Vector* d_energy)
 {
-   int nd = fluxelem.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int nd = fluxelem.GetDof();
    dim = fluxelem.GetDim();
    int spaceDim = Trans.GetSpaceDim();
 
@@ -1206,13 +1506,21 @@ double DiffusionIntegrator::ComputeFluxEnergy
       }
    }
 
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
+
    return energy;
 }
 
 const IntegrationRule &DiffusionIntegrator::GetRule(
    const FiniteElement &trial_fe, const FiniteElement &test_fe)
 {
-   int order;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int order;
    if (trial_fe.Space() == FunctionSpace::Pk)
    {
       order = trial_fe.GetOrder() + test_fe.GetOrder() - 2;
@@ -1225,9 +1533,19 @@ const IntegrationRule &DiffusionIntegrator::GetRule(
 
    if (trial_fe.Space() == FunctionSpace::rQk)
    {
+
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
       return RefinedIntRules.Get(trial_fe.GetGeomType(), order);
    }
-   return IntRules.Get(trial_fe.GetGeomType(), order);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
+
+    return IntRules.Get(trial_fe.GetGeomType(), order);
 }
 
 
@@ -1235,7 +1553,11 @@ void MassIntegrator::AssembleElementMatrix
 ( const FiniteElement &el, ElementTransformation &Trans,
   DenseMatrix &elmat )
 {
-   int nd = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int nd = el.GetDof();
    // int dim = el.GetDim();
    double w;
 
@@ -1263,13 +1585,21 @@ void MassIntegrator::AssembleElementMatrix
 
       AddMult_a_VVt(w, shape, elmat);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void MassIntegrator::AssembleElementMatrix2(
    const FiniteElement &trial_fe, const FiniteElement &test_fe,
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int tr_nd = trial_fe.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int tr_nd = trial_fe.GetDof();
    int te_nd = test_fe.GetDof();
    double w;
 
@@ -1300,20 +1630,38 @@ void MassIntegrator::AssembleElementMatrix2(
       te_shape *= w;
       AddMultVWt(te_shape, shape, elmat);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 const IntegrationRule &MassIntegrator::GetRule(const FiniteElement &trial_fe,
                                                const FiniteElement &test_fe,
                                                ElementTransformation &Trans)
 {
-   // int order = trial_fe.GetOrder() + test_fe.GetOrder();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    // int order = trial_fe.GetOrder() + test_fe.GetOrder();
    const int order = trial_fe.GetOrder() + test_fe.GetOrder() + Trans.OrderW();
 
    if (trial_fe.Space() == FunctionSpace::rQk)
    {
-      return RefinedIntRules.Get(trial_fe.GetGeomType(), order);
+
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
+       return RefinedIntRules.Get(trial_fe.GetGeomType(), order);
    }
-   return IntRules.Get(trial_fe.GetGeomType(), order);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
+
+    return IntRules.Get(trial_fe.GetGeomType(), order);
 }
 
 
@@ -1324,7 +1672,11 @@ void BoundaryMassIntegrator::AssembleFaceMatrix(
    MFEM_ASSERT(Trans.Elem2No < 0,
                "support for interior faces is not implemented");
 
-   int nd1 = el1.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int nd1 = el1.GetDof();
    double w;
 
 #ifdef MFEM_THREAD_SAFE
@@ -1361,12 +1713,20 @@ void BoundaryMassIntegrator::AssembleFaceMatrix(
 
       AddMult_a_VVt(w, shape, elmat);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void ConvectionIntegrator::AssembleElementMatrix(
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int nd = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int nd = el.GetDof();
    dim = el.GetDim();
 
 #ifdef MFEM_THREAD_SAFE
@@ -1408,13 +1768,21 @@ void ConvectionIntegrator::AssembleElementMatrix(
 
       AddMultVWt(shape, BdFidxT, elmat);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
 void GroupConvectionIntegrator::AssembleElementMatrix(
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int nd = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int nd = el.GetDof();
    int dim = el.GetDim();
 
    elmat.SetSize(nd);
@@ -1461,13 +1829,25 @@ void GroupConvectionIntegrator::AssembleElementMatrix(
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 const IntegrationRule &ConvectionIntegrator::GetRule(
    const FiniteElement &trial_fe, const FiniteElement &test_fe,
    ElementTransformation &Trans)
 {
-   int order = Trans.OrderGrad(&trial_fe) + Trans.Order() + test_fe.GetOrder();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int order = Trans.OrderGrad(&trial_fe) + Trans.Order() + test_fe.GetOrder();
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 
    return IntRules.Get(trial_fe.GetGeomType(), order);
 }
@@ -1482,7 +1862,11 @@ void VectorMassIntegrator::AssembleElementMatrix
 ( const FiniteElement &el, ElementTransformation &Trans,
   DenseMatrix &elmat )
 {
-   int nd = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int nd = el.GetDof();
    int spaceDim = Trans.GetSpaceDim();
 
    double norm;
@@ -1558,13 +1942,21 @@ void VectorMassIntegrator::AssembleElementMatrix
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void VectorMassIntegrator::AssembleElementMatrix2(
    const FiniteElement &trial_fe, const FiniteElement &test_fe,
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int tr_nd = trial_fe.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int tr_nd = trial_fe.GetDof();
    int te_nd = test_fe.GetDof();
 
    double norm;
@@ -1643,13 +2035,21 @@ void VectorMassIntegrator::AssembleElementMatrix2(
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void VectorFEDivergenceIntegrator::AssembleElementMatrix2(
    const FiniteElement &trial_fe, const FiniteElement &test_fe,
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
 
 #ifdef MFEM_THREAD_SAFE
    Vector divshape(trial_nd), shape(test_nd);
@@ -1683,13 +2083,21 @@ void VectorFEDivergenceIntegrator::AssembleElementMatrix2(
       shape *= w;
       AddMultVWt(shape, divshape, elmat);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void VectorFEWeakDivergenceIntegrator::AssembleElementMatrix2(
    const FiniteElement &trial_fe, const FiniteElement &test_fe,
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
    int dim = trial_fe.GetDim();
 
    MFEM_ASSERT(test_fe.GetRangeType() == mfem::FiniteElement::SCALAR &&
@@ -1765,13 +2173,21 @@ void VectorFEWeakDivergenceIntegrator::AssembleElementMatrix2(
 
       AddMultABt(dshapedxt, vshape, elmat);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void VectorFECurlIntegrator::AssembleElementMatrix2(
    const FiniteElement &trial_fe, const FiniteElement &test_fe,
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
    int dim = trial_fe.GetDim();
    int dimc = (dim == 3) ? 3 : 1;
 
@@ -1862,6 +2278,10 @@ void VectorFECurlIntegrator::AssembleElementMatrix2(
          AddMultABt(curlshapeTrial_dFT, vshapeTest, elmat);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void DerivativeIntegrator::AssembleElementMatrix2 (
@@ -1870,7 +2290,11 @@ void DerivativeIntegrator::AssembleElementMatrix2 (
    ElementTransformation &Trans,
    DenseMatrix &elmat)
 {
-   int dim = trial_fe.GetDim();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int dim = trial_fe.GetDim();
    int trial_nd = trial_fe.GetDof();
    int test_nd = test_fe.GetDof();
    int spaceDim = Trans.GetSpaceDim();
@@ -1930,13 +2354,21 @@ void DerivativeIntegrator::AssembleElementMatrix2 (
       shape *= Q->Eval(Trans,ip) * det * ip.weight;
       AddMultVWt (shape, dshapedxi, elmat);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void CurlCurlIntegrator::AssembleElementMatrix
 ( const FiniteElement &el, ElementTransformation &Trans,
   DenseMatrix &elmat )
 {
-   int nd = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int nd = el.GetDof();
    dim = el.GetDim();
    int dimc = el.GetCurlDim();
    double w;
@@ -2001,6 +2433,10 @@ void CurlCurlIntegrator::AssembleElementMatrix
          AddMult_a_AAt(w, curlshape_dFt, elmat);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void CurlCurlIntegrator::AssembleElementMatrix2(const FiniteElement &trial_fe,
@@ -2008,7 +2444,11 @@ void CurlCurlIntegrator::AssembleElementMatrix2(const FiniteElement &trial_fe,
                                                 ElementTransformation &Trans,
                                                 DenseMatrix &elmat)
 {
-   int tr_nd = trial_fe.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int tr_nd = trial_fe.GetDof();
    int te_nd = test_fe.GetDof();
    dim = trial_fe.GetDim();
    int dimc = trial_fe.GetCurlDim();
@@ -2078,6 +2518,10 @@ void CurlCurlIntegrator::AssembleElementMatrix2(const FiniteElement &trial_fe,
          AddMultABt(te_curlshape_dFt, curlshape_dFt, elmat);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void CurlCurlIntegrator
@@ -2085,6 +2529,10 @@ void CurlCurlIntegrator
                      Vector &u, const FiniteElement &fluxelem, Vector &flux,
                      bool with_coef, const IntegrationRule *ir)
 {
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
 #ifdef MFEM_THREAD_SAFE
    DenseMatrix projcurl;
 #endif
@@ -2097,13 +2545,21 @@ void CurlCurlIntegrator
    projcurl.Mult(u, flux);
 
    // TODO: Q, wcoef?
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 double CurlCurlIntegrator::ComputeFluxEnergy(const FiniteElement &fluxelem,
                                              ElementTransformation &Trans,
                                              Vector &flux, Vector *d_energy)
 {
-   int nd = fluxelem.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int nd = fluxelem.GetDof();
    dim = fluxelem.GetDim();
 
 #ifdef MFEM_THREAD_SAFE
@@ -2201,13 +2657,21 @@ double CurlCurlIntegrator::ComputeFluxEnergy(const FiniteElement &fluxelem,
       delete [] pfluxes;
    }
 
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
+
    return energy;
 }
 
 void VectorCurlCurlIntegrator::AssembleElementMatrix(
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int dim = el.GetDim();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int dim = el.GetDim();
    int dof = el.GetDof();
    int cld = (dim*(dim-1))/2;
 
@@ -2250,12 +2714,20 @@ void VectorCurlCurlIntegrator::AssembleElementMatrix(
 
       AddMult_a_AAt(w, curlshape, elmat);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 double VectorCurlCurlIntegrator::GetElementEnergy(
    const FiniteElement &el, ElementTransformation &Tr, const Vector &elfun)
 {
-   int dim = el.GetDim();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int dim = el.GetDim();
    int dof = el.GetDof();
 
 #ifdef MFEM_THREAD_SAFE
@@ -2314,6 +2786,10 @@ double VectorCurlCurlIntegrator::GetElementEnergy(
 
    elfun_mat.ClearExternalData();
 
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
+
    return 0.5 * energy;
 }
 
@@ -2321,7 +2797,11 @@ void MixedCurlIntegrator::AssembleElementMatrix2(
    const FiniteElement &trial_fe, const FiniteElement &test_fe,
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int dim = trial_fe.GetDim();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int dim = trial_fe.GetDim();
    int trial_dof = trial_fe.GetDof();
    int test_dof = test_fe.GetDof();
    int dimc = (dim == 3) ? 3 : 1;
@@ -2393,6 +2873,10 @@ void MixedCurlIntegrator::AssembleElementMatrix2(
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
@@ -2401,7 +2885,11 @@ void VectorFEMassIntegrator::AssembleElementMatrix(
    ElementTransformation &Trans,
    DenseMatrix &elmat)
 {
-   int dof = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int dof = el.GetDof();
    int spaceDim = Trans.GetSpaceDim();
    int vdim = std::max(spaceDim, el.GetVDim());
 
@@ -2460,13 +2948,21 @@ void VectorFEMassIntegrator::AssembleElementMatrix(
          AddMult_a_AAt (w, trial_vshape, elmat);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void VectorFEMassIntegrator::AssembleElementMatrix2(
    const FiniteElement &trial_fe, const FiniteElement &test_fe,
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   if (test_fe.GetRangeType() == FiniteElement::SCALAR
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    if (test_fe.GetRangeType() == FiniteElement::SCALAR
        && trial_fe.GetRangeType() == FiniteElement::VECTOR)
    {
       // assume test_fe is scalar FE and trial_fe is vector FE
@@ -2636,6 +3132,10 @@ void VectorFEMassIntegrator::AssembleElementMatrix2(
       mfem_error("VectorFEMassIntegrator::AssembleElementMatrix2(...)\n"
                  "   is not implemented for given trial and test bases.");
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void VectorDivergenceIntegrator::AssembleElementMatrix2(
@@ -2644,7 +3144,11 @@ void VectorDivergenceIntegrator::AssembleElementMatrix2(
    ElementTransformation &Trans,
    DenseMatrix &elmat)
 {
-   dim  = trial_fe.GetDim();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    dim  = trial_fe.GetDim();
    int trial_dof = trial_fe.GetDof();
    int test_dof = test_fe.GetDof();
    double c;
@@ -2686,6 +3190,10 @@ void VectorDivergenceIntegrator::AssembleElementMatrix2(
       shape *= c;
       AddMultVWt (shape, divshape, elmat);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 const IntegrationRule &VectorDivergenceIntegrator::GetRule(
@@ -2703,7 +3211,11 @@ void DivDivIntegrator::AssembleElementMatrix(
    ElementTransformation &Trans,
    DenseMatrix &elmat)
 {
-   int dof = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int dof = el.GetDof();
    double c;
 
 #ifdef MFEM_THREAD_SAFE
@@ -2739,6 +3251,10 @@ void DivDivIntegrator::AssembleElementMatrix(
       // elmat += c * divshape * divshape ^ t
       AddMult_a_VVt (c, divshape, elmat);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void DivDivIntegrator::AssembleElementMatrix2(
@@ -2747,7 +3263,11 @@ void DivDivIntegrator::AssembleElementMatrix2(
    ElementTransformation &Trans,
    DenseMatrix &elmat)
 {
-   int tr_nd = trial_fe.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int tr_nd = trial_fe.GetDof();
    int te_nd = test_fe.GetDof();
    double c;
 
@@ -2788,6 +3308,10 @@ void DivDivIntegrator::AssembleElementMatrix2(
       te_divshape *= c;
       AddMultVWt(te_divshape, divshape, elmat);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void VectorDiffusionIntegrator::AssembleElementMatrix(
@@ -2795,7 +3319,11 @@ void VectorDiffusionIntegrator::AssembleElementMatrix(
    ElementTransformation &Trans,
    DenseMatrix &elmat)
 {
-   const int dof = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    const int dof = el.GetDof();
    dim = el.GetDim();
    sdim = Trans.GetSpaceDim();
 
@@ -2870,13 +3398,21 @@ void VectorDiffusionIntegrator::AssembleElementMatrix(
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void VectorDiffusionIntegrator::AssembleElementVector(
    const FiniteElement &el, ElementTransformation &Tr,
    const Vector &elfun, Vector &elvect)
 {
-   const int dof = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    const int dof = el.GetDof();
    dim = el.GetDim();
    sdim = Tr.GetSpaceDim();
 
@@ -2960,13 +3496,21 @@ void VectorDiffusionIntegrator::AssembleElementVector(
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
 void ElasticityIntegrator::AssembleElementMatrix(
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int dof = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int dof = el.GetDof();
    int dim = el.GetDim();
    double w, L, M;
 
@@ -3043,6 +3587,10 @@ void ElasticityIntegrator::AssembleElementMatrix(
             }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void ElasticityIntegrator::ComputeElementFlux(
@@ -3050,7 +3598,11 @@ void ElasticityIntegrator::ComputeElementFlux(
    Vector &u, const mfem::FiniteElement &fluxelem, Vector &flux,
    bool with_coef, const IntegrationRule *ir)
 {
-   const int dof = el.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    const int dof = el.GetDof();
    const int dim = el.GetDim();
    const int tdim = dim*(dim+1)/2; // num. entries in a symmetric tensor
    double L, M;
@@ -3122,13 +3674,21 @@ void ElasticityIntegrator::ComputeElementFlux(
          flux(i+fnd*5) = M*(grad(1,2) + grad(2,1));
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 double ElasticityIntegrator::ComputeFluxEnergy(const FiniteElement &fluxelem,
                                                ElementTransformation &Trans,
                                                Vector &flux, Vector *d_energy)
 {
-   const int dof = fluxelem.GetDof();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    const int dof = fluxelem.GetDof();
    const int dim = fluxelem.GetDim();
    const int tdim = dim*(dim+1)/2; // num. entries in a symmetric tensor
    double L, M;
@@ -3214,6 +3774,10 @@ double ElasticityIntegrator::ComputeFluxEnergy(const FiniteElement &fluxelem,
       energy += w * pt_e;
    }
 
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
+
    return energy;
 }
 
@@ -3222,7 +3786,11 @@ void DGTraceIntegrator::AssembleFaceMatrix(const FiniteElement &el1,
                                            FaceElementTransformations &Trans,
                                            DenseMatrix &elmat)
 {
-   int ndof1, ndof2;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int ndof1, ndof2;
 
    double un, a, b, w;
 
@@ -3348,6 +3916,10 @@ void DGTraceIntegrator::AssembleFaceMatrix(const FiniteElement &el1,
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
@@ -3362,7 +3934,11 @@ void DGDiffusionIntegrator::AssembleFaceMatrix(
    const FiniteElement &el1, const FiniteElement &el2,
    FaceElementTransformations &Trans, DenseMatrix &elmat)
 {
-   int dim, ndof1, ndof2, ndofs;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int dim, ndof1, ndof2, ndofs;
    bool kappa_is_nonzero = (kappa != 0.);
    double w, wq = 0.0;
 
@@ -3591,6 +4167,10 @@ void DGDiffusionIntegrator::AssembleFaceMatrix(
          elmat(i,i) *= (sigma - 1.);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
@@ -3603,7 +4183,11 @@ void DGElasticityIntegrator::AssembleBlock(
    const Vector &col_dshape_dnM, const DenseMatrix &col_dshape,
    DenseMatrix &elmat, DenseMatrix &jmat)
 {
-   for (int jm = 0, j = col_offset; jm < dim; ++jm)
+#ifdef MFEM_USE_CUDA
+        nvtxRangePush(__FUNCTION__);
+#endif
+
+        for (int jm = 0, j = col_offset; jm < dim; ++jm)
    {
       for (int jdof = 0; jdof < col_ndofs; ++jdof, ++j)
       {
@@ -3636,6 +4220,10 @@ void DGElasticityIntegrator::AssembleBlock(
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+        nvtxRangePop();
+#endif
 }
 
 void DGElasticityIntegrator::AssembleFaceMatrix(
@@ -3653,6 +4241,10 @@ void DGElasticityIntegrator::AssembleFaceMatrix(
    Vector nM1, nM2;
    Vector dshape1_dnM, dshape2_dnM;
    DenseMatrix jmat;
+#endif
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
 #endif
 
    const int dim = el1.GetDim();
@@ -3815,6 +4407,10 @@ void DGElasticityIntegrator::AssembleFaceMatrix(
          elmat(i,i) *= (alpha - 1.);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
@@ -3823,7 +4419,11 @@ void TraceJumpIntegrator::AssembleFaceMatrix(
    const FiniteElement &test_fe2, FaceElementTransformations &Trans,
    DenseMatrix &elmat)
 {
-   int i, j, face_ndof, ndof1, ndof2;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int i, j, face_ndof, ndof1, ndof2;
    int order;
 
    double w;
@@ -3908,6 +4508,10 @@ void TraceJumpIntegrator::AssembleFaceMatrix(
             }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void NormalTraceJumpIntegrator::AssembleFaceMatrix(
@@ -3915,7 +4519,11 @@ void NormalTraceJumpIntegrator::AssembleFaceMatrix(
    const FiniteElement &test_fe2, FaceElementTransformations &Trans,
    DenseMatrix &elmat)
 {
-   int i, j, face_ndof, ndof1, ndof2, dim;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int i, j, face_ndof, ndof1, ndof2, dim;
    int order;
 
    MFEM_VERIFY(trial_face_fe.GetMapType() == FiniteElement::VALUE, "");
@@ -3995,6 +4603,10 @@ void NormalTraceJumpIntegrator::AssembleFaceMatrix(
             }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
@@ -4002,7 +4614,11 @@ void NormalInterpolator::AssembleElementMatrix2(
    const FiniteElement &dom_fe, const FiniteElement &ran_fe,
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
-   int spaceDim = Trans.GetSpaceDim();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    int spaceDim = Trans.GetSpaceDim();
    elmat.SetSize(ran_fe.GetDof(), spaceDim*dom_fe.GetDof());
    Vector n(spaceDim), shape(dom_fe.GetDof());
 
@@ -4021,6 +4637,10 @@ void NormalInterpolator::AssembleElementMatrix2(
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
@@ -4055,13 +4675,21 @@ ScalarProductInterpolator::AssembleElementMatrix2(const FiniteElement &dom_fe,
                                                   ElementTransformation &Trans,
                                                   DenseMatrix &elmat)
 {
-   internal::ShapeCoefficient dom_shape_coeff(*Q, dom_fe);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    internal::ShapeCoefficient dom_shape_coeff(*Q, dom_fe);
 
    elmat.SetSize(ran_fe.GetDof(),dom_fe.GetDof());
 
    Vector elmat_as_vec(elmat.Data(), ran_fe.GetDof()*dom_fe.GetDof());
 
    ran_fe.Project(dom_shape_coeff, Trans, elmat_as_vec);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
@@ -4072,7 +4700,11 @@ ScalarVectorProductInterpolator::AssembleElementMatrix2(
    ElementTransformation &Trans,
    DenseMatrix &elmat)
 {
-   // Vector shape functions scaled by scalar coefficient
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    // Vector shape functions scaled by scalar coefficient
    struct VShapeCoefficient : public MatrixCoefficient
    {
       Coefficient &Q;
@@ -4097,6 +4729,10 @@ ScalarVectorProductInterpolator::AssembleElementMatrix2(
    Vector elmat_as_vec(elmat.Data(), ran_fe.GetDof()*dom_fe.GetDof());
 
    ran_fe.ProjectMatrixCoefficient(dom_shape_coeff, Trans, elmat_as_vec);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
@@ -4107,7 +4743,11 @@ VectorScalarProductInterpolator::AssembleElementMatrix2(
    ElementTransformation &Trans,
    DenseMatrix &elmat)
 {
-   // Scalar shape functions scaled by vector coefficient
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    // Scalar shape functions scaled by vector coefficient
    struct VecShapeCoefficient : public MatrixCoefficient
    {
       VectorCoefficient &VQ;
@@ -4135,6 +4775,10 @@ VectorScalarProductInterpolator::AssembleElementMatrix2(
    Vector elmat_as_vec(elmat.Data(), ran_fe.GetDof()*dom_fe.GetDof());
 
    ran_fe.ProjectMatrixCoefficient(dom_shape_coeff, Trans, elmat_as_vec);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
@@ -4145,7 +4789,11 @@ ScalarCrossProductInterpolator::AssembleElementMatrix2(
    ElementTransformation &Trans,
    DenseMatrix &elmat)
 {
-   // Vector coefficient product with vector shape functions
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    // Vector coefficient product with vector shape functions
    struct VCrossVShapeCoefficient : public VectorCoefficient
    {
       VectorCoefficient &VQ;
@@ -4178,6 +4826,10 @@ ScalarCrossProductInterpolator::AssembleElementMatrix2(
    Vector elmat_as_vec(elmat.Data(), elmat.Height()*elmat.Width());
 
    ran_fe.Project(dom_shape_coeff, Trans, elmat_as_vec);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void
@@ -4187,7 +4839,11 @@ VectorCrossProductInterpolator::AssembleElementMatrix2(
    ElementTransformation &Trans,
    DenseMatrix &elmat)
 {
-   // Vector coefficient product with vector shape functions
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    // Vector coefficient product with vector shape functions
    struct VCrossVShapeCoefficient : public MatrixCoefficient
    {
       VectorCoefficient &VQ;
@@ -4231,6 +4887,10 @@ VectorCrossProductInterpolator::AssembleElementMatrix2(
    Vector elmat_as_vec(elmat.Data(), elmat.Height()*elmat.Width());
 
    ran_fe.ProjectMatrixCoefficient(dom_shape_coeff, Trans, elmat_as_vec);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 
@@ -4270,13 +4930,21 @@ VectorInnerProductInterpolator::AssembleElementMatrix2(
    ElementTransformation &Trans,
    DenseMatrix &elmat)
 {
-   internal::VDotVShapeCoefficient dom_shape_coeff(*VQ, dom_fe);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    internal::VDotVShapeCoefficient dom_shape_coeff(*VQ, dom_fe);
 
    elmat.SetSize(ran_fe.GetDof(),dom_fe.GetDof());
 
    Vector elmat_as_vec(elmat.Data(), elmat.Height()*elmat.Width());
 
    ran_fe.Project(dom_shape_coeff, Trans, elmat_as_vec);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 }
