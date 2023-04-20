@@ -19,7 +19,11 @@ namespace mfem
 LinearForm::LinearForm(FiniteElementSpace *f, LinearForm *lf)
    : Vector(f->GetVSize())
 {
-   ext = nullptr;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    ext = nullptr;
    extern_lfs = 1;
    fast_assembly = false;
    fes = f;
@@ -36,11 +40,19 @@ LinearForm::LinearForm(FiniteElementSpace *f, LinearForm *lf)
 
    boundary_face_integs = lf->boundary_face_integs;
    boundary_face_integs_marker = lf->boundary_face_integs_marker;
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::AddDomainIntegrator(LinearFormIntegrator *lfi)
 {
-   DeltaLFIntegrator *maybe_delta =
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    DeltaLFIntegrator *maybe_delta =
       dynamic_cast<DeltaLFIntegrator *>(lfi);
    if (!maybe_delta || !maybe_delta->IsDelta())
    {
@@ -51,12 +63,20 @@ void LinearForm::AddDomainIntegrator(LinearFormIntegrator *lfi)
       domain_delta_integs.Append(maybe_delta);
    }
    domain_integs_marker.Append(NULL);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::AddDomainIntegrator(LinearFormIntegrator *lfi,
                                      Array<int> &elem_marker)
 {
-   DeltaLFIntegrator *maybe_delta =
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    DeltaLFIntegrator *maybe_delta =
       dynamic_cast<DeltaLFIntegrator *>(lfi);
    if (!maybe_delta || !maybe_delta->IsDelta())
    {
@@ -67,68 +87,162 @@ void LinearForm::AddDomainIntegrator(LinearFormIntegrator *lfi,
       domain_delta_integs.Append(maybe_delta);
    }
    domain_integs_marker.Append(&elem_marker);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::AddBoundaryIntegrator (LinearFormIntegrator * lfi)
 {
-   boundary_integs.Append (lfi);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    boundary_integs.Append (lfi);
    boundary_integs_marker.Append(NULL); // NULL -> all attributes are active
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::AddBoundaryIntegrator (LinearFormIntegrator * lfi,
                                         Array<int> &bdr_attr_marker)
 {
-   boundary_integs.Append (lfi);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    boundary_integs.Append (lfi);
    boundary_integs_marker.Append(&bdr_attr_marker);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::AddBdrFaceIntegrator (LinearFormIntegrator * lfi)
 {
-   boundary_face_integs.Append(lfi);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    boundary_face_integs.Append(lfi);
    // NULL -> all attributes are active
    boundary_face_integs_marker.Append(NULL);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::AddBdrFaceIntegrator(LinearFormIntegrator *lfi,
                                       Array<int> &bdr_attr_marker)
 {
-   boundary_face_integs.Append(lfi);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    boundary_face_integs.Append(lfi);
    boundary_face_integs_marker.Append(&bdr_attr_marker);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::AddInteriorFaceIntegrator(LinearFormIntegrator *lfi)
 {
-   interior_face_integs.Append(lfi);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    interior_face_integs.Append(lfi);
+
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 bool LinearForm::SupportsDevice()
 {
-   // return false for NURBS meshes, so we don’t convert it to non-NURBS
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    // return false for NURBS meshes, so we don’t convert it to non-NURBS
    // through Assemble, AssembleDevice, GetGeometricFactors and EnsureNodes
    const Mesh &mesh = *fes->GetMesh();
-   if (mesh.NURBSext != nullptr) { return false; }
+   if (mesh.NURBSext != nullptr) {
+
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
+       return false;
+   }
 
    // scan integrators to verify that all can use device assembly
    auto IntegratorsSupportDevice = [](const Array<LinearFormIntegrator*> &integ)
    {
       for (int k = 0; k < integ.Size(); k++)
       {
-         if (!integ[k]->SupportsDevice()) { return false; }
+         if (!integ[k]->SupportsDevice()) {
+
+#ifdef MFEM_USE_CUDA
+             nvtxRangePop();
+#endif
+
+             return false;
+         }
       }
-      return true;
+
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
+       return true;
    };
 
-   if (!IntegratorsSupportDevice(domain_integs)) { return false; }
-   if (!IntegratorsSupportDevice(boundary_integs)) { return false; }
+   if (!IntegratorsSupportDevice(domain_integs)) {
+
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
+       return false;
+   }
+   if (!IntegratorsSupportDevice(boundary_integs)) {
+
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
+       return false;
+   }
    if (boundary_face_integs.Size() > 0 || interior_face_integs.Size() > 0 ||
-       domain_delta_integs.Size() > 0) { return false; }
+       domain_delta_integs.Size() > 0) {
+
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
+       return false;
+   }
 
    if (boundary_integs.Size() > 0)
    {
       // Make sure there are no boundary faces that are not boundary elements
       if (fes->GetNFbyType(FaceType::Boundary) != fes->GetNBE())
       {
-         return false;
+
+#ifdef MFEM_USE_CUDA
+          nvtxRangePop();
+#endif
+
+          return false;
       }
       // Make sure every boundary element corresponds to a boundary face
       for (int be = 0; be < fes->GetNBE(); ++be)
@@ -137,37 +251,79 @@ bool LinearForm::SupportsDevice()
          const auto face_info = mesh.GetFaceInformation(f);
          if (!face_info.IsBoundary())
          {
-            return false;
+
+#ifdef MFEM_USE_CUDA
+             nvtxRangePop();
+#endif
+
+             return false;
          }
       }
    }
 
    // no support for elements with varying polynomial orders
-   if (fes->IsVariableOrder()) { return false; }
+   if (fes->IsVariableOrder()) {
+
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
+       return false;
+   }
 
    // no support for 1D and embedded meshes
    const int mesh_dim = mesh.Dimension();
-   if (mesh_dim == 1 || mesh_dim != mesh.SpaceDimension()) { return false; }
+   if (mesh_dim == 1 || mesh_dim != mesh.SpaceDimension()) {
+
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
+       return false;
+   }
 
    // tensor-product finite element space only
-   if (!UsesTensorBasis(*fes)) { return false; }
+   if (!UsesTensorBasis(*fes)) {
+
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
+       return false;
+   }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 
    return true;
 }
 
 void LinearForm::UseFastAssembly(bool use_fa)
 {
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
    fast_assembly = use_fa;
 
    if (fast_assembly && SupportsDevice() && !ext)
    {
       ext = new LinearFormExtension(this);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::Assemble()
 {
-   Array<int> vdofs;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    Array<int> vdofs;
    ElementTransformation *eltrans;
    DofTransformation *doftrans;
    Vector elemvect;
@@ -178,7 +334,14 @@ void LinearForm::Assemble()
    // The first use of AddElementVector() below will move it back to host
    // because both 'vdofs' and 'elemvect' are on host.
 
-   if (fast_assembly && ext) { return ext->Assemble(); }
+   if (fast_assembly && ext) {
+
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
+       return ext->Assemble();
+   }
 
    if (domain_integs.Size())
    {
@@ -339,32 +502,72 @@ void LinearForm::Assemble()
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::Update()
 {
-   SetSize(fes->GetVSize()); ResetDeltaLocations();
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    SetSize(fes->GetVSize()); ResetDeltaLocations();
    if (ext) { ext->Update(); }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::Update(FiniteElementSpace *f, Vector &v, int v_offset)
 {
-   MFEM_ASSERT(v.Size() >= v_offset + f->GetVSize(), "");
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    MFEM_ASSERT(v.Size() >= v_offset + f->GetVSize(), "");
    fes = f;
    v.UseDevice(true);
    this->Vector::MakeRef(v, v_offset, fes->GetVSize());
    ResetDeltaLocations();
    if (ext) { ext->Update(); }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::MakeRef(FiniteElementSpace *f, Vector &v, int v_offset)
 {
-   Update(f, v, v_offset);
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    Update(f, v, v_offset);
+
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 void LinearForm::AssembleDelta()
 {
-   if (domain_delta_integs.Size() == 0) { return; }
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    if (domain_delta_integs.Size() == 0) {
+
+#ifdef MFEM_USE_CUDA
+        nvtxRangePop();
+#endif
+
+        return;
+    }
 
    if (!HaveDeltaLocations())
    {
@@ -401,19 +604,41 @@ void LinearForm::AssembleDelta()
                                                        Trans, elemvect);
       AddElementVector(vdofs, elemvect);
    }
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
 }
 
 LinearForm & LinearForm::operator=(double value)
 {
-   Vector::operator=(value);
-   return *this;
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    Vector::operator=(value);
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
+
+    return *this;
 }
 
 LinearForm & LinearForm::operator=(const Vector &v)
 {
-   MFEM_ASSERT(fes && v.Size() == fes->GetVSize(), "");
+#ifdef MFEM_USE_CUDA
+    nvtxRangePush(__FUNCTION__);
+#endif
+
+    MFEM_ASSERT(fes && v.Size() == fes->GetVSize(), "");
    Vector::operator=(v);
-   return *this;
+
+#ifdef MFEM_USE_CUDA
+    nvtxRangePop();
+#endif
+
+    return *this;
 }
 
 LinearForm::~LinearForm()

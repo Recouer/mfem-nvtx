@@ -92,7 +92,12 @@ static TargetT *DuplicateAs(const SourceT *array, int size,
                             bool cplusplus = true)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    TargetT *target_array = cplusplus ? (TargetT*) Memory<TargetT>(size)
@@ -130,7 +135,12 @@ bool CanShallowCopy(const Memory<T> &src, MemoryClass mc)
 inline void HypreParVector::_SetDataAndSize_()
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    hypre_Vector *x_loc = hypre_ParVectorLocalVector(x);
@@ -357,7 +367,12 @@ void HypreParVector::HypreWrite()
 void HypreParVector::WrapMemoryRead(const Memory<double> &mem)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_ASSERT(CanShallowCopy(mem, GetHypreMemoryClass()), "");
@@ -380,7 +395,12 @@ void HypreParVector::WrapMemoryRead(const Memory<double> &mem)
 void HypreParVector::WrapMemoryReadWrite(Memory<double> &mem)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_ASSERT(CanShallowCopy(mem, GetHypreMemoryClass()), "");
@@ -402,7 +422,12 @@ void HypreParVector::WrapMemoryReadWrite(Memory<double> &mem)
 void HypreParVector::WrapMemoryWrite(Memory<double> &mem)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_ASSERT(CanShallowCopy(mem, GetHypreMemoryClass()), "");
@@ -455,7 +480,12 @@ HypreParVector::~HypreParVector()
 double InnerProduct(HypreParVector *x, HypreParVector *y)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    double tmp = hypre_ParVectorInnerProd(*x, *y);
@@ -470,7 +500,12 @@ double InnerProduct(HypreParVector *x, HypreParVector *y)
 double InnerProduct(HypreParVector &x, HypreParVector &y)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    double tmp = hypre_ParVectorInnerProd(x, y);
@@ -486,7 +521,12 @@ double InnerProduct(HypreParVector &x, HypreParVector &y)
 double ParNormlp(const Vector &vec, double p, MPI_Comm comm)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    double norm = 0.0;
@@ -546,7 +586,12 @@ void CopyMemory(Memory<T> &src, Memory<T> &dst, MemoryClass dst_mc,
                 bool dst_owner)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (CanShallowCopy(src, dst_mc))
@@ -589,7 +634,12 @@ template <typename SrcT, typename DstT>
 void CopyConvertMemory(Memory<SrcT> &src, MemoryClass dst_mc, Memory<DstT> &dst)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    auto capacity = src.Capacity();
@@ -720,7 +770,12 @@ signed char HypreParMatrix::CopyCSR(SparseMatrix *csr,
                                     bool mem_owner)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const MemoryClass hypre_mc = GetHypreMemoryClass();
@@ -745,7 +800,12 @@ signed char HypreParMatrix::CopyCSR(SparseMatrix *csr,
                "invalid state: host ownership for I and J differ!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    return (mem_csr.I.OwnsHostPtr()    ? 1 : 0) +
@@ -757,7 +817,12 @@ signed char HypreParMatrix::CopyBoolCSR(Table *bool_csr,
                                         hypre_CSRMatrix *hypre_csr)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const MemoryClass hypre_mc = GetHypreMemoryClass();
@@ -813,7 +878,12 @@ signed char HypreParMatrix::HypreCsrToMem(hypre_CSRMatrix *h_mat,
                                           MemoryIJData &mem)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const int nr1 = internal::to_int(h_mat->num_rows) + 1;
@@ -1727,7 +1797,12 @@ void HypreParMatrix::GetBlocks(Array2D<HypreParMatrix*> &blocks,
 HypreParMatrix * HypreParMatrix::Transpose() const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    hypre_ParCSRMatrix * At;
@@ -1860,7 +1935,12 @@ HYPRE_Int HypreParMatrix::Mult(HypreParVector &x, HypreParVector &y,
                                double a, double b) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    x.HypreRead();
@@ -1882,7 +1962,12 @@ void HypreParMatrix::Mult(double a, const Vector &x, double b, Vector &y) const
                << ", expected size = " << Height());
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (X == NULL)
@@ -1948,7 +2033,12 @@ void HypreParMatrix::MultTranspose(double a, const Vector &x,
                << ", expected size = " << Width());
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    // Note: x has the dimensions of Y (height), and
@@ -2015,7 +2105,12 @@ HYPRE_Int HypreParMatrix::Mult(HYPRE_ParVector x, HYPRE_ParVector y,
                                double a, double b) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    HYPRE_Int tmp = hypre_ParCSRMatrixMatvec(a, A, (hypre_ParVector *) x, b,
@@ -2032,7 +2127,12 @@ HYPRE_Int HypreParMatrix::MultTranspose(HypreParVector & x, HypreParVector & y,
                                         double a, double b) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    EnsureMultTranspose();
@@ -2056,7 +2156,12 @@ void HypreParMatrix::AbsMult(double a, const Vector &x,
                << ", expected size = " << Height());
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    auto x_data = x.HostRead();
@@ -2081,7 +2186,12 @@ void HypreParMatrix::AbsMultTranspose(double a, const Vector &x,
                << ", expected size = " << Width());
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    auto x_data = x.HostRead();
@@ -2101,7 +2211,12 @@ HypreParMatrix* HypreParMatrix::LeftDiagMult(const SparseMatrix &D,
                                              HYPRE_BigInt* row_starts) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool assumed_partition = HYPRE_AssumedPartitionCheck();
@@ -2220,7 +2335,12 @@ void HypreParMatrix::ScaleRows(const Vector &diag)
    }
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    HostReadWrite();
@@ -2267,7 +2387,12 @@ void HypreParMatrix::InvScaleRows(const Vector &diag)
    }
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    HostReadWrite();
@@ -2315,7 +2440,12 @@ void HypreParMatrix::operator*=(double s)
       mfem_error("Row does not match");
    }
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    HostReadWrite();
@@ -2348,7 +2478,12 @@ static void get_sorted_rows_cols(const Array<int> &rows_cols,
                                  Array<HYPRE_Int> &hypre_sorted)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    rows_cols.HostRead();
@@ -2763,7 +2898,12 @@ void HypreParMatrix::Print(const char *fname, HYPRE_Int offi,
 void HypreParMatrix::Read(MPI_Comm comm, const char *fname)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    Destroy();
@@ -2786,7 +2926,12 @@ void HypreParMatrix::Read(MPI_Comm comm, const char *fname)
 void HypreParMatrix::Read_IJMatrix(MPI_Comm comm, const char *fname)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    Destroy();
@@ -3038,7 +3183,12 @@ HypreParMatrix *Add(double alpha, const HypreParMatrix &A,
                     double beta,  const HypreParMatrix &B)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    hypre_ParCSRMatrix *C_hypre =
@@ -3062,7 +3212,12 @@ HypreParMatrix *Add(double alpha, const HypreParMatrix &A,
 HypreParMatrix * ParAdd(const HypreParMatrix *A, const HypreParMatrix *B)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    hypre_ParCSRMatrix * C = internal::hypre_ParCSRMatrixAdd(*A,*B);
@@ -3082,7 +3237,12 @@ HypreParMatrix *Add(double alpha, const HypreParMatrix &A,
                     double beta,  const HypreParMatrix &B)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    hypre_ParCSRMatrix *C;
@@ -3103,7 +3263,12 @@ HypreParMatrix *Add(double alpha, const HypreParMatrix &A,
 HypreParMatrix * ParAdd(const HypreParMatrix *A, const HypreParMatrix *B)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    hypre_ParCSRMatrix *C;
@@ -3127,7 +3292,12 @@ HypreParMatrix * ParMult(const HypreParMatrix *A, const HypreParMatrix *B,
                          bool own_matrix)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    hypre_ParCSRMatrix * ab;
@@ -3156,7 +3326,12 @@ HypreParMatrix * ParMult(const HypreParMatrix *A, const HypreParMatrix *B,
 HypreParMatrix * RAP(const HypreParMatrix *A, const HypreParMatrix *P)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    hypre_ParCSRMatrix * rap;
@@ -3211,7 +3386,12 @@ HypreParMatrix * RAP(const HypreParMatrix * Rt, const HypreParMatrix *A,
                      const HypreParMatrix *P)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    hypre_ParCSRMatrix * rap;
@@ -3938,7 +4118,12 @@ void HypreSmoother::SetFIRCoefficients(double max_eig)
 void HypreSmoother::Mult(const HypreParVector &b, HypreParVector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (A == NULL)
@@ -4030,7 +4215,12 @@ void HypreSmoother::Mult(const Vector &b, Vector &x) const
    MFEM_ASSERT(x.Size() == NumRows(), "");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (A == NULL)
@@ -4096,7 +4286,12 @@ void HypreSmoother::Mult(const Vector &b, Vector &x) const
 void HypreSmoother::MultTranspose(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (A_is_symmetric || type == 0 || type == 1 || type == 5)
@@ -4239,7 +4434,12 @@ void HypreSolver::Setup(const Vector &b, Vector &x) const
 void HypreSolver::Mult(const HypreParVector &b, HypreParVector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    HYPRE_Int err_flag;
@@ -4280,7 +4480,12 @@ void HypreSolver::Mult(const HypreParVector &b, HypreParVector &x) const
 void HypreSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool x_shallow = WrapVectors(b, x);
@@ -4392,7 +4597,12 @@ void HyprePCG::SetResidualConvergenceOptions(int res_frequency, double rtol)
 void HyprePCG::Mult(const HypreParVector &b, HypreParVector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    int myid;
@@ -4577,7 +4787,12 @@ void HypreGMRES::SetPreconditioner(HypreSolver &precond_)
 void HypreGMRES::Mult(const HypreParVector &b, HypreParVector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    int myid;
@@ -4751,7 +4966,12 @@ void HypreFGMRES::SetPreconditioner(HypreSolver &precond_)
 void HypreFGMRES::Mult(const HypreParVector &b, HypreParVector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    int myid;
@@ -5710,7 +5930,12 @@ void HypreAMS::MakeGradientAndInterpolation(
    ParFiniteElementSpace *edge_fespace, int cycle_type)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    int dim = edge_fespace->GetMesh()->Dimension();

@@ -35,7 +35,12 @@ void SparseSmoother::SetOperator(const Operator &a)
 void GSSmoother::Mult(const Vector &x, Vector &y) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (!iterative_mode)
@@ -72,7 +77,12 @@ DSmoother::DSmoother(const SparseMatrix &a, int t, double s, int it)
 void DSmoother::Mult(const Vector &x, Vector &y) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (!iterative_mode && type == 0 && iterations == 1)

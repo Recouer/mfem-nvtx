@@ -111,7 +111,12 @@ const double &Vector::Elem(int i) const
 double Vector::operator*(const double *v) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    double dot = 0.0;
@@ -132,7 +137,12 @@ double Vector::operator*(const double *v) const
 Vector &Vector::operator=(const double *v)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    data.CopyFromHost(v, size);
@@ -147,7 +157,12 @@ Vector &Vector::operator=(const double *v)
 Vector &Vector::operator=(const Vector &v)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
 #if 0
@@ -175,7 +190,12 @@ Vector &Vector::operator=(const Vector &v)
 Vector &Vector::operator=(Vector &&v)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    data = std::move(v.data);
@@ -194,7 +214,12 @@ Vector &Vector::operator=(Vector &&v)
 Vector &Vector::operator=(double value)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice();
@@ -212,7 +237,12 @@ Vector &Vector::operator=(double value)
 Vector &Vector::operator*=(double c)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice();
@@ -232,7 +262,12 @@ Vector &Vector::operator*=(const Vector &v)
    MFEM_ASSERT(size == v.size, "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice() || v.UseDevice();
@@ -251,7 +286,12 @@ Vector &Vector::operator*=(const Vector &v)
 Vector &Vector::operator/=(double c)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice();
@@ -272,7 +312,12 @@ Vector &Vector::operator/=(const Vector &v)
    MFEM_ASSERT(size == v.size, "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice() || v.UseDevice();
@@ -291,7 +336,12 @@ Vector &Vector::operator/=(const Vector &v)
 Vector &Vector::operator-=(double c)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice();
@@ -311,7 +361,12 @@ Vector &Vector::operator-=(const Vector &v)
    MFEM_ASSERT(size == v.size, "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice() || v.UseDevice();
@@ -330,7 +385,12 @@ Vector &Vector::operator-=(const Vector &v)
 Vector &Vector::operator+=(double c)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice();
@@ -350,7 +410,12 @@ Vector &Vector::operator+=(const Vector &v)
    MFEM_ASSERT(size == v.size, "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice() || v.UseDevice();
@@ -371,7 +436,12 @@ Vector &Vector::Add(const double a, const Vector &Va)
    MFEM_ASSERT(size == Va.size, "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (a != 0.0)
@@ -419,7 +489,12 @@ void Vector::AddSubVector(const Vector &v, int offset)
    MFEM_ASSERT(v.Size() + offset <= size, "invalid sub-vector");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const int vs = v.Size();
@@ -437,7 +512,12 @@ void Vector::AddSubVector(const Vector &v, int offset)
 void Vector::Neg()
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice();
@@ -456,7 +536,12 @@ void add(const Vector &v1, const Vector &v2, Vector &v)
                "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-   nvtxRangePush(__FUNCTION__);
+   	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
 #if !defined(MFEM_USE_LEGACY_OPENMP)
@@ -486,7 +571,12 @@ void add(const Vector &v1, double alpha, const Vector &v2, Vector &v)
                "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (alpha == 0.0)
@@ -531,7 +621,12 @@ void add(const double a, const Vector &x, const Vector &y, Vector &z)
                "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (a == 0.0)
@@ -578,7 +673,12 @@ void add(const double a, const Vector &x,
                "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (a == 0.0)
@@ -637,7 +737,12 @@ void subtract(const Vector &x, const Vector &y, Vector &z)
                "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
 #if !defined(MFEM_USE_LEGACY_OPENMP)
@@ -671,7 +776,12 @@ void subtract(const double a, const Vector &x, const Vector &y, Vector &z)
                "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (a == 0.)
@@ -716,7 +826,12 @@ void Vector::median(const Vector &lo, const Vector &hi)
                "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice() || lo.UseDevice() || hi.UseDevice();
@@ -745,7 +860,12 @@ void Vector::median(const Vector &lo, const Vector &hi)
 void Vector::GetSubVector(const Array<int> &dofs, Vector &elemvect) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const int n = dofs.Size();
@@ -768,7 +888,12 @@ void Vector::GetSubVector(const Array<int> &dofs, Vector &elemvect) const
 void Vector::GetSubVector(const Array<int> &dofs, double *elem_data) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    data.Read(MemoryClass::HOST, size);
@@ -787,7 +912,12 @@ void Vector::GetSubVector(const Array<int> &dofs, double *elem_data) const
 void Vector::SetSubVector(const Array<int> &dofs, const double value)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = dofs.UseDevice();
@@ -820,7 +950,12 @@ void Vector::SetSubVector(const Array<int> &dofs, const Vector &elemvect)
                << ", length of elemvect is " << elemvect.Size());
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = dofs.UseDevice() || elemvect.UseDevice();
@@ -850,7 +985,12 @@ void Vector::SetSubVector(const Array<int> &dofs, const Vector &elemvect)
 void Vector::SetSubVector(const Array<int> &dofs, double *elem_data)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    // Use read+write access because we overwrite only part of the data.
@@ -881,7 +1021,12 @@ void Vector::AddElementVector(const Array<int> &dofs, const Vector &elemvect)
                ", length of elemvect is " << elemvect.Size());
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = dofs.UseDevice() || elemvect.UseDevice();
@@ -910,7 +1055,12 @@ void Vector::AddElementVector(const Array<int> &dofs, const Vector &elemvect)
 void Vector::AddElementVector(const Array<int> &dofs, double *elem_data)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    data.ReadWrite(MemoryClass::HOST, size);
@@ -941,7 +1091,12 @@ void Vector::AddElementVector(const Array<int> &dofs, const double a,
                ", length of elemvect is " << elemvect.Size());
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = dofs.UseDevice() || elemvect.UseDevice();
@@ -970,7 +1125,12 @@ void Vector::AddElementVector(const Array<int> &dofs, const double a,
 void Vector::SetSubVectorComplement(const Array<int> &dofs, const double val)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice() || dofs.UseDevice();
@@ -1091,7 +1251,12 @@ double Vector::Norml2() const
 double Vector::Normlinf() const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    HostRead();
@@ -1111,7 +1276,12 @@ double Vector::Normlinf() const
 double Vector::Norml1() const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    HostRead();
@@ -1133,7 +1303,12 @@ double Vector::Normlp(double p) const
    MFEM_ASSERT(p > 0.0, "Vector::Normlp");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (p == 1.0)
@@ -1215,7 +1390,12 @@ double Vector::Max() const
    if (size == 0) { return -infinity(); }
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    HostRead();
@@ -1239,7 +1419,12 @@ double Vector::Max() const
 double Vector::Sum() const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    double sum = 0.0;
@@ -1288,7 +1473,12 @@ static Array<double> cuda_reduce_buf;
 static double cuVectorMin(const int N, const double *X)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const int tpb = MFEM_CUDA_BLOCKS;
@@ -1340,7 +1530,12 @@ static __global__ void cuKernelDot(const int N, double *gdsr,
 static double cuVectorDot(const int N, const double *X, const double *Y)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const int tpb = MFEM_CUDA_BLOCKS;
@@ -1459,7 +1654,12 @@ double Vector::operator*(const Vector &v) const
    if (size == 0) { return 0.0; }
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice() || v.UseDevice();
@@ -1588,7 +1788,12 @@ double Vector::Min() const
    if (size == 0) { return infinity(); }
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice();

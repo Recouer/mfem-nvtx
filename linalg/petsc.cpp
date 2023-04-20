@@ -659,7 +659,12 @@ PetscParVector& PetscParVector::SetValues(const Array<PetscInt>& idx,
                                           const Array<PetscScalar>& vals)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_VERIFY(idx.Size() == vals.Size(),
@@ -684,7 +689,12 @@ PetscParVector& PetscParVector::AddValues(const Array<PetscInt>& idx,
    MFEM_VERIFY(idx.Size() == vals.Size(),
                "Size mismatch between indices and values");
  #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    PetscInt n = idx.Size();
@@ -704,7 +714,12 @@ PetscParVector& PetscParVector::AddValues(const Array<PetscInt>& idx,
 PetscParVector& PetscParVector::operator=(const PetscParVector &y)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    ierr = VecCopy(y.x,x); PCHKERRQ(x,ierr);
@@ -720,7 +735,12 @@ PetscParVector& PetscParVector::operator=(const PetscParVector &y)
 PetscParVector& PetscParVector::operator+=(const PetscParVector &y)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    ierr = VecAXPY(x,1.0,y.x); PCHKERRQ(x,ierr);
@@ -736,7 +756,12 @@ PetscParVector& PetscParVector::operator+=(const PetscParVector &y)
 PetscParVector& PetscParVector::operator-=(const PetscParVector &y)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    ierr = VecAXPY(x,-1.0,y.x); PCHKERRQ(x,ierr);
@@ -752,7 +777,12 @@ PetscParVector& PetscParVector::operator-=(const PetscParVector &y)
 PetscParVector& PetscParVector::operator*=(PetscScalar s)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    ierr = VecScale(x,s); PCHKERRQ(x,ierr);
@@ -768,7 +798,12 @@ PetscParVector& PetscParVector::operator*=(PetscScalar s)
 PetscParVector& PetscParVector::operator+=(PetscScalar s)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    ierr = VecShift(x,s); PCHKERRQ(x,ierr);
@@ -1111,7 +1146,12 @@ PetscParMatrix::PetscParMatrix(MPI_Comm comm, PetscInt global_num_rows,
 PetscParMatrix& PetscParMatrix::operator=(const HypreParMatrix& B)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (A)
@@ -1141,7 +1181,12 @@ PetscParMatrix& PetscParMatrix::operator=(const HypreParMatrix& B)
 PetscParMatrix& PetscParMatrix::operator=(const PetscParMatrix& B)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (A)
@@ -1166,7 +1211,12 @@ PetscParMatrix& PetscParMatrix::operator=(const PetscParMatrix& B)
 PetscParMatrix& PetscParMatrix::operator+=(const PetscParMatrix& B)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (!A)
@@ -1190,7 +1240,12 @@ PetscParMatrix& PetscParMatrix::operator+=(const PetscParMatrix& B)
 PetscParMatrix& PetscParMatrix::operator-=(const PetscParMatrix& B)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (!A)
@@ -1927,7 +1982,12 @@ static void MatMultKernel(Mat A,PetscScalar a,Vec X,PetscScalar b,Vec Y,
                           bool transpose)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    PetscErrorCode (*f)(Mat,Vec,Vec);
@@ -2034,7 +2094,12 @@ void PetscParMatrix::Mult(double a, const Vector &x, double b, Vector &y) const
                << ", expected size = " << Height());
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    PetscParVector *XX = GetX();
@@ -2060,7 +2125,12 @@ void PetscParMatrix::MultTranspose(double a, const Vector &x, double b,
                << ", expected size = " << Width());
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    PetscParVector *XX = GetX();
@@ -2278,7 +2348,12 @@ PetscParMatrix * RAP(HypreParMatrix *hA, PetscParMatrix *P)
 PetscParMatrix * ParMult(const PetscParMatrix *A, const PetscParMatrix *B)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    Mat AB;
@@ -3215,7 +3290,12 @@ void PetscLinearSolver::SetPreconditioner(Solver &precond)
 void PetscLinearSolver::MultKernel(const Vector &b, Vector &x, bool trans) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    KSP ksp = (KSP)obj;
@@ -3400,7 +3480,12 @@ void PetscPreconditioner::MultKernel(const Vector &b, Vector &x,
                "Iterative mode not supported for PetscPreconditioner");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    PC pc = (PC)obj;
@@ -3471,7 +3556,12 @@ static void func_coords(const Vector &x, Vector &y)
 void PetscBDDCSolver::BDDCSolverConstructor(const PetscBDDCSolverParams &opts)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MPI_Comm comm = PetscObjectComm(obj);
@@ -4204,7 +4294,12 @@ void PetscNonlinearSolver::SetUpdate(void (*update)(Operator *,int,
 void PetscNonlinearSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    SNES snes = (SNES)obj;
@@ -4381,7 +4476,12 @@ void PetscODESolver::SetType(PetscODESolver::Type type)
 void PetscODESolver::Step(Vector &x, double &t, double &dt)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    // Pass the parameters to PETSc.
@@ -4427,7 +4527,12 @@ void PetscODESolver::Step(Vector &x, double &t, double &dt)
 void PetscODESolver::Run(Vector &x, double &t, double &dt, double t_final)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    // Give the parameters to PETSc.

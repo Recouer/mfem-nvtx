@@ -56,7 +56,12 @@ IterativeSolver::IterativeSolver(MPI_Comm comm_)
 double IterativeSolver::Dot(const Vector &x, const Vector &y) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
 #ifndef MFEM_USE_MPI
@@ -215,7 +220,12 @@ void IterativeSolver::Monitor(int it, double norm, const Vector& r,
                               const Vector& x, bool final) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (monitor != nullptr)
@@ -338,7 +348,12 @@ void OperatorJacobiSmoother::Mult(const Vector &x, Vector &y) const
    MFEM_ASSERT(y.Size() == Height(), "invalid output vector");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (iterative_mode)
@@ -530,7 +545,12 @@ void OperatorChebyshevSmoother::Mult(const Vector& x, Vector &y) const
    }
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    residual = x;
@@ -574,7 +594,12 @@ void SLISolver::UpdateVectors()
 void SLISolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    int i;
@@ -778,7 +803,12 @@ void CGSolver::UpdateVectors()
 void CGSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    int i;
@@ -1075,7 +1105,12 @@ inline void Update(Vector &x, int k, DenseMatrix &h, Vector &s,
 void GMRESSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    // Generalized Minimum Residual method following the algorithm
@@ -1271,7 +1306,12 @@ finish:
 void FGMRESSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    DenseMatrix H(m+1,m);
@@ -1499,7 +1539,12 @@ void BiCGSTABSolver::UpdateVectors()
 void BiCGSTABSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    // BiConjugate Gradient Stabilized method following the algorithm
@@ -1755,7 +1800,12 @@ void MINRESSolver::SetOperator(const Operator &op)
 void MINRESSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    // Based on the MINRES algorithm on p. 86, Fig. 6.9 in
@@ -1968,7 +2018,12 @@ void NewtonSolver::SetOperator(const Operator &op)
 void NewtonSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_ASSERT(oper != NULL, "the Operator is not set (use SetOperator).");
@@ -2164,7 +2219,12 @@ void NewtonSolver::AdaptiveLinRtolPostSolve(const Vector &x,
 void LBFGSSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_VERIFY(oper != NULL, "the Operator is not set (use SetOperator).");
@@ -2318,7 +2378,12 @@ int aGMRES(const Operator &A, Vector &x, const Vector &b,
            double &tol, double &atol, int printit)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
 
@@ -2565,7 +2630,12 @@ inline void SLBQPOptimizer::print_iteration(int it, double r, double l) const
 void SLBQPOptimizer::Mult(const Vector& xt, Vector& x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
 
@@ -3188,7 +3258,12 @@ void BlockILU::Factorize()
 void BlockILU::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_ASSERT(height > 0, "BlockILU(0) preconditioner is not constructed");
@@ -3394,7 +3469,12 @@ void UMFPackSolver::SetOperator(const Operator &op)
 void UMFPackSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
 
@@ -3438,7 +3518,12 @@ void UMFPackSolver::Mult(const Vector &b, Vector &x) const
 void UMFPackSolver::MultTranspose(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
 
@@ -3537,7 +3622,12 @@ void KLUSolver::SetOperator(const Operator &op)
 void KLUSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_VERIFY(mat != NULL,
@@ -3559,7 +3649,12 @@ void KLUSolver::Mult(const Vector &b, Vector &x) const
 void KLUSolver::MultTranspose(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_VERIFY(mat != NULL,
@@ -3594,7 +3689,12 @@ DirectSubBlockSolver::DirectSubBlockSolver(const SparseMatrix &A,
      block_solvers(new DenseMatrixInverse[block_dof.NumRows()])
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    DenseMatrix sub_A;
@@ -3614,7 +3714,12 @@ DirectSubBlockSolver::DirectSubBlockSolver(const SparseMatrix &A,
 void DirectSubBlockSolver::Mult(const Vector &x, Vector &y) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    y.SetSize(x.Size());
@@ -3637,7 +3742,12 @@ void DirectSubBlockSolver::Mult(const Vector &x, Vector &y) const
 void ProductSolver::Mult(const Vector & x, Vector & y) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    y.SetSize(x.Size());
@@ -3662,7 +3772,12 @@ void ProductSolver::Mult(const Vector & x, Vector & y) const
 void ProductSolver::MultTranspose(const Vector & x, Vector & y) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    y.SetSize(x.Size());
@@ -3718,7 +3833,12 @@ void OrthoSolver::SetOperator(const Operator &op)
 void OrthoSolver::Mult(const Vector &b, Vector &x) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_VERIFY(solver, "Solver hasn't been set, call SetSolver() first.");
@@ -3740,14 +3860,19 @@ void OrthoSolver::Mult(const Vector &b, Vector &x) const
    Orthogonalize(x, x);
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+    nvtxRangePop();
 #endif
 }
 
 void OrthoSolver::Orthogonalize(const Vector &v, Vector &v_ortho) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    if (global_size == -1)
@@ -3783,7 +3908,7 @@ void OrthoSolver::Orthogonalize(const Vector &v, Vector &v_ortho) const
    }
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+    nvtxRangePop();
 #endif
 }
 

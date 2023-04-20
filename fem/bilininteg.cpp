@@ -158,7 +158,13 @@ void BilinearFormIntegrator::AssembleElementVector(
    Vector &elvect)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     // Note: This default implementation is general but not efficient
@@ -177,7 +183,13 @@ void BilinearFormIntegrator::AssembleFaceVector(
    FaceElementTransformations &Tr, const Vector &elfun, Vector &elvect)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     // Note: This default implementation is general but not efficient
@@ -201,7 +213,13 @@ void TransposeIntegrator::AssembleElementMatrix (
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     bfi -> AssembleElementMatrix (el, Trans, bfi_elmat);
@@ -218,7 +236,13 @@ void TransposeIntegrator::AssembleElementMatrix2 (
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     bfi -> AssembleElementMatrix2 (test_fe, trial_fe, Trans, bfi_elmat);
@@ -235,7 +259,13 @@ void TransposeIntegrator::AssembleFaceMatrix (
    FaceElementTransformations &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     bfi -> AssembleFaceMatrix (el1, el2, Trans, bfi_elmat);
@@ -250,7 +280,13 @@ void TransposeIntegrator::AssembleFaceMatrix (
 void LumpedIntegrator::SetIntRule(const IntegrationRule *ir)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     IntRule = ir;
@@ -265,7 +301,13 @@ void LumpedIntegrator::AssembleElementMatrix (
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     bfi -> AssembleElementMatrix (el, Trans, elmat);
@@ -279,7 +321,13 @@ void LumpedIntegrator::AssembleElementMatrix (
 void InverseIntegrator::SetIntRule(const IntegrationRule *ir)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     IntRule = ir;
@@ -294,7 +342,13 @@ void InverseIntegrator::AssembleElementMatrix(
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     integrator->AssembleElementMatrix(el, Trans, elmat);
@@ -308,7 +362,13 @@ void InverseIntegrator::AssembleElementMatrix(
 void SumIntegrator::SetIntRule(const IntegrationRule *ir)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     IntRule = ir;
@@ -328,7 +388,13 @@ void SumIntegrator::AssembleElementMatrix(
    MFEM_ASSERT(integrators.Size() > 0, "empty SumIntegrator.");
 
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     integrators[0]->AssembleElementMatrix(el, Trans, elmat);
@@ -350,7 +416,13 @@ void SumIntegrator::AssembleElementMatrix2(
    MFEM_ASSERT(integrators.Size() > 0, "empty SumIntegrator.");
 
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     integrators[0]->AssembleElementMatrix2(el1, el2, Trans, elmat);
@@ -371,7 +443,13 @@ void SumIntegrator::AssembleFaceMatrix(
 {
    MFEM_ASSERT(integrators.Size() > 0, "empty SumIntegrator.");
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     integrators[0]->AssembleFaceMatrix(el1, el2, Trans, elmat);
@@ -393,7 +471,13 @@ void SumIntegrator::AssembleFaceMatrix(
 {
    MFEM_ASSERT(integrators.Size() > 0, "empty SumIntegrator.");
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     integrators[0]->AssembleFaceMatrix(tr_fe, te_fe1, te_fe2, Trans, elmat);
@@ -411,7 +495,13 @@ void SumIntegrator::AssembleFaceMatrix(
 void SumIntegrator::AssemblePA(const FiniteElementSpace& fes)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -427,7 +517,13 @@ void SumIntegrator::AssemblePA(const FiniteElementSpace& fes)
 void SumIntegrator::AssembleDiagonalPA(Vector &diag)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -443,7 +539,13 @@ void SumIntegrator::AssembleDiagonalPA(Vector &diag)
 void SumIntegrator::AssemblePAInteriorFaces(const FiniteElementSpace &fes)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -459,7 +561,13 @@ void SumIntegrator::AssemblePAInteriorFaces(const FiniteElementSpace &fes)
 void SumIntegrator::AssemblePABoundaryFaces(const FiniteElementSpace &fes)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -475,7 +583,13 @@ void SumIntegrator::AssemblePABoundaryFaces(const FiniteElementSpace &fes)
 void SumIntegrator::AddMultPA(const Vector& x, Vector& y) const
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -491,7 +605,13 @@ void SumIntegrator::AddMultPA(const Vector& x, Vector& y) const
 void SumIntegrator::AddMultTransposePA(const Vector &x, Vector &y) const
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -507,7 +627,13 @@ void SumIntegrator::AddMultTransposePA(const Vector &x, Vector &y) const
 void SumIntegrator::AssembleMF(const FiniteElementSpace &fes)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -523,7 +649,13 @@ void SumIntegrator::AssembleMF(const FiniteElementSpace &fes)
 void SumIntegrator::AddMultMF(const Vector& x, Vector& y) const
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -539,7 +671,13 @@ void SumIntegrator::AddMultMF(const Vector& x, Vector& y) const
 void SumIntegrator::AddMultTransposeMF(const Vector &x, Vector &y) const
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -555,7 +693,13 @@ void SumIntegrator::AddMultTransposeMF(const Vector &x, Vector &y) const
 void SumIntegrator::AssembleDiagonalMF(Vector &diag)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -572,7 +716,13 @@ void SumIntegrator::AssembleEA(const FiniteElementSpace &fes, Vector &emat,
                                const bool add)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -591,7 +741,13 @@ void SumIntegrator::AssembleEAInteriorFaces(const FiniteElementSpace &fes,
                                             const bool add)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -609,7 +765,13 @@ void SumIntegrator::AssembleEABoundaryFaces(const FiniteElementSpace &fes,
                                             const bool add)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     for (int i = 0; i < integrators.Size(); i++)
@@ -625,7 +787,13 @@ void SumIntegrator::AssembleEABoundaryFaces(const FiniteElementSpace &fes,
 SumIntegrator::~SumIntegrator()
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     if (own_integrators)
@@ -649,7 +817,13 @@ void MixedScalarIntegrator::AssembleElementMatrix2(
                this->FiniteElementTypeFailureMessage());
 
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
@@ -716,7 +890,13 @@ void MixedVectorIntegrator::AssembleElementMatrix2(
                this->FiniteElementTypeFailureMessage());
 
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     space_dim = Trans.GetSpaceDim();
@@ -901,7 +1081,13 @@ void MixedScalarVectorIntegrator::AssembleElementMatrix2(
                "VectorCoefficient must be set");
 
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     const FiniteElement * vec_fe = transpose?&trial_fe:&test_fe;
@@ -979,7 +1165,13 @@ void GradientIntegrator::AssembleElementMatrix2(
    ElementTransformation &Trans,  DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     dim = test_fe.GetDim();
@@ -1044,7 +1236,13 @@ const IntegrationRule &GradientIntegrator::GetRule(const FiniteElement
                                                    ElementTransformation &Trans)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int order = Trans.OrderGrad(&trial_fe) + test_fe.GetOrder() + Trans.OrderJ();
@@ -1062,7 +1260,13 @@ void DiffusionIntegrator::AssembleElementMatrix
   DenseMatrix &elmat )
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int nd = el.GetDof();
@@ -1145,7 +1349,13 @@ void DiffusionIntegrator::AssembleElementMatrix2(
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int tr_nd = trial_fe.GetDof();
@@ -1237,7 +1447,13 @@ void DiffusionIntegrator::AssembleElementVector(
    Vector &elvect)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int nd = el.GetDof();
@@ -1328,7 +1544,13 @@ void DiffusionIntegrator::ComputeElementFlux
   const IntegrationRule *ir)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int nd, spaceDim, fnd;
@@ -1434,7 +1656,13 @@ double DiffusionIntegrator::ComputeFluxEnergy
   Vector &flux, Vector* d_energy)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int nd = fluxelem.GetDof();
@@ -1517,7 +1745,13 @@ const IntegrationRule &DiffusionIntegrator::GetRule(
    const FiniteElement &trial_fe, const FiniteElement &test_fe)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int order;
@@ -1554,7 +1788,13 @@ void MassIntegrator::AssembleElementMatrix
   DenseMatrix &elmat )
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int nd = el.GetDof();
@@ -1596,7 +1836,13 @@ void MassIntegrator::AssembleElementMatrix2(
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int tr_nd = trial_fe.GetDof();
@@ -1641,7 +1887,13 @@ const IntegrationRule &MassIntegrator::GetRule(const FiniteElement &trial_fe,
                                                ElementTransformation &Trans)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     // int order = trial_fe.GetOrder() + test_fe.GetOrder();
@@ -1673,7 +1925,13 @@ void BoundaryMassIntegrator::AssembleFaceMatrix(
                "support for interior faces is not implemented");
 
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int nd1 = el1.GetDof();
@@ -1723,7 +1981,13 @@ void ConvectionIntegrator::AssembleElementMatrix(
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int nd = el.GetDof();
@@ -1779,7 +2043,13 @@ void GroupConvectionIntegrator::AssembleElementMatrix(
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int nd = el.GetDof();
@@ -1840,7 +2110,13 @@ const IntegrationRule &ConvectionIntegrator::GetRule(
    ElementTransformation &Trans)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int order = Trans.OrderGrad(&trial_fe) + Trans.Order() + test_fe.GetOrder();
@@ -1863,7 +2139,13 @@ void VectorMassIntegrator::AssembleElementMatrix
   DenseMatrix &elmat )
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int nd = el.GetDof();
@@ -1953,7 +2235,13 @@ void VectorMassIntegrator::AssembleElementMatrix2(
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int tr_nd = trial_fe.GetDof();
@@ -2046,7 +2334,13 @@ void VectorFEDivergenceIntegrator::AssembleElementMatrix2(
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
@@ -2094,7 +2388,13 @@ void VectorFEWeakDivergenceIntegrator::AssembleElementMatrix2(
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
@@ -2184,7 +2484,13 @@ void VectorFECurlIntegrator::AssembleElementMatrix2(
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int trial_nd = trial_fe.GetDof(), test_nd = test_fe.GetDof(), i;
@@ -2291,7 +2597,13 @@ void DerivativeIntegrator::AssembleElementMatrix2 (
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int dim = trial_fe.GetDim();
@@ -2365,7 +2677,13 @@ void CurlCurlIntegrator::AssembleElementMatrix
   DenseMatrix &elmat )
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int nd = el.GetDof();
@@ -2445,7 +2763,13 @@ void CurlCurlIntegrator::AssembleElementMatrix2(const FiniteElement &trial_fe,
                                                 DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int tr_nd = trial_fe.GetDof();
@@ -2530,7 +2854,13 @@ void CurlCurlIntegrator
                      bool with_coef, const IntegrationRule *ir)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
 #ifdef MFEM_THREAD_SAFE
@@ -2556,7 +2886,13 @@ double CurlCurlIntegrator::ComputeFluxEnergy(const FiniteElement &fluxelem,
                                              Vector &flux, Vector *d_energy)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int nd = fluxelem.GetDof();
@@ -2668,7 +3004,13 @@ void VectorCurlCurlIntegrator::AssembleElementMatrix(
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int dim = el.GetDim();
@@ -2724,7 +3066,13 @@ double VectorCurlCurlIntegrator::GetElementEnergy(
    const FiniteElement &el, ElementTransformation &Tr, const Vector &elfun)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int dim = el.GetDim();
@@ -2798,7 +3146,13 @@ void MixedCurlIntegrator::AssembleElementMatrix2(
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int dim = trial_fe.GetDim();
@@ -2886,7 +3240,13 @@ void VectorFEMassIntegrator::AssembleElementMatrix(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int dof = el.GetDof();
@@ -2959,7 +3319,13 @@ void VectorFEMassIntegrator::AssembleElementMatrix2(
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     if (test_fe.GetRangeType() == FiniteElement::SCALAR
@@ -3145,7 +3511,13 @@ void VectorDivergenceIntegrator::AssembleElementMatrix2(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     dim  = trial_fe.GetDim();
@@ -3212,7 +3584,13 @@ void DivDivIntegrator::AssembleElementMatrix(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int dof = el.GetDof();
@@ -3264,7 +3642,13 @@ void DivDivIntegrator::AssembleElementMatrix2(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int tr_nd = trial_fe.GetDof();
@@ -3320,7 +3704,13 @@ void VectorDiffusionIntegrator::AssembleElementMatrix(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     const int dof = el.GetDof();
@@ -3409,7 +3799,13 @@ void VectorDiffusionIntegrator::AssembleElementVector(
    const Vector &elfun, Vector &elvect)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     const int dof = el.GetDof();
@@ -3507,7 +3903,13 @@ void ElasticityIntegrator::AssembleElementMatrix(
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int dof = el.GetDof();
@@ -3599,7 +4001,13 @@ void ElasticityIntegrator::ComputeElementFlux(
    bool with_coef, const IntegrationRule *ir)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     const int dof = el.GetDof();
@@ -3685,7 +4093,13 @@ double ElasticityIntegrator::ComputeFluxEnergy(const FiniteElement &fluxelem,
                                                Vector &flux, Vector *d_energy)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     const int dof = fluxelem.GetDof();
@@ -3787,7 +4201,13 @@ void DGTraceIntegrator::AssembleFaceMatrix(const FiniteElement &el1,
                                            DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int ndof1, ndof2;
@@ -3935,7 +4355,13 @@ void DGDiffusionIntegrator::AssembleFaceMatrix(
    FaceElementTransformations &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int dim, ndof1, ndof2, ndofs;
@@ -4184,7 +4610,13 @@ void DGElasticityIntegrator::AssembleBlock(
    DenseMatrix &elmat, DenseMatrix &jmat)
 {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
         for (int jm = 0, j = col_offset; jm < dim; ++jm)
@@ -4244,7 +4676,13 @@ void DGElasticityIntegrator::AssembleFaceMatrix(
 #endif
 
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
    const int dim = el1.GetDim();
@@ -4420,7 +4858,13 @@ void TraceJumpIntegrator::AssembleFaceMatrix(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int i, j, face_ndof, ndof1, ndof2;
@@ -4520,7 +4964,13 @@ void NormalTraceJumpIntegrator::AssembleFaceMatrix(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int i, j, face_ndof, ndof1, ndof2, dim;
@@ -4615,7 +5065,13 @@ void NormalInterpolator::AssembleElementMatrix2(
    ElementTransformation &Trans, DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     int spaceDim = Trans.GetSpaceDim();
@@ -4676,7 +5132,13 @@ ScalarProductInterpolator::AssembleElementMatrix2(const FiniteElement &dom_fe,
                                                   DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     internal::ShapeCoefficient dom_shape_coeff(*Q, dom_fe);
@@ -4701,7 +5163,13 @@ ScalarVectorProductInterpolator::AssembleElementMatrix2(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     // Vector shape functions scaled by scalar coefficient
@@ -4744,7 +5212,13 @@ VectorScalarProductInterpolator::AssembleElementMatrix2(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     // Scalar shape functions scaled by vector coefficient
@@ -4790,7 +5264,13 @@ ScalarCrossProductInterpolator::AssembleElementMatrix2(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     // Vector coefficient product with vector shape functions
@@ -4840,7 +5320,13 @@ VectorCrossProductInterpolator::AssembleElementMatrix2(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     // Vector coefficient product with vector shape functions
@@ -4931,7 +5417,13 @@ VectorInnerProductInterpolator::AssembleElementMatrix2(
    DenseMatrix &elmat)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    	char str[256];
+	sprintf(str, "%d ", __LINE__);
+	strcat(str, __FILE__);
+	strcat(str, " ");
+	strcat(str, __FUNCTION__);
+	nvtxRangePush(str);
+	printf("i am here");
 #endif
 
     internal::VDotVShapeCoefficient dom_shape_coeff(*VQ, dom_fe);

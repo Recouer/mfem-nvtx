@@ -51,7 +51,12 @@ void Operator::InitTVectors(const Operator *Po, const Operator *Ri,
 void Operator::AddMult(const Vector &x, Vector &y, const double a) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    mfem::Vector z(y.Size());
@@ -67,7 +72,12 @@ void Operator::AddMultTranspose(const Vector &x, Vector &y,
                                 const double a) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    mfem::Vector z(y.Size());
@@ -83,7 +93,12 @@ void Operator::ArrayMult(const Array<const Vector *> &X,
                          Array<Vector *> &Y) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_ASSERT(X.Size() == Y.Size(),
@@ -103,7 +118,12 @@ void Operator::ArrayMultTranspose(const Array<const Vector *> &X,
                                   Array<Vector *> &Y) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_ASSERT(X.Size() == Y.Size(),
@@ -123,7 +143,12 @@ void Operator::ArrayAddMult(const Array<const Vector *> &X, Array<Vector *> &Y,
                             const double a) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    MFEM_ASSERT(X.Size() == Y.Size(),
@@ -146,7 +171,12 @@ void Operator::ArrayAddMultTranspose(const Array<const Vector *> &X,
                "Number of columns mismatch in Operator::AddMultTranspose!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    for (int i = 0; i < X.Size(); i++)
@@ -197,7 +227,12 @@ void Operator::FormRectangularLinearSystem(
 void Operator::RecoverFEMSolution(const Vector &X, const Vector &b, Vector &x)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    // Same for Rectangular and Square operators
@@ -577,7 +612,12 @@ void ConstrainedOperator::AssembleDiagonal(Vector &diag) const
 void ConstrainedOperator::EliminateRHS(const Vector &x, Vector &b) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    w = 0.0;
@@ -612,7 +652,12 @@ void ConstrainedOperator::EliminateRHS(const Vector &x, Vector &b) const
 void ConstrainedOperator::Mult(const Vector &x, Vector &y) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const int csz = constraint_list.Size();
@@ -687,7 +732,12 @@ void RectangularConstrainedOperator::EliminateRHS(const Vector &x,
                                                   Vector &b) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    w = 0.0;
@@ -719,7 +769,12 @@ void RectangularConstrainedOperator::EliminateRHS(const Vector &x,
 void RectangularConstrainedOperator::Mult(const Vector &x, Vector &y) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const int trial_csz = trial_constraints.Size();
@@ -756,7 +811,12 @@ void RectangularConstrainedOperator::MultTranspose(const Vector &x,
                                                    Vector &y) const
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const int trial_csz = trial_constraints.Size();
@@ -793,7 +853,12 @@ double PowerMethod::EstimateLargestEigenvalue(Operator& opr, Vector& v0,
                                               int numSteps, double tolerance, int seed)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    v1.SetSize(v0.Size());
