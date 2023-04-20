@@ -56,6 +56,10 @@ Vector::Vector(Vector &&v)
 
 void Vector::Load(std::istream **in, int np, int *dim)
 {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    int i, j, s;
 
    s = 0;
@@ -80,10 +84,18 @@ void Vector::Load(std::istream **in, int np, int *dim)
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::Load(std::istream &in, int Size)
 {
+   #ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    SetSize(Size);
 
    for (int i = 0; i < size; i++)
@@ -96,6 +108,10 @@ void Vector::Load(std::istream &in, int Size)
          in.clear();
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 double &Vector::Elem(int i)
@@ -463,17 +479,29 @@ Vector &Vector::Set(const double a, const Vector &Va)
 {
    MFEM_ASSERT(size == Va.size, "incompatible Vectors!");
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
+
    const bool use_dev = UseDevice() || Va.UseDevice();
    const int N = size;
    auto x = Va.Read(use_dev);
    auto y = Write(use_dev);
    MFEM_FORALL_SWITCH(use_dev, i, N, y[i] = a * x[i];);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return *this;
 }
 
 void Vector::SetVector(const Vector &v, int offset)
 {
    MFEM_ASSERT(v.Size() + offset <= size, "invalid sub-vector");
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush(__FUNCTION__);
+#endif
 
    const int vs = v.Size();
    const double *vp = v.data;
@@ -482,6 +510,9 @@ void Vector::SetVector(const Vector &v, int offset)
    {
       p[i] = vp[i];
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Vector::AddSubVector(const Vector &v, int offset)
@@ -1689,11 +1720,13 @@ double Vector::operator*(const Vector &v) const
    if (Device::Allows(Backend::CUDA_MASK))
    {
 
+      double tmp = cuVectorDot(size, m_data, v_data);
+
 #ifdef MFEM_USE_CUDA
   nvtxRangePop();
 #endif
 
-      return cuVectorDot(size, m_data, v_data);
+      return tmp;
    }
 #endif
 

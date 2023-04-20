@@ -15,6 +15,7 @@
 #define MFEM_PETSC
 
 #include "../config/config.hpp"
+#include <nvToolsExt.h>
 
 #ifdef MFEM_USE_PETSC
 #ifdef MFEM_USE_MPI
