@@ -565,6 +565,7 @@ inline void ForallWrap(const bool use_dev, const int N,
    MFEM_CONTRACT_VAR(Z);
    MFEM_CONTRACT_VAR(G);
    MFEM_CONTRACT_VAR(d_body);
+   printf("%d\n", use_dev);
    if (!use_dev) { goto backend_cpu; }
 
 #if defined(MFEM_USE_RAJA) && defined(RAJA_ENABLE_CUDA)
