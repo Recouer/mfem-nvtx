@@ -328,7 +328,7 @@ void LinearForm::Assemble()
    DofTransformation *doftrans;
    Vector elemvect;
 
-   Vector::operator=(0.0);
+   Vector::AssignOnDevice(0.0, true);
 
    // The above operation is executed on device because of UseDevice().
    // The first use of AddElementVector() below will move it back to host

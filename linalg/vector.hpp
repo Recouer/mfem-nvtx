@@ -293,6 +293,9 @@ public:
    /// Redefine '=' for vector = constant.
    Vector &operator=(double value);
 
+   // TODO: test function
+   Vector &Vector::AssignOnDevice(double value, const bool useDevice) 
+
    Vector &operator*=(double c);
 
    /// Component-wise scaling: (*this)(i) *= v(i)

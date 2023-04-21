@@ -250,6 +250,28 @@ Vector &Vector::operator=(double value)
    return *this;
 }
 
+Vector &Vector::AssignOnDevice(double value, const bool useDevice) 
+{
+#ifdef MFEM_USE_CUDA
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
+#endif
+
+   const int N = size;
+   auto y = Write(useDevice);
+   MFEM_FORALL_SWITCH(useDevice, i, N, y[i] = value;);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
+   return *this;
+}
+
 Vector &Vector::operator*=(double c)
 {
 #ifdef MFEM_USE_CUDA
