@@ -57,7 +57,12 @@ Vector::Vector(Vector &&v)
 void Vector::Load(std::istream **in, int np, int *dim)
 {
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    int i, j, s;
@@ -93,7 +98,12 @@ void Vector::Load(std::istream **in, int np, int *dim)
 void Vector::Load(std::istream &in, int Size)
 {
    #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    SetSize(Size);
@@ -502,7 +512,12 @@ Vector &Vector::Set(const double a, const Vector &Va)
    MFEM_ASSERT(size == Va.size, "incompatible Vectors!");
 
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const bool use_dev = UseDevice() || Va.UseDevice();
@@ -522,7 +537,12 @@ void Vector::SetVector(const Vector &v, int offset)
 {
    MFEM_ASSERT(v.Size() + offset <= size, "invalid sub-vector");
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush(__FUNCTION__);
+  char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    const int vs = v.Size();

@@ -19,7 +19,12 @@ namespace mfem {
 
     void BilinearForm::AllocMat() {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (static_cond) {
@@ -80,7 +85,12 @@ namespace mfem {
     BilinearForm::BilinearForm(FiniteElementSpace *f)
             : Matrix(f->GetVSize()) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         fes = f;
@@ -105,7 +115,12 @@ namespace mfem {
     BilinearForm::BilinearForm(FiniteElementSpace *f, BilinearForm *bf, int ps)
             : Matrix(f->GetVSize()) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         fes = f;
@@ -142,7 +157,12 @@ namespace mfem {
 
     void BilinearForm::SetAssemblyLevel(AssemblyLevel assembly_level) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
         if (ext) {
             MFEM_ABORT("the assembly level has already been set!");
@@ -174,7 +194,12 @@ namespace mfem {
 
     void BilinearForm::EnableStaticCondensation() {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         delete static_cond;
@@ -207,7 +232,12 @@ namespace mfem {
                                            BilinearFormIntegrator *constr_integ,
                                            const Array<int> &ess_tdof_list) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         delete hybridization;
@@ -233,7 +263,12 @@ namespace mfem {
 
     void BilinearForm::UseSparsity(int *I, int *J, bool isSorted) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (static_cond) {
@@ -266,7 +301,12 @@ namespace mfem {
 
     void BilinearForm::UseSparsity(SparseMatrix &A) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         MFEM_ASSERT(A.Height() == fes->GetVSize() && A.Width() == fes->GetVSize(),
@@ -295,7 +335,12 @@ namespace mfem {
 
     void BilinearForm::Finalize(int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (assembly == AssemblyLevel::LEGACY) {
@@ -312,7 +357,12 @@ namespace mfem {
 
     void BilinearForm::AddDomainIntegrator(BilinearFormIntegrator *bfi) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         domain_integs.Append(bfi);
@@ -326,7 +376,12 @@ namespace mfem {
     void BilinearForm::AddDomainIntegrator(BilinearFormIntegrator *bfi,
                                            Array<int> &elem_marker) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         domain_integs.Append(bfi);
@@ -339,7 +394,12 @@ namespace mfem {
 
     void BilinearForm::AddBoundaryIntegrator(BilinearFormIntegrator *bfi) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         boundary_integs.Append(bfi);
@@ -353,7 +413,12 @@ namespace mfem {
     void BilinearForm::AddBoundaryIntegrator(BilinearFormIntegrator *bfi,
                                              Array<int> &bdr_marker) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         boundary_integs.Append(bfi);
@@ -366,7 +431,12 @@ namespace mfem {
 
     void BilinearForm::AddInteriorFaceIntegrator(BilinearFormIntegrator *bfi) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         interior_face_integs.Append(bfi);
@@ -378,7 +448,12 @@ namespace mfem {
 
     void BilinearForm::AddBdrFaceIntegrator(BilinearFormIntegrator *bfi) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         boundary_face_integs.Append(bfi);
@@ -393,7 +468,12 @@ namespace mfem {
     void BilinearForm::AddBdrFaceIntegrator(BilinearFormIntegrator *bfi,
                                             Array<int> &bdr_marker) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         boundary_face_integs.Append(bfi);
@@ -406,7 +486,12 @@ namespace mfem {
 
     void BilinearForm::ComputeElementMatrix(int i, DenseMatrix &elmat) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (element_matrices) {
@@ -441,7 +526,12 @@ namespace mfem {
 
     void BilinearForm::ComputeBdrElementMatrix(int i, DenseMatrix &elmat) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (boundary_integs.Size()) {
@@ -466,7 +556,12 @@ namespace mfem {
     void BilinearForm::AssembleElementMatrix(
             int i, const DenseMatrix &elmat, int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         AssembleElementMatrix(i, elmat, vdofs, skip_zeros);
@@ -479,7 +574,12 @@ namespace mfem {
     void BilinearForm::AssembleElementMatrix(
             int i, const DenseMatrix &elmat, Array<int> &vdofs_, int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         fes->GetElementVDofs(i, vdofs_);
@@ -503,7 +603,12 @@ namespace mfem {
     void BilinearForm::AssembleBdrElementMatrix(
             int i, const DenseMatrix &elmat, int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         AssembleBdrElementMatrix(i, elmat, vdofs, skip_zeros);
@@ -516,7 +621,12 @@ namespace mfem {
     void BilinearForm::AssembleBdrElementMatrix(
             int i, const DenseMatrix &elmat, Array<int> &vdofs_, int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         fes->GetBdrElementVDofs(i, vdofs_);
@@ -539,7 +649,12 @@ namespace mfem {
 
     void BilinearForm::Assemble(int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -760,7 +875,12 @@ namespace mfem {
 
     void BilinearForm::ConformingAssemble() {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         // Do not remove zero entries to preserve the symmetric structure of the
@@ -800,7 +920,12 @@ namespace mfem {
 
     void BilinearForm::AssembleDiagonal(Vector &diag) const {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         MFEM_ASSERT(diag.Size() == fes->GetTrueVSize(),
@@ -846,7 +971,12 @@ namespace mfem {
                                         Vector &b, OperatorHandle &A, Vector &X,
                                         Vector &B, int copy_interior) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -916,7 +1046,12 @@ namespace mfem {
     void BilinearForm::FormSystemMatrix(const Array<int> &ess_tdof_list,
                                         OperatorHandle &A) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -962,7 +1097,12 @@ namespace mfem {
     void BilinearForm::RecoverFEMSolution(const Vector &X,
                                           const Vector &b, Vector &x) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -1019,7 +1159,12 @@ namespace mfem {
 
     void BilinearForm::ComputeElementMatrices() {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (element_matrices || domain_integs.Size() == 0 || fes->GetNE() == 0) {
@@ -1072,7 +1217,12 @@ namespace mfem {
                                             const Vector &sol, Vector &rhs,
                                             DiagonalPolicy dpolicy) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         Array<int> ess_dofs, conf_ess_dofs;
@@ -1093,7 +1243,12 @@ namespace mfem {
     void BilinearForm::EliminateEssentialBC(const Array<int> &bdr_attr_is_ess,
                                             DiagonalPolicy dpolicy) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         Array<int> ess_dofs, conf_ess_dofs;
@@ -1114,7 +1269,12 @@ namespace mfem {
     void BilinearForm::EliminateEssentialBCDiag(const Array<int> &bdr_attr_is_ess,
                                                 double value) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         Array<int> ess_dofs, conf_ess_dofs;
@@ -1136,7 +1296,12 @@ namespace mfem {
                                       const Vector &sol, Vector &rhs,
                                       DiagonalPolicy dpolicy) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         vdofs_.HostRead();
@@ -1157,7 +1322,12 @@ namespace mfem {
     void BilinearForm::EliminateVDofs(const Array<int> &vdofs_,
                                       DiagonalPolicy dpolicy) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (mat_e == NULL) {
@@ -1183,7 +1353,12 @@ namespace mfem {
             const Array<int> &ess_dofs, const Vector &sol, Vector &rhs,
             DiagonalPolicy dpolicy) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         MFEM_ASSERT(ess_dofs.Size() == height, "incorrect dof Array size");
@@ -1203,7 +1378,12 @@ namespace mfem {
     void BilinearForm::EliminateEssentialBCFromDofs(const Array<int> &ess_dofs,
                                                     DiagonalPolicy dpolicy) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         MFEM_ASSERT(ess_dofs.Size() == height, "incorrect dof Array size");
@@ -1221,7 +1401,12 @@ namespace mfem {
     void BilinearForm::EliminateEssentialBCFromDofsDiag(const Array<int> &ess_dofs,
                                                         double value) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         MFEM_ASSERT(ess_dofs.Size() == height, "incorrect dof Array size");
@@ -1239,7 +1424,12 @@ namespace mfem {
     void BilinearForm::EliminateVDofsInRHS(
             const Array<int> &vdofs_, const Vector &x, Vector &b) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         mat_e->AddMult(x, b, -1.);
@@ -1252,7 +1442,12 @@ namespace mfem {
 
     void BilinearForm::Mult(const Vector &x, Vector &y) const {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -1268,7 +1463,12 @@ namespace mfem {
 
     void BilinearForm::MultTranspose(const Vector &x, Vector &y) const {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -1285,7 +1485,12 @@ namespace mfem {
 
     void BilinearForm::Update(FiniteElementSpace *nfes) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         bool full_update;
@@ -1328,7 +1533,12 @@ namespace mfem {
 
     void BilinearForm::SetDiagonalPolicy(DiagonalPolicy policy) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         diag_policy = policy;
@@ -1340,7 +1550,12 @@ namespace mfem {
 
     BilinearForm::~BilinearForm() {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         delete mat_e;
@@ -1369,7 +1584,12 @@ namespace mfem {
                                          FiniteElementSpace *te_fes)
             : Matrix(te_fes->GetVSize(), tr_fes->GetVSize()) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         trial_fes = tr_fes;
@@ -1390,7 +1610,12 @@ namespace mfem {
                                          MixedBilinearForm *mbf)
             : Matrix(te_fes->GetVSize(), tr_fes->GetVSize()) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         trial_fes = tr_fes;
@@ -1419,7 +1644,12 @@ namespace mfem {
 
     void MixedBilinearForm::SetAssemblyLevel(AssemblyLevel assembly_level) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -1463,7 +1693,12 @@ namespace mfem {
 
     void MixedBilinearForm::Mult(const Vector &x, Vector &y) const {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         y = 0.0;
@@ -1477,7 +1712,12 @@ namespace mfem {
     void MixedBilinearForm::AddMult(const Vector &x, Vector &y,
                                     const double a) const {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -1493,7 +1733,12 @@ namespace mfem {
 
     void MixedBilinearForm::MultTranspose(const Vector &x, Vector &y) const {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         y = 0.0;
@@ -1507,7 +1752,12 @@ namespace mfem {
     void MixedBilinearForm::AddMultTranspose(const Vector &x, Vector &y,
                                              const double a) const {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -1523,7 +1773,12 @@ namespace mfem {
 
     MatrixInverse *MixedBilinearForm::Inverse() const {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (assembly != AssemblyLevel::LEGACY) {
@@ -1547,7 +1802,12 @@ namespace mfem {
 
     void MixedBilinearForm::Finalize(int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (assembly == AssemblyLevel::LEGACY) {
@@ -1566,7 +1826,12 @@ namespace mfem {
                     "must use Ordering::byNODES!");
 
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         blocks.SetSize(test_fes->GetVDim(), trial_fes->GetVDim());
@@ -1580,7 +1845,12 @@ namespace mfem {
 
     void MixedBilinearForm::AddDomainIntegrator(BilinearFormIntegrator *bfi) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         domain_integs.Append(bfi);
@@ -1592,7 +1862,12 @@ namespace mfem {
 
     void MixedBilinearForm::AddBoundaryIntegrator(BilinearFormIntegrator *bfi) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         boundary_integs.Append(bfi);
@@ -1606,7 +1881,12 @@ namespace mfem {
     void MixedBilinearForm::AddBoundaryIntegrator(BilinearFormIntegrator *bfi,
                                                   Array<int> &bdr_marker) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         boundary_integs.Append(bfi);
@@ -1619,7 +1899,12 @@ namespace mfem {
 
     void MixedBilinearForm::AddTraceFaceIntegrator(BilinearFormIntegrator *bfi) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         trace_face_integs.Append(bfi);
@@ -1631,7 +1916,12 @@ namespace mfem {
 
     void MixedBilinearForm::AddBdrTraceFaceIntegrator(BilinearFormIntegrator *bfi) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         boundary_trace_face_integs.Append(bfi);
@@ -1646,7 +1936,12 @@ namespace mfem {
     void MixedBilinearForm::AddBdrTraceFaceIntegrator(BilinearFormIntegrator *bfi,
                                                       Array<int> &bdr_marker) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         boundary_trace_face_integs.Append(bfi);
@@ -1659,7 +1954,12 @@ namespace mfem {
 
     void MixedBilinearForm::Assemble(int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -1838,7 +2138,12 @@ namespace mfem {
     void MixedBilinearForm::AssembleDiagonal_ADAt(const Vector &D,
                                                   Vector &diag) const {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -1880,7 +2185,12 @@ namespace mfem {
 
     void MixedBilinearForm::ConformingAssemble() {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (assembly != AssemblyLevel::LEGACY) {
@@ -1922,7 +2232,12 @@ namespace mfem {
 
     void MixedBilinearForm::ComputeElementMatrix(int i, DenseMatrix &elmat) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (domain_integs.Size()) {
@@ -1950,7 +2265,12 @@ namespace mfem {
 
     void MixedBilinearForm::ComputeBdrElementMatrix(int i, DenseMatrix &elmat) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (boundary_integs.Size()) {
@@ -1979,7 +2299,12 @@ namespace mfem {
     void MixedBilinearForm::AssembleElementMatrix(
             int i, const DenseMatrix &elmat, int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         AssembleElementMatrix(i, elmat, trial_vdofs, test_vdofs, skip_zeros);
@@ -1993,7 +2318,12 @@ namespace mfem {
             int i, const DenseMatrix &elmat, Array<int> &trial_vdofs_,
             Array<int> &test_vdofs_, int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         trial_fes->GetElementVDofs(i, trial_vdofs_);
@@ -2011,7 +2341,12 @@ namespace mfem {
     void MixedBilinearForm::AssembleBdrElementMatrix(
             int i, const DenseMatrix &elmat, int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         AssembleBdrElementMatrix(i, elmat, trial_vdofs, test_vdofs, skip_zeros);
@@ -2025,7 +2360,12 @@ namespace mfem {
             int i, const DenseMatrix &elmat, Array<int> &trial_vdofs_,
             Array<int> &test_vdofs_, int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         trial_fes->GetBdrElementVDofs(i, trial_vdofs_);
@@ -2043,7 +2383,12 @@ namespace mfem {
     void MixedBilinearForm::EliminateTrialDofs(
             const Array<int> &bdr_attr_is_ess, const Vector &sol, Vector &rhs) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         int i, j, k;
@@ -2070,7 +2415,12 @@ namespace mfem {
     void MixedBilinearForm::EliminateEssentialBCFromTrialDofs(
             const Array<int> &marked_vdofs, const Vector &sol, Vector &rhs) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         mat->EliminateCols(marked_vdofs, &sol, &rhs);
@@ -2082,7 +2432,12 @@ namespace mfem {
 
     void MixedBilinearForm::EliminateTestDofs(const Array<int> &bdr_attr_is_ess) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         int i, j, k;
@@ -2109,7 +2464,12 @@ namespace mfem {
             const Array<int> &test_tdof_list,
             OperatorHandle &A) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -2168,7 +2528,12 @@ namespace mfem {
             OperatorHandle &A,
             Vector &X, Vector &B) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -2203,7 +2568,12 @@ namespace mfem {
 
     void MixedBilinearForm::Update() {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         delete mat;
@@ -2221,7 +2591,12 @@ namespace mfem {
 
     MixedBilinearForm::~MixedBilinearForm() {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (mat) { delete mat; }
@@ -2242,7 +2617,12 @@ namespace mfem {
 
     void DiscreteLinearOperator::SetAssemblyLevel(AssemblyLevel assembly_level) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {
@@ -2274,7 +2654,12 @@ namespace mfem {
 
     void DiscreteLinearOperator::Assemble(int skip_zeros) {
 #ifdef MFEM_USE_CUDA
-        nvtxRangePush(__FUNCTION__);
+        char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
         if (ext) {

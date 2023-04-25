@@ -20,7 +20,12 @@ LinearForm::LinearForm(FiniteElementSpace *f, LinearForm *lf)
    : Vector(f->GetVSize())
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     ext = nullptr;
@@ -49,7 +54,12 @@ LinearForm::LinearForm(FiniteElementSpace *f, LinearForm *lf)
 void LinearForm::AddDomainIntegrator(LinearFormIntegrator *lfi)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     DeltaLFIntegrator *maybe_delta =
@@ -73,7 +83,12 @@ void LinearForm::AddDomainIntegrator(LinearFormIntegrator *lfi,
                                      Array<int> &elem_marker)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     DeltaLFIntegrator *maybe_delta =
@@ -96,7 +111,12 @@ void LinearForm::AddDomainIntegrator(LinearFormIntegrator *lfi,
 void LinearForm::AddBoundaryIntegrator (LinearFormIntegrator * lfi)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     boundary_integs.Append (lfi);
@@ -111,7 +131,12 @@ void LinearForm::AddBoundaryIntegrator (LinearFormIntegrator * lfi,
                                         Array<int> &bdr_attr_marker)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     boundary_integs.Append (lfi);
@@ -125,7 +150,12 @@ void LinearForm::AddBoundaryIntegrator (LinearFormIntegrator * lfi,
 void LinearForm::AddBdrFaceIntegrator (LinearFormIntegrator * lfi)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     boundary_face_integs.Append(lfi);
@@ -141,7 +171,12 @@ void LinearForm::AddBdrFaceIntegrator(LinearFormIntegrator *lfi,
                                       Array<int> &bdr_attr_marker)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     boundary_face_integs.Append(lfi);
@@ -155,7 +190,12 @@ void LinearForm::AddBdrFaceIntegrator(LinearFormIntegrator *lfi,
 void LinearForm::AddInteriorFaceIntegrator(LinearFormIntegrator *lfi)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     interior_face_integs.Append(lfi);
@@ -169,7 +209,12 @@ void LinearForm::AddInteriorFaceIntegrator(LinearFormIntegrator *lfi)
 bool LinearForm::SupportsDevice()
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     // return false for NURBS meshes, so we don’t convert it to non-NURBS
@@ -302,7 +347,12 @@ bool LinearForm::SupportsDevice()
 void LinearForm::UseFastAssembly(bool use_fa)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
    fast_assembly = use_fa;
@@ -320,7 +370,12 @@ void LinearForm::UseFastAssembly(bool use_fa)
 void LinearForm::Assemble()
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     Array<int> vdofs;
@@ -511,7 +566,12 @@ void LinearForm::Assemble()
 void LinearForm::Update()
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     SetSize(fes->GetVSize()); ResetDeltaLocations();
@@ -525,7 +585,12 @@ void LinearForm::Update()
 void LinearForm::Update(FiniteElementSpace *f, Vector &v, int v_offset)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     MFEM_ASSERT(v.Size() >= v_offset + f->GetVSize(), "");
@@ -543,7 +608,12 @@ void LinearForm::Update(FiniteElementSpace *f, Vector &v, int v_offset)
 void LinearForm::MakeRef(FiniteElementSpace *f, Vector &v, int v_offset)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     Update(f, v, v_offset);
@@ -557,7 +627,12 @@ void LinearForm::MakeRef(FiniteElementSpace *f, Vector &v, int v_offset)
 void LinearForm::AssembleDelta()
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     if (domain_delta_integs.Size() == 0) {
@@ -613,7 +688,12 @@ void LinearForm::AssembleDelta()
 LinearForm & LinearForm::operator=(double value)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     Vector::operator=(value);
@@ -628,7 +708,12 @@ LinearForm & LinearForm::operator=(double value)
 LinearForm & LinearForm::operator=(const Vector &v)
 {
 #ifdef MFEM_USE_CUDA
-    nvtxRangePush(__FUNCTION__);
+    char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
 #endif
 
     MFEM_ASSERT(fes && v.Size() == fes->GetVSize(), "");
