@@ -800,12 +800,7 @@ signed char HypreParMatrix::CopyCSR(SparseMatrix *csr,
                "invalid state: host ownership for I and J differ!");
 
 #ifdef MFEM_USE_CUDA
-  	char str_nvtx[256];
-	sprintf(str_nvtx, "%d ", __LINE__);
-	strcat(str_nvtx, __FILE__);
-	strcat(str_nvtx, " ");
-	strcat(str_nvtx, __FUNCTION__);
-	nvtxRangePush(str_nvtx);
+   nvtxRangePop();
 #endif
 
    return (mem_csr.I.OwnsHostPtr()    ? 1 : 0) +
