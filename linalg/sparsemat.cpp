@@ -1857,6 +1857,11 @@ void SparseMatrix::Finalize(int skip_zeros, bool fix_empty_rows)
 
    if (Finalized())
    {
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
       return;
    }
 
