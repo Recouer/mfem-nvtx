@@ -585,7 +585,7 @@ inline void ForallWrap(const bool use_dev, const int N,
 
 #ifdef MFEM_USE_CUDA
    // If Backend::CUDA is allowed, use it
-   printf("%d ", Device::Allows(Backend::CUDA));
+   // printf("device allows cuda backend: %d\n", Device::Allows(Backend::CUDA));
    if (Device::Allows(Backend::CUDA))
    {
       return CuWrap<DIM>::run(N, d_body, X, Y, Z, G);

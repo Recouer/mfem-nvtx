@@ -2174,6 +2174,11 @@ int SparseMatrix::NumNonZeroElems() const
     if (Finalized())
    {
       HostReadI();
+
+#ifdef MFEM_USE_CUDA
+        nvtxRangePop();
+#endif
+
       return I[height];
    }
    else
@@ -2268,6 +2273,7 @@ int SparseMatrix::CountSmallElems(double tol) const
          }
       }
    }
+   
 #ifdef MFEM_USE_CUDA
   nvtxRangePop();
 #endif
