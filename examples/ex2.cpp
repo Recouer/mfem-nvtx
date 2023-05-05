@@ -46,6 +46,15 @@ using namespace mfem;
 
 int main(int argc, char *argv[])
 {
+#ifdef MFEM_USE_CUDA
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
+#endif
+
    // 1. Parse command-line options.
    const char *mesh_file = "../data/beam-tri.mesh";
    int order = 1;
@@ -65,6 +74,8 @@ int main(int argc, char *argv[])
                   "Enable or disable GLVis visualization.");
     args.AddOption(&device_config, "-d", "--device",
                    "Device configuration string, see Device::Configure().");
+   args.AddOption(&refinment, "-r", "--refinment",
+                  "change the refinment to increase problem size");
 
    args.Parse();
    if (!args.Good())
@@ -104,6 +115,7 @@ int main(int argc, char *argv[])
    {
       int ref_levels =
          (int)floor(log(5000./mesh->GetNE())/log(2.)/dim);
+      if (refinment > 0) ref_levels = refinment;
       for (int l = 0; l < ref_levels; l++)
       {
          mesh->UniformRefinement();
@@ -263,6 +275,10 @@ int main(int argc, char *argv[])
       delete fec;
    }
    delete mesh;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return 0;
 }

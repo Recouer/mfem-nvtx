@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
    // 2. Parse command-line options.
    const char *mesh_file = "../data/beam-tet.mesh";
    int order = 1;
+   int refinment = 0;
    bool static_cond = false;
    bool pa = false;
    const char *device_config = "cpu";
@@ -92,11 +93,14 @@ int main(int argc, char *argv[])
    args.AddOption(&visualization, "-vis", "--visualization", "-no-vis",
                   "--no-visualization",
                   "Enable or disable GLVis visualization.");
+   args.AddOption(&refinment, "-r", "--refinment",
+                  "change the refinment to increase problem size");
 #ifdef MFEM_USE_AMGX
    args.AddOption(&useAmgX, "-amgx", "--useAmgX", "-no-amgx",
                   "--no-useAmgX",
                   "Enable or disable AmgX in MatrixFreeAMS.");
 #endif
+
 
    args.Parse();
    if (!args.Good())
@@ -131,6 +135,7 @@ int main(int argc, char *argv[])
    //    more than 1,000 elements.
    {
       int ref_levels = (int)floor(log(1000./mesh->GetNE())/log(2.)/dim);
+      if (refinment > 0) ref_levels = refinment;
       for (int l = 0; l < ref_levels; l++)
       {
          mesh->UniformRefinement();

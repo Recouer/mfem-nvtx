@@ -3358,6 +3358,15 @@ void ResidualBCMonitor::MonitorResidual(
 
 void UMFPackSolver::Init()
 {
+#ifdef MFEM_USE_CUDA
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
+#endif
+
    mat = NULL;
    Numeric = NULL;
    AI = AJ = NULL;
@@ -3369,10 +3378,22 @@ void UMFPackSolver::Init()
    {
       umfpack_dl_defaults(Control);
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void UMFPackSolver::SetOperator(const Operator &op)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    void *Symbolic;
 
    if (Numeric)
@@ -3464,6 +3485,9 @@ void UMFPackSolver::SetOperator(const Operator &op)
       }
       umfpack_dl_free_symbolic(&Symbolic);
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void UMFPackSolver::Mult(const Vector &b, Vector &x) const
@@ -3590,6 +3614,15 @@ void KLUSolver::Init()
 
 void KLUSolver::SetOperator(const Operator &op)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    if (Numeric)
    {
       MFEM_ASSERT(Symbolic != 0,
@@ -3617,6 +3650,10 @@ void KLUSolver::SetOperator(const Operator &op)
 
    Symbolic = klu_analyze( height, Ap, Ai, &Common);
    Numeric = klu_factor(Ap, Ai, Ax, Symbolic, &Common);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void KLUSolver::Mult(const Vector &b, Vector &x) const
