@@ -208,12 +208,20 @@ int main(int argc, char *argv[])
    // 14. Save the refined mesh and the solution. This output can be viewed
    //     later using GLVis: "glvis -m refined.mesh -g sol.gf".
    {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush("saving");
+#endif
+
       ofstream mesh_ofs("refined.mesh");
       mesh_ofs.precision(8);
       mesh->Print(mesh_ofs);
       ofstream sol_ofs("sol.gf");
       sol_ofs.precision(8);
       x.Save(sol_ofs);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
    }
 
    // 15. Send the solution by socket to a GLVis server.
@@ -225,6 +233,10 @@ int main(int argc, char *argv[])
       sol_sock.precision(8);
       sol_sock << "solution\n" << *mesh << x << flush;
    }
+   
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush("saving");
+#endif
 
    // 16. Free the used memory.
    delete a;
@@ -234,6 +246,10 @@ int main(int argc, char *argv[])
    delete fespace;
    delete fec;
    delete mesh;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return 0;
 }

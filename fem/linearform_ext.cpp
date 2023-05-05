@@ -19,6 +19,15 @@ LinearFormExtension::LinearFormExtension(LinearForm *lf): lf(lf) { Update(); }
 
 void LinearFormExtension::Assemble()
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    const FiniteElementSpace &fes = *lf->FESpace();
    MFEM_VERIFY(lf->SupportsDevice(), "Not supported.");
    MFEM_VERIFY(lf->Size() == fes.GetVSize(), "LinearForm size does not "
@@ -102,10 +111,22 @@ void LinearFormExtension::Assemble()
       boundary_integs[k]->AssembleDevice(fes, bdr_markers, bdr_b);
       bdr_restrict_lex->AddMultTranspose(bdr_b, *lf);
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void LinearFormExtension::Update()
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    const FiniteElementSpace &fes = *lf->FESpace();
    const Mesh &mesh = *fes.GetMesh();
    constexpr ElementDofOrdering ordering = ElementDofOrdering::LEXICOGRAPHIC;
@@ -166,6 +187,10 @@ void LinearFormExtension::Update()
       bdr_b.SetSize(bdr_restrict_lex->Height(), Device::GetMemoryType());
       bdr_b.UseDevice(true);
    }
+   
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 } // namespace mfem

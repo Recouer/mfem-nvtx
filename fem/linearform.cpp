@@ -379,9 +379,9 @@ void LinearForm::Assemble()
 #endif
 
     Array<int> vdofs;
-   ElementTransformation *eltrans;
-   DofTransformation *doftrans;
-   Vector elemvect;
+    ElementTransformation *eltrans;
+    DofTransformation *doftrans;
+    Vector elemvect;
 
    Vector::AssignOnDevice(0.0, true);
 
@@ -433,6 +433,7 @@ void LinearForm::Assemble()
          }
       }
    }
+   
    AssembleDelta();
 
    if (boundary_integs.Size())
@@ -482,6 +483,7 @@ void LinearForm::Assemble()
          }
       }
    }
+   
    if (boundary_face_integs.Size())
    {
       FaceElementTransformations *tr;

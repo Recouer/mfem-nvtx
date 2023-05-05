@@ -245,6 +245,10 @@ int main(int argc, char *argv[])
    //     backward displacements to the original grid). This output can be
    //     viewed later using GLVis: "glvis -m displaced.mesh -g sol.gf".
    {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush("saving");
+#endif
+
       GridFunction *nodes = mesh->GetNodes();
       *nodes += x;
       x *= -1;
@@ -254,6 +258,10 @@ int main(int argc, char *argv[])
       ofstream sol_ofs("sol.gf");
       sol_ofs.precision(8);
       x.Save(sol_ofs);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
    }
 
    // 15. Send the above data by socket to a GLVis server. Use the "n" and "b"
@@ -266,6 +274,9 @@ int main(int argc, char *argv[])
       sol_sock.precision(8);
       sol_sock << "solution\n" << *mesh << x << flush;
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush("saving");
+#endif
 
    // 16. Free the used memory.
    delete a;
@@ -276,6 +287,10 @@ int main(int argc, char *argv[])
       delete fec;
    }
    delete mesh;
+   
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
 #ifdef MFEM_USE_CUDA
   nvtxRangePop();
