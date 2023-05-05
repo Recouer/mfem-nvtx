@@ -40,6 +40,15 @@ void DomainLFIntegrator::AssembleRHSElementVect(const FiniteElement &el,
                                                 ElementTransformation &Tr,
                                                 Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = el.GetDof();
 
    shape.SetSize(dof);       // vector of size dof
@@ -65,20 +74,47 @@ void DomainLFIntegrator::AssembleRHSElementVect(const FiniteElement &el,
 
       add(elvect, ip.weight * val, shape, elvect);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void DomainLFIntegrator::AssembleDeltaElementVect(
    const FiniteElement &fe, ElementTransformation &Trans, Vector &elvect)
 {
    MFEM_ASSERT(delta != NULL, "coefficient must be DeltaCoefficient");
+
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    elvect.SetSize(fe.GetDof());
    fe.CalcPhysShape(Trans, elvect);
    elvect *= delta->EvalDelta(Trans, Trans.GetIntPoint());
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void DomainLFGradIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = el.GetDof();
    int spaceDim = Tr.GetSpaceDim();
 
@@ -106,12 +142,25 @@ void DomainLFGradIntegrator::AssembleRHSElementVect(
 
       dshape.AddMult(Qvec, elvect);
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void DomainLFGradIntegrator::AssembleDeltaElementVect(
    const FiniteElement &fe, ElementTransformation &Trans, Vector &elvect)
 {
    MFEM_ASSERT(vec_delta != NULL,"coefficient must be VectorDeltaCoefficient");
+
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = fe.GetDof();
    int spaceDim = Trans.GetSpaceDim();
 
@@ -122,11 +171,24 @@ void DomainLFGradIntegrator::AssembleDeltaElementVect(
 
    elvect.SetSize(dof);
    dshape.Mult(Qvec, elvect);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void BoundaryLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = el.GetDof();
 
    shape.SetSize(dof);        // vector of size dof
@@ -151,11 +213,23 @@ void BoundaryLFIntegrator::AssembleRHSElementVect(
 
       add(elvect, ip.weight * val, shape, elvect);
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void BoundaryLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, FaceElementTransformations &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = el.GetDof();
 
    shape.SetSize(dof);        // vector of size dof
@@ -185,11 +259,23 @@ void BoundaryLFIntegrator::AssembleRHSElementVect(
 
       add(elvect, val, shape, elvect);
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void BoundaryNormalLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dim = el.GetDim()+1;
    int dof = el.GetDof();
    Vector nor(dim), Qvec;
@@ -224,11 +310,23 @@ void BoundaryNormalLFIntegrator::AssembleRHSElementVect(
 
       elvect.Add(ip.weight*(Qvec*nor), shape);
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void BoundaryTangentialLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dim = el.GetDim()+1;
    int dof = el.GetDof();
    Vector tangent(dim), Qvec;
@@ -264,11 +362,23 @@ void BoundaryTangentialLFIntegrator::AssembleRHSElementVect(
 
       add(elvect, ip.weight*(Qvec*tangent), shape, elvect);
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorDomainLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int vdim = Q.GetVDim();
    int dof  = el.GetDof();
 
@@ -306,12 +416,24 @@ void VectorDomainLFIntegrator::AssembleRHSElementVect(
          }
       }
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorDomainLFIntegrator::AssembleDeltaElementVect(
    const FiniteElement &fe, ElementTransformation &Trans, Vector &elvect)
 {
    MFEM_ASSERT(vec_delta != NULL, "coefficient must be VectorDeltaCoefficient");
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int vdim = Q.GetVDim();
    int dof  = fe.GetDof();
 
@@ -323,11 +445,24 @@ void VectorDomainLFIntegrator::AssembleDeltaElementVect(
    elvect.SetSize(dof*vdim);
    DenseMatrix elvec_as_mat(elvect.GetData(), dof, vdim);
    MultVWt(shape, Qvec, elvec_as_mat);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorDomainLFGradIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    const int dim = el.GetDim();
    const int dof = el.GetDof();
    const int vdim = Q.GetVDim();
@@ -365,6 +500,9 @@ void VectorDomainLFGradIntegrator::AssembleRHSElementVect(
          for (int s = 0; s < dof; ++s) { elvect(s+k*dof) += pelvect(s); }
       }
    }
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorDomainLFGradIntegrator::AssembleDeltaElementVect(
@@ -376,6 +514,15 @@ void VectorDomainLFGradIntegrator::AssembleDeltaElementVect(
 void VectorBoundaryLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int vdim = Q.GetVDim();
    int dof  = el.GetDof();
 
@@ -406,11 +553,24 @@ void VectorBoundaryLFIntegrator::AssembleRHSElementVect(
             elvect(dof*k+s) += vec(k) * shape(s);
          }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorBoundaryLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, FaceElementTransformations &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int vdim = Q.GetVDim();
    int dof  = el.GetDof();
 
@@ -449,11 +609,24 @@ void VectorBoundaryLFIntegrator::AssembleRHSElementVect(
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorFEDomainLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = el.GetDof();
    int spaceDim = Tr.GetSpaceDim();
    int vdim = std::max(spaceDim, el.GetVDim());
@@ -483,12 +656,25 @@ void VectorFEDomainLFIntegrator::AssembleRHSElementVect(
       vec *= ip.weight * Tr.Weight();
       vshape.AddMult (vec, elvect);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorFEDomainLFIntegrator::AssembleDeltaElementVect(
    const FiniteElement &fe, ElementTransformation &Trans, Vector &elvect)
 {
    MFEM_ASSERT(vec_delta != NULL, "coefficient must be VectorDeltaCoefficient");
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = fe.GetDof();
    int spaceDim = Trans.GetSpaceDim();
 
@@ -499,11 +685,24 @@ void VectorFEDomainLFIntegrator::AssembleDeltaElementVect(
 
    elvect.SetSize(dof);
    vshape.Mult(vec, elvect);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorFEDomainLFCurlIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = el.GetDof();
    int spaceDim = Tr.GetSpaceDim();
    int n=(spaceDim == 3)? spaceDim : 1;
@@ -531,6 +730,10 @@ void VectorFEDomainLFCurlIntegrator::AssembleRHSElementVect(
       vec *= ip.weight * Tr.Weight();
       curlshape.AddMult (vec, elvect);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorFEDomainLFCurlIntegrator::AssembleDeltaElementVect(
@@ -539,6 +742,15 @@ void VectorFEDomainLFCurlIntegrator::AssembleDeltaElementVect(
    int spaceDim = Trans.GetSpaceDim();
    MFEM_ASSERT(vec_delta != NULL,
                "coefficient must be VectorDeltaCoefficient");
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = fe.GetDof();
    int n=(spaceDim == 3)? spaceDim : 1;
    vec.SetSize(n);
@@ -548,11 +760,24 @@ void VectorFEDomainLFCurlIntegrator::AssembleDeltaElementVect(
 
    vec_delta->EvalDelta(vec, Trans, Trans.GetIntPoint());
    curlshape.Mult(vec, elvect);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorFEDomainLFDivIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = el.GetDof();
 
    divshape.SetSize(dof);       // vector of size dof
@@ -576,20 +801,48 @@ void VectorFEDomainLFDivIntegrator::AssembleRHSElementVect(
 
       add(elvect, ip.weight * val, divshape, elvect);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorFEDomainLFDivIntegrator::AssembleDeltaElementVect(
    const FiniteElement &fe, ElementTransformation &Trans, Vector &elvect)
 {
    MFEM_ASSERT(delta != NULL, "coefficient must be DeltaCoefficient");
+
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    elvect.SetSize(fe.GetDof());
    fe.CalcPhysDivShape(Trans, elvect);
    elvect *= delta->EvalDelta(Trans, Trans.GetIntPoint());
+
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorBoundaryFluxLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dim = el.GetDim()+1;
    int dof = el.GetDof();
 
@@ -617,12 +870,25 @@ void VectorBoundaryFluxLFIntegrator::AssembleRHSElementVect(
             elvect(dof*k+j) += nor(k) * shape(j);
          }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
 void VectorFEBoundaryFluxLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = el.GetDof();
 
    shape.SetSize(dof);
@@ -650,11 +916,24 @@ void VectorFEBoundaryFluxLFIntegrator::AssembleRHSElementVect(
 
       elvect.Add(val, shape);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void VectorFEBoundaryTangentLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dof = el.GetDof();
    int dim = el.GetDim();
    int vdim = el.GetVDim();
@@ -706,6 +985,10 @@ void VectorFEBoundaryTangentLFIntegrator::AssembleRHSElementVect(
 
       vshape.AddMult(f_hat, elvect);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void BoundaryFlowIntegrator::AssembleRHSElementVect(
@@ -720,6 +1003,15 @@ void BoundaryFlowIntegrator::AssembleRHSElementVect(
 void BoundaryFlowIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, FaceElementTransformations &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dim, ndof, order;
    double un, w, vu_data[3], nor_data[3];
 
@@ -772,6 +1064,10 @@ void BoundaryFlowIntegrator::AssembleRHSElementVect(
       w *= ip.weight*f->Eval(Tr, ip);
       elvect.Add(w, shape);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void DGDirichletLFIntegrator::AssembleRHSElementVect(
@@ -783,6 +1079,15 @@ void DGDirichletLFIntegrator::AssembleRHSElementVect(
 void DGDirichletLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &el, FaceElementTransformations &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int dim, ndof;
    bool kappa_is_nonzero = (kappa != 0.);
    double w;
@@ -863,6 +1168,10 @@ void DGDirichletLFIntegrator::AssembleRHSElementVect(
          elvect.Add(kappa*(ni*nor), shape);
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void DGElasticityDirichletLFIntegrator::AssembleRHSElementVect(
@@ -886,6 +1195,16 @@ void DGElasticityDirichletLFIntegrator::AssembleRHSElementVect(
    Vector dshape_du;
    Vector u_dir;
 #endif
+
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
 
    const int dim = el.GetDim();
    const int ndofs = el.GetDof();
@@ -999,6 +1318,10 @@ void DGElasticityDirichletLFIntegrator::AssembleRHSElementVect(
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -1008,6 +1331,16 @@ void WhiteGaussianNoiseDomainLFIntegrator::AssembleRHSElementVect
  ElementTransformation &Tr,
  Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
+
    int n = el.GetDof();
    elvect.SetSize(n);
    for (int i = 0; i < n; i++)
@@ -1039,12 +1372,26 @@ void WhiteGaussianNoiseDomainLFIntegrator::AssembleRHSElementVect
       CholeskyFactors chol(L[iel]->Data());
       chol.LMult(n,1,elvect.GetData());
    }
+
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
 void VectorQuadratureLFIntegrator::AssembleRHSElementVect(
    const FiniteElement &fe, ElementTransformation &Tr, Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    const IntegrationRule *ir =
       &vqfc.GetQuadFunction().GetSpace()->GetIntRule(Tr.ElementNo);
 
@@ -1070,6 +1417,10 @@ void VectorQuadratureLFIntegrator::AssembleRHSElementVect(
          }
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -1077,6 +1428,15 @@ void QuadratureLFIntegrator::AssembleRHSElementVect(const FiniteElement &fe,
                                                     ElementTransformation &Tr,
                                                     Vector &elvect)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    const IntegrationRule *ir =
       &qfc.GetQuadFunction().GetSpace()->GetIntRule(Tr.ElementNo);
 
@@ -1095,6 +1455,10 @@ void QuadratureLFIntegrator::AssembleRHSElementVect(const FiniteElement &fe,
       shape *= (w * temp);
       elvect += shape;
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 }
