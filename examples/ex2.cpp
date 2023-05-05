@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
    const char *mesh_file = "../data/beam-tri.mesh";
    int order = 1;
    bool static_cond = false;
+   int refinment = 0;
    bool visualization = 1;
     const char *device_config = "cpu";
 
