@@ -233,9 +233,9 @@ int main(int argc, char *argv[])
       sol_sock.precision(8);
       sol_sock << "solution\n" << *mesh << x << flush;
    }
-   
+
 #ifdef MFEM_USE_CUDA
-  nvtxRangePush("saving");
+  nvtxRangePush("deleting");
 #endif
 
    // 16. Free the used memory.

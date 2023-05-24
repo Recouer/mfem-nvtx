@@ -48,6 +48,14 @@ using namespace mfem;
 
 int main(int argc, char *argv[])
 {
+#ifdef MFEM_USE_CUDA
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
+#endif
    // 1. Initialize MPI and HYPRE.
    Mpi::Init(argc, argv);
    int num_procs = Mpi::WorldSize();
@@ -60,6 +68,7 @@ int main(int argc, char *argv[])
    bool static_cond = false;
    bool visualization = 1;
    bool amg_elast = 0;
+   int refinment = 0;
    bool reorder_space = false;
    const char *device_config = "cpu";
 
@@ -81,6 +90,8 @@ int main(int argc, char *argv[])
                   "Use byNODES ordering of vector space instead of byVDIM");
    args.AddOption(&device_config, "-d", "--device",
                   "Device configuration string, see Device::Configure().");
+   args.AddOption(&refinment, "-r", "--refinment",
+                  "change the refinment to increase problem size");
    args.Parse();
    if (!args.Good())
    {
@@ -129,6 +140,7 @@ int main(int argc, char *argv[])
    {
       int ref_levels =
          (int)floor(log(1000./mesh->GetNE())/log(2.)/dim);
+      if (refinment > 0) ref_levels = refinment;
       for (int l = 0; l < ref_levels; l++)
       {
          mesh->UniformRefinement();
@@ -294,6 +306,10 @@ int main(int argc, char *argv[])
    //     gives the backward displacements to the original grid). This output
    //     can be viewed later using GLVis: "glvis -np <np> -m mesh -g sol".
    {
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush("saving");
+#endif
+
       GridFunction *nodes = pmesh->GetNodes();
       *nodes += x;
       x *= -1;
@@ -309,6 +325,10 @@ int main(int argc, char *argv[])
       ofstream sol_ofs(sol_name.str().c_str());
       sol_ofs.precision(8);
       x.Save(sol_ofs);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
    }
 
    // 18. Send the above data by socket to a GLVis server.  Use the "n" and "b"
@@ -323,6 +343,10 @@ int main(int argc, char *argv[])
       sol_sock << "solution\n" << *pmesh << x << flush;
    }
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePush("delete");
+#endif
+
    // 19. Free the used memory.
    delete pcg;
    delete amg;
@@ -334,6 +358,18 @@ int main(int argc, char *argv[])
       delete fec;
    }
    delete pmesh;
+
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
+
+
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return 0;
 }
