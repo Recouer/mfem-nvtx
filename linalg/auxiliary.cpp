@@ -69,6 +69,15 @@ void GeneralAMS::FormResidual(const Vector& rhs, const Vector& x,
 */
 void GeneralAMS::Mult(const Vector& x, Vector& y) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    MFEM_ASSERT(x.Size() == y.Size(), "Sizes don't match!");
    MFEM_ASSERT(curlcurl_op.Height() == x.Size(), "Sizes don't match!");
 
@@ -114,6 +123,10 @@ void GeneralAMS::Mult(const Vector& x, Vector& y) const
    Vector temp(x.Size());
    smoother.Mult(residual, temp);
    y += temp;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 // Pi-space constructor
@@ -134,6 +147,15 @@ MatrixFreeAuxiliarySpace::MatrixFreeAuxiliarySpace(
 #endif
    inner_aux_iterations(0)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    H1_FECollection * fec_lor = new H1_FECollection(1, mesh_lor.Dimension());
    ParFiniteElementSpace fespace_lor_d(&mesh_lor, fec_lor, mesh_lor.Dimension(),
                                        Ordering::byVDIM);
@@ -190,6 +212,10 @@ MatrixFreeAuxiliarySpace::MatrixFreeAuxiliarySpace(
       SetupVCycle();
    }
    delete fec_lor;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 /* G-space constructor
@@ -218,6 +244,15 @@ MatrixFreeAuxiliarySpace::MatrixFreeAuxiliarySpace(
 #endif
    inner_aux_iterations(0)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    H1_FECollection * fec_lor = new H1_FECollection(1, mesh_lor.Dimension());
    ParFiniteElementSpace fespace_lor(&mesh_lor, fec_lor);
 
@@ -273,12 +308,25 @@ MatrixFreeAuxiliarySpace::MatrixFreeAuxiliarySpace(
    }
 
    delete fec_lor;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void MatrixFreeAuxiliarySpace::SetupCG(
    Operator& curlcurl_oper, Operator& conn,
    int inner_cg_iterations)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    MFEM_ASSERT(conn.Height() == curlcurl_oper.Width(),
                "Operators don't match!");
    matfree = new RAPOperator(conn, curlcurl_oper, conn);
@@ -301,6 +349,10 @@ void MatrixFreeAuxiliarySpace::SetupCG(
    cg->SetPrintLevel(-1);
 
    aspacewrapper = cg;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void MatrixFreeAuxiliarySpace::SetupVCycle()
@@ -363,6 +415,15 @@ private:
 
 void MatrixFreeAuxiliarySpace::SetupAMG(int system_dimension)
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    if (system_dimension == 0)
    {
       // boundary condition tweak for G-space solver
@@ -394,10 +455,23 @@ void MatrixFreeAuxiliarySpace::SetupAMG(int system_dimension)
          lor_pc = hpc;
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void MatrixFreeAuxiliarySpace::Mult(const Vector& x, Vector& y) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int rank;
    MPI_Comm_rank(comm, &rank);
 
@@ -408,6 +482,10 @@ void MatrixFreeAuxiliarySpace::Mult(const Vector& x, Vector& y) const
       int q = cg->GetNumIterations();
       inner_aux_iterations += q;
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 MatrixFreeAuxiliarySpace::~MatrixFreeAuxiliarySpace()
@@ -433,6 +511,15 @@ MatrixFreeAMS::MatrixFreeAMS(
    int inner_pi_iterations, int inner_g_iterations, Solver * nd_smoother) :
    Solver(oper.Height())
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int order = nd_fespace.GetFE(0)->GetOrder();
    ParMesh *mesh = nd_fespace.GetParMesh();
    int dim = mesh->Dimension();
@@ -494,6 +581,10 @@ MatrixFreeAMS::MatrixFreeAMS(
                                 *Gspacesolver, *smoother, ess_tdof_list);
 
    delete h1_fec;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 MatrixFreeAMS::~MatrixFreeAMS()

@@ -383,7 +383,7 @@ void LinearForm::Assemble()
     DofTransformation *doftrans;
     Vector elemvect;
 
-   Vector::AssignOnDevice(0.0, true);
+   Vector::operator=(0.0);
 
    // The above operation is executed on device because of UseDevice().
    // The first use of AddElementVector() below will move it back to host
@@ -398,6 +398,9 @@ void LinearForm::Assemble()
        return ext->Assemble();
    }
 
+#ifdef MFEM_USE_CUDA
+	nvtxRangePush("domain integrator");
+#endif
    if (domain_integs.Size())
    {
       for (int k = 0; k < domain_integs.Size(); k++)
@@ -433,9 +436,15 @@ void LinearForm::Assemble()
          }
       }
    }
-   
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
    AssembleDelta();
 
+#ifdef MFEM_USE_CUDA
+	nvtxRangePush("boundary integrator");
+#endif
    if (boundary_integs.Size())
    {
       Mesh *mesh = fes->GetMesh();
@@ -483,7 +492,14 @@ void LinearForm::Assemble()
          }
       }
    }
-   
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
+
+
+#ifdef MFEM_USE_CUDA
+	nvtxRangePush("boundary face integrator");
+#endif
    if (boundary_face_integs.Size())
    {
       FaceElementTransformations *tr;
@@ -533,7 +549,13 @@ void LinearForm::Assemble()
          }
       }
    }
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
 
+#ifdef MFEM_USE_CUDA
+	nvtxRangePush("interior face integrator");
+#endif
    if (interior_face_integs.Size())
    {
       Mesh *mesh = fes->GetMesh();
@@ -559,6 +581,9 @@ void LinearForm::Assemble()
          }
       }
    }
+#ifdef MFEM_USE_CUDA
+       nvtxRangePop();
+#endif
 
 #ifdef MFEM_USE_CUDA
     nvtxRangePop();

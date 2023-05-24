@@ -2764,6 +2764,15 @@ double GridFunction::ComputeL2Error(
    Coefficient *exsol[], const IntegrationRule *irs[],
    const Array<int> *elems) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double error = 0.0, a;
    const FiniteElement *fe;
    ElementTransformation *transf;
@@ -2812,6 +2821,10 @@ double GridFunction::ComputeL2Error(
       }
    }
 
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
    return (error < 0.0) ? -sqrt(-error) : sqrt(error);
 }
 
@@ -2819,6 +2832,15 @@ double GridFunction::ComputeL2Error(
    VectorCoefficient &exsol, const IntegrationRule *irs[],
    const Array<int> *elems) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " ");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double error = 0.0;
    const FiniteElement *fe;
    ElementTransformation *T;
@@ -2852,6 +2874,10 @@ double GridFunction::ComputeL2Error(
          error += ip.weight * T->Weight() * (loc_errs(j) * loc_errs(j));
       }
    }
+   
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 
    return (error < 0.0) ? -sqrt(-error) : sqrt(error);
 }
