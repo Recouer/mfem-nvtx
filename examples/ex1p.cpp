@@ -68,6 +68,15 @@ using namespace mfem;
 
 int main(int argc, char *argv[])
 {
+#ifdef MFEM_USE_CUDA
+  	char str_nvtx[256];
+	sprintf(str_nvtx, "%d ", __LINE__);
+	strcat(str_nvtx, __FILE__);
+	strcat(str_nvtx, " ");
+	strcat(str_nvtx, __FUNCTION__);
+	nvtxRangePush(str_nvtx);
+#endif
+
    // 1. Initialize MPI and HYPRE.
    Mpi::Init();
    int num_procs = Mpi::WorldSize();
@@ -80,6 +89,7 @@ int main(int argc, char *argv[])
    bool static_cond = false;
    bool pa = false;
    bool fa = false;
+   int refinment = 0;
    const char *device_config = "cpu";
    bool visualization = true;
    bool algebraic_ceed = false;
@@ -98,6 +108,8 @@ int main(int argc, char *argv[])
                   "--no-full-assembly", "Enable Full Assembly.");
    args.AddOption(&device_config, "-d", "--device",
                   "Device configuration string, see Device::Configure().");
+   args.AddOption(&refinment, "-r", "--refinment",
+                  "change the refinment to increase problem size");
 #ifdef MFEM_USE_CEED
    args.AddOption(&algebraic_ceed, "-a", "--algebraic",
                   "-no-a", "--no-algebraic",
@@ -307,6 +319,13 @@ int main(int argc, char *argv[])
    {
       delete fec;
    }
+
+
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
+
 
    return 0;
 }
