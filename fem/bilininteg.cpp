@@ -12,6 +12,7 @@
 // Implementation of Bilinear Form Integrators
 
 #include "fem.hpp"
+#include "../general/forall.hpp"
 #include <cmath>
 #include <algorithm>
 
@@ -3899,6 +3900,7 @@ void VectorDiffusionIntegrator::AssembleElementVector(
 }
 
 
+
 void ElasticityIntegrator::AssembleElementMatrix(
    const FiniteElement &el, ElementTransformation &Trans, DenseMatrix &elmat)
 {
@@ -3909,8 +3911,10 @@ void ElasticityIntegrator::AssembleElementMatrix(
 	strcat(str, " ");
 	strcat(str, __FUNCTION__);
 	nvtxRangePush(str);
+	nvtxRangePush("Initialisation");
 	
 #endif
+
 
    int dof = el.GetDof();
    int dim = el.GetDim();
@@ -3933,67 +3937,154 @@ void ElasticityIntegrator::AssembleElementMatrix(
    const IntegrationRule *ir = IntRule;
    if (ir == NULL)
    {
-   int order = 2 * Trans.OrderGrad(&el); // correct order?
-   ir = &IntRules.Get(el.GetGeomType(), order);
+      int order = 2 * Trans.OrderGrad(&el); // correct order?
+      ir = &IntRules.Get(el.GetGeomType(), order);
    }
 
    elmat = 0.0;
 
+#ifdef MFEM_USE_CUDA
+   nvtxRangePop();
+#endif
+
    for (int i = 0; i < ir -> GetNPoints(); i++)
    {
-   const IntegrationPoint &ip = ir->IntPoint(i);
+      const IntegrationPoint &ip = ir->IntPoint(i);
 
-   el.CalcDShape(ip, dshape);
+      el.CalcDShape(ip, dshape);
 
-   Trans.SetIntPoint(&ip);
-   w = ip.weight * Trans.Weight();
-   Mult(dshape, Trans.InverseJacobian(), gshape);
-   MultAAt(gshape, pelmat);
-   gshape.GradToDiv (divshape);
+      Trans.SetIntPoint(&ip);
+      // ???
 
-   M = mu->Eval(Trans, ip);
-   if (lambda)
-   {
-    L = lambda->Eval(Trans, ip);
-   }
-   else
-   {
-    L = q_lambda * M;
-    M = q_mu * M;
-   }
+      w = ip.weight * Trans.Weight();
+      Mult(dshape, Trans.InverseJacobian(), gshape);
+      // kernels::Mult(ah,aw,bw,bd,cd,ad);
 
-   if (L != 0.0)
-   {
-    AddMult_a_VVt(L * w, divshape, elmat);
-   }
 
-   if (M != 0.0)
-   {
-    for (int d = 0; d < dim; d++)
-    {
-    for (int k = 0; k < dof; k++)
-     for (int l = 0; l < dof; l++)
-     {
-      elmat (dof*d+k, dof*d+l) += (M * w) * pelmat(k, l);
-     }
-    }
-    for (int ii = 0; ii < dim; ii++)
-    for (int jj = 0; jj < dim; jj++)
-    {
-     for (int kk = 0; kk < dof; kk++)
-      for (int ll = 0; ll < dof; ll++)
+      MultAAt(gshape, pelmat);
+      /*
+         const int height = gshape.Height();
+         const int width = gshape.Width();
+         for (int i = 0; i < height; i++)
+         {
+            for (int j = 0; j <= i; j++)
+            {
+               double temp = 0.;
+               for (int k = 0; k < width; k++)
+               {
+                  temp += a(i,k) * a(j,k);
+               }
+               aat(j,i) = aat(i,j) = temp;
+            }
+         }
+      */
+
+      gshape.GradToDiv (divshape); 
+      // divshape[i] = gshape[i] for i in dim*dof
+
+      M = mu->Eval(Trans, ip);
+      if (lambda)
       {
-       elmat(dof*ii+kk, dof*jj+ll) +=
-       (M * w) * gshape(kk, jj) * gshape(ll, ii);
+         L = lambda->Eval(Trans, ip);
       }
-    }
-   }
+      else
+      {
+         L = q_lambda * M;
+         M = q_mu * M;
+      }
+
+      auto GPU_elmat = Reshape(elmat.ReadWrite(), dof, dim);
+      auto GPU_pelmat = Reshape(pelmat.Read(), dof, dim);
+      auto GPU_divshape = Reshape(divshape.Read(), dim*dof);
+      auto GPU_gshape = Reshape(gshape.Read(), dof, dim);
+
+      const int n = divshape.Size();
+
+      auto device_kernel = [=] MFEM_DEVICE (int)
+      {
+         if (L != 0.0)
+         {
+            MFEM_ASSERT(elmat.Height() == v.Size() && elmat.Width() == v.Size(), "incompatible dimensions!");
+            
+            double a = L * w;
+            
+            MFEM_FOREACH_THREAD(i, x, n)
+            {
+               double avi = a * GPU_divshape(i);
+               MFEM_FOREACH_THREAD(j, y, i)
+               {
+                  const double avivj = avi * GPU_divshape(j);
+                  GPU_elmat(i, j) += avivj;
+                  GPU_elmat(j, i) += avivj;
+               }
+               GPU_elmat(i, i) += avi * GPU_divshape(i);
+            }
+         }
+
+         if (M != 0.0)
+         {
+            for (int d = 0; d < dim; d++)
+            {
+               MFEM_FOREACH_THREAD(k, x, dof)
+                  MFEM_FOREACH_THREAD(l, y, dof)
+                  {
+                     GPU_elmat (dof*d+k, dof*d+l) += (M * w) * GPU_pelmat(k, l);
+                  }
+            }
+
+            for (int ii = 0; ii < dim; ii++)
+               for (int jj = 0; jj < dim; jj++)
+               {
+                  MFEM_FOREACH_THREAD(kk, x, dof)
+                     MFEM_FOREACH_THREAD(ll, y, dof)
+                     {
+                        GPU_elmat(dof*ii+kk, dof*jj+ll) +=
+                        (M * w) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
+                     }
+               }
+         }
+      };
+
+      auto host_kernel = [&] MFEM_LAMBDA (int) { 
+
+         if (L != 0.0)
+         {
+            AddMult_a_VVt(L * w, divshape, elmat);
+         }
+
+         if (M != 0.0)
+         {
+            for (int d = 0; d < dim; d++)
+            {
+               for (int k = 0; k < dof; k++)
+                  for (int l = 0; l < dof; l++)
+                  {
+                     elmat (dof*d+k, dof*d+l) += (M * w) * pelmat(k, l);
+                  }
+            }
+            for (int ii = 0; ii < dim; ii++)
+               for (int jj = 0; jj < dim; jj++)
+               {
+                  for (int kk = 0; kk < dof; kk++)
+                     for (int ll = 0; ll < dof; ll++)
+                     {
+                        elmat(dof*ii+kk, dof*jj+ll) +=
+                           (M * w) * gshape(kk, jj) * gshape(ll, ii);
+                     }
+               }
+         }
+      };
+
+      ForallWrap<3>(false, 1, device_kernel, host_kernel, 1, 1, 1);
+      
    }
 
 #ifdef MFEM_USE_CUDA
    nvtxRangePop();
 #endif
 }
+
+
 
 void ElasticityIntegrator::ComputeElementFlux(
    const mfem::FiniteElement &el, ElementTransformation &Trans,

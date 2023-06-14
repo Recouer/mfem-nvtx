@@ -262,7 +262,7 @@ void ParBilinearForm::AssembleSharedFaces(int skip_zeros)
    }
 }
 
-void ParBilinearForm::Assemble(int skip_zeros)
+void ParBilinearForm::Assemble(int skip_zeros, std::ostream &os)
 {
    if (interior_face_integs.Size())
    {
@@ -273,7 +273,7 @@ void ParBilinearForm::Assemble(int skip_zeros)
       }
    }
 
-   BilinearForm::Assemble(skip_zeros);
+   BilinearForm::Assemble(skip_zeros, os);
 
    if (!ext && interior_face_integs.Size() > 0)
    {

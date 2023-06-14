@@ -424,7 +424,7 @@ public:
    }
 
    /// Assembles the form i.e. sums over all domain/bdr integrators.
-   void Assemble(int skip_zeros = 1);
+   void Assemble(int skip_zeros = 1, std::ostream &os = mfem::out);
 
    /** @brief Assemble the diagonal of the bilinear form into @a diag. Note that
        @a diag is a tdof Vector.
@@ -669,6 +669,8 @@ public:
        - DIAG_KEEP (Keep the diagonal values)
    */
    void SetDiagonalPolicy(DiagonalPolicy policy);
+
+   void PrintResults(std::ostream &os) { elemmat.Print(os); };
 
    /// Indicate that integrators are not owned by the BilinearForm
    void UseExternalIntegrators() { extern_bfs = 1; }

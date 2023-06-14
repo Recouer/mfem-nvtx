@@ -46,6 +46,8 @@ namespace mfem {
             return;
         }
 
+
+
         const Table &elem_dof = fes->GetElementToDofTable();
         Table dof_dof;
 
@@ -647,7 +649,7 @@ namespace mfem {
 #endif
     }
 
-    void BilinearForm::Assemble(int skip_zeros) {
+    void BilinearForm::Assemble(int skip_zeros, std::ostream &os) {
 #ifdef MFEM_USE_CUDA
         char str_nvtx[256];
 	sprintf(str_nvtx, "%d ", __LINE__);
@@ -713,6 +715,7 @@ namespace mfem {
                             } else {
                                 elmat += elemmat;
                             }
+                            // elemmat.Print(os, elemmat.Height());
                         }
                     }
                     if (elmat.Size() == 0) {
