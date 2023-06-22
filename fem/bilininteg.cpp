@@ -3912,7 +3912,6 @@ void ElasticityIntegrator::AssembleElementMatrix(
 	strcat(str, __FUNCTION__);
 	nvtxRangePush(str);
 	nvtxRangePush("Initialisation");
-	
 #endif
 
 
@@ -3993,12 +3992,15 @@ void ElasticityIntegrator::AssembleElementMatrix(
          M = q_mu * M;
       }
 
-      auto GPU_elmat = Reshape(elmat.ReadWrite(), dof, dim);
-      auto GPU_pelmat = Reshape(pelmat.Read(), dof, dim);
+      // elmat.Print();
+
+      auto GPU_elmat = Reshape(elmat.ReadWrite(), dof*dim, dof*dim);
+      auto GPU_pelmat = Reshape(pelmat.Read(), dof*dim, dof*dim);
       auto GPU_divshape = Reshape(divshape.Read(), dim*dof);
-      auto GPU_gshape = Reshape(gshape.Read(), dof, dim);
+      auto GPU_gshape = Reshape(gshape.Read(), dof*dim, dof*dim);
 
       const int n = divshape.Size();
+
 
       auto device_kernel = [=] MFEM_DEVICE (int)
       {
@@ -4046,37 +4048,14 @@ void ElasticityIntegrator::AssembleElementMatrix(
       };
 
       auto host_kernel = [&] MFEM_LAMBDA (int) { 
-
-         if (L != 0.0)
-         {
-            AddMult_a_VVt(L * w, divshape, elmat);
-         }
-
-         if (M != 0.0)
-         {
-            for (int d = 0; d < dim; d++)
-            {
-               for (int k = 0; k < dof; k++)
-                  for (int l = 0; l < dof; l++)
-                  {
-                     elmat (dof*d+k, dof*d+l) += (M * w) * pelmat(k, l);
-                  }
-            }
-            for (int ii = 0; ii < dim; ii++)
-               for (int jj = 0; jj < dim; jj++)
-               {
-                  for (int kk = 0; kk < dof; kk++)
-                     for (int ll = 0; ll < dof; ll++)
-                     {
-                        elmat(dof*ii+kk, dof*jj+ll) +=
-                           (M * w) * gshape(kk, jj) * gshape(ll, ii);
-                     }
-               }
-         }
+         printf("this part is to be done on the GPU\n");
       };
 
-      ForallWrap<3>(false, 1, device_kernel, host_kernel, 1, 1, 1);
+      ForallWrap<3>(true, 1, device_kernel, host_kernel, 1, 1, 1);
       
+      cudaMemcpy(elmat.GetData(), GPU_elmat, dof*dim*dof*dim*sizeof(double), cudaMemcpyDeviceToHost);
+
+      // elmat.Print();
    }
 
 #ifdef MFEM_USE_CUDA

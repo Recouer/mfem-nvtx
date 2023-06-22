@@ -88,7 +88,7 @@ public:
    }
 
    /// Assemble the local matrix
-   void Assemble(int skip_zeros = 1);
+   void Assemble(int skip_zeros = 1, std::ostream &os = std::cout);
 
    /** @brief Assemble the diagonal of the bilinear form into @a diag. Note that
        @a diag is a true-dof Vector.
