@@ -3992,8 +3992,7 @@ void ElasticityIntegrator::AssembleElementMatrix(
          M = q_mu * M;
       }
 
-      // elmat.Print();
-
+#ifdef MFEM_USE_CUDA
       auto GPU_elmat = Reshape(elmat.ReadWrite(), dof*dim, dof*dim);
       auto GPU_pelmat = Reshape(pelmat.Read(), dof*dim, dof*dim);
       auto GPU_divshape = Reshape(divshape.Read(), dim*dof);
@@ -4010,16 +4009,18 @@ void ElasticityIntegrator::AssembleElementMatrix(
             
             double a = L * w;
             
-            MFEM_FOREACH_THREAD(i, x, n)
+            for (int i=0; i<n; i++)
             {
                double avi = a * GPU_divshape(i);
-               MFEM_FOREACH_THREAD(j, y, i)
+               for (int j=0; j<i; j++)
                {
                   const double avivj = avi * GPU_divshape(j);
                   GPU_elmat(i, j) += avivj;
                   GPU_elmat(j, i) += avivj;
+                  printf("(%lf, %lf) ", GPU_elmat(j, i), GPU_elmat(i, j));
                }
                GPU_elmat(i, i) += avi * GPU_divshape(i);
+               printf("## %lf \n", GPU_elmat(i, i));
             }
          }
 
@@ -4027,23 +4028,37 @@ void ElasticityIntegrator::AssembleElementMatrix(
          {
             for (int d = 0; d < dim; d++)
             {
-               MFEM_FOREACH_THREAD(k, x, dof)
-                  MFEM_FOREACH_THREAD(l, y, dof)
+               for (int k=0; k<dof; k++)
+               {
+                  for (int l=0; l<dof; l++)
                   {
                      GPU_elmat (dof*d+k, dof*d+l) += (M * w) * GPU_pelmat(k, l);
+                     printf("%lf ", GPU_elmat(dof*d+k, dof*d+l));
                   }
+                  printf("\n");
+               }
+               printf("\n");
             }
 
             for (int ii = 0; ii < dim; ii++)
+            {
                for (int jj = 0; jj < dim; jj++)
                {
-                  MFEM_FOREACH_THREAD(kk, x, dof)
-                     MFEM_FOREACH_THREAD(ll, y, dof)
+                  printf("[row %d %d]\n", ii, jj);
+
+                  for (int kk=0; kk<dof; kk++) 
+                  {
+                     for (int ll=0; ll<dof; ll++)
                      {
                         GPU_elmat(dof*ii+kk, dof*jj+ll) +=
                         (M * w) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
+                        printf("%lf ", GPU_elmat(dof*ii+kk, dof*jj+ll));
                      }
+                     printf("\n");
+                  }
+                  printf("\n");
                }
+            }
          }
       };
 
@@ -4056,8 +4071,49 @@ void ElasticityIntegrator::AssembleElementMatrix(
       cudaMemcpy(elmat.GetData(), GPU_elmat, dof*dim*dof*dim*sizeof(double), cudaMemcpyDeviceToHost);
 
       // elmat.Print();
-   }
+#else 
 
+
+      if (L != 0.0)
+      {
+         AddMult_a_VVt(L * w, divshape, elmat);
+      }
+
+      if (M != 0.0)
+      {
+         for (int d = 0; d < dim; d++) 
+         {
+            for (int k = 0; k < dof; k++) 
+            {
+               for (int l = 0; l < dof; l++)
+               {
+                  elmat (dof*d+k, dof*d+l) += (M * w) * pelmat(k, l);
+                  printf("%lf ", elmat(dof*d+k, dof*d+l));
+               }
+               printf("\n");
+            }
+            printf("\n");
+         }
+         for (int ii = 0; ii < dim; ii++)
+            for (int jj = 0; jj < dim; jj++)
+            {
+               for (int kk = 0; kk < dof; kk++)
+               {
+                  printf("[row %d %d]\n", ii, jj);
+
+                  for (int ll = 0; ll < dof; ll++)
+                  {
+                     elmat(dof*ii+kk, dof*jj+ll) +=
+                        (M * w) * gshape(kk, jj) * gshape(ll, ii);
+                        printf("%lf ", elmat(dof*ii+kk, dof*jj+ll));
+                  }
+                  printf("\n");
+               }
+               printf("\n");
+            }
+      }
+#endif
+   }
 #ifdef MFEM_USE_CUDA
    nvtxRangePop();
 #endif

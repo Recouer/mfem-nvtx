@@ -1025,6 +1025,18 @@ public:
    int SizeJ() const { return Mk.Width(); }
    int SizeK() const { return nk; }
 
+   void Print(std::ostream &os) {
+      for (int i=0; i<SizeI(); i++) {
+         for (int j=0; j<SizeJ(); j++) {
+            for (int k=0; k<SizeK(); k++) {
+               os << (*this)(i, j, k);
+            }
+            os << "\n";
+         }
+         os << "[new]";
+      }
+   }
+
    int TotalSize() const { return SizeI()*SizeJ()*SizeK(); }
 
    void SetSize(int i, int j, int k, MemoryType mt_ = MemoryType::PRESERVE)

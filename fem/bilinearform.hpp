@@ -14,6 +14,7 @@
 
 #include "../config/config.hpp"
 #include "../linalg/linalg.hpp"
+#include "../general/forall.hpp"
 #include "fespace.hpp"
 #include "gridfunc.hpp"
 #include "linearform.hpp"
@@ -153,9 +154,9 @@ private:
    BilinearForm &operator=(const BilinearForm &);
 
 public:
-   /// Creates bilinear form associated with FE space @a *f.
-   /** The pointer @a f is not owned by the newly constructed object. */
-   BilinearForm(FiniteElementSpace *f);
+    /// Creates bilinear form associated with FE space @a *f.
+    /** The pointer @a f is not owned by the newly constructed object. */
+    BilinearForm(FiniteElementSpace *f);
 
    /** @brief Create a BilinearForm on the FiniteElementSpace @a f, using the
        same integrators as the BilinearForm @a bf.
@@ -670,7 +671,12 @@ public:
    */
    void SetDiagonalPolicy(DiagonalPolicy policy);
 
-   void PrintResults(std::ostream &os) { elemmat.Print(os); };
+   void PrintResults(std::ostream &os) {
+        os << mat << "\n";
+        if (mat != NULL) {
+            mat->Print(os);
+        }
+    };
 
    /// Indicate that integrators are not owned by the BilinearForm
    void UseExternalIntegrators() { extern_bfs = 1; }
