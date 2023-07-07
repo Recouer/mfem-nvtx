@@ -4366,7 +4366,8 @@ void SparseMatrix::Print(std::ostream & os, int width_) const
       RowNode *nd;
       for (i = 0; i < height; i++)
       {
-         os << "[row " << i << "]\n";
+         os << "[row " << i << "] ";
+         os << Rows[i] << "\n";
          for (nd = Rows[i], j = 0; nd != NULL; nd = nd->Prev, j++)
          {
             os << " (" << nd->Column << "," << nd->Value << ")";
