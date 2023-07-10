@@ -17,11 +17,19 @@
 #include <algorithm>
 #include <fstream>
 
-#if 1
+#if 0
 #define SHOW printf
 #else
 #define SHOW //printf
 #endif
+
+#if 1
+#define DEBUG printf
+#else
+#define DEBUG //printf
+#endif
+
+
 
 using namespace std;
 
@@ -3945,7 +3953,7 @@ void ElasticityIntegrator::AssembleElementMatrix(
    const IntegrationRule *ir = IntRule;
    if (ir == NULL)
    {
-      int order = 2 * Trans.OrderGrad(&el); // correct order?
+      int order = 2 * Trans.OrderGrad(&el); // correct order ?
       ir = &IntRules.Get(el.GetGeomType(), order);
    }
 
@@ -3955,11 +3963,275 @@ void ElasticityIntegrator::AssembleElementMatrix(
    nvtxRangePop();
 #endif
 
+
+#if 0
+
+   // initialisation of values
+   
+   const int numberOfPoints = ir->GetNPoints();
+
+   DenseTensor TransInvJ_values(numberOfPoints, dim, dim), dshape_values(numberOfPoints, dim, dof);
+   Vector w_values(numberOfPoints), M_values(numberOfPoints), L_values(numberOfPoints);
+
+
+   for (size_t i = 0; i < numberOfPoints; i++)
+   {
+      const IntegrationPoint &ip = ir->IntPoint(i);
+
+      Trans.SetIntPoint(&ip);
+      w_values[i] = ip.weight * Trans.Weight();
+
+      auto Jacobian = Trans.InverseJacobian();
+      for (size_t k = 0; k < dim; k++)
+      {
+         for (size_t l = 0; l < dim; l++)
+         {
+            TransInvJ_values = Jacobian(k, l);
+         }
+      }
+
+      el.CalcDShape(ip, dshape);
+      for (size_t k = 0; k < dim; k++)
+      {
+         for (size_t l = 0; l < dof; l++)
+         {
+            dshape_values(i, k, l) = dshape(k, l);
+         }
+      }
+
+      M_values[i] = mu->Eval(Trans, ip);
+      if (lambda)
+      {
+         L_values[i] = lambda->Eval(Trans, ip);
+      }
+      else
+      {
+         L_values[i] = q_lambda * M_values[i];
+         M_values[i] = q_mu * M_values[i];
+      }
+   }
+   
+
+
+
+      auto GPU_TransInvJ = Reshape(TransInvJ_values.Read(), numberOfPoints, dim, dim);
+      auto GPU_dshape = Reshape(dshape_values.Read(), numberOfPoints, dim, dof);
+
+      auto GPU_elmat = Reshape(elmat.ReadWrite(), dof*dim, dof*dim);
+      auto GPU_pelmat = Reshape(pelmat.ReadWrite(), dof, dof);
+      auto GPU_divshape = Reshape(divshape.ReadWrite(), dim*dof);
+      auto GPU_gshape = Reshape(gshape.ReadWrite(), dof, dim);
+
+      auto GPU_w = Reshape(w_values.Read(), numberOfPoints);
+      auto GPU_L = Reshape(M_values.Read(), numberOfPoints);
+      auto GPU_M = Reshape(L_values.Read(), numberOfPoints);
+
+      auto device_kernel = [=] MFEM_DEVICE (int) {
+         
+         for (size_t i = 0; i < numberOfPoints; i++)
+         {
+
+            // Mult(dshape, Trans.InverseJacobian(), gshape);
+            for (size_t n = 0; n < dim*dof; n++) GPU_gshape[n] = 0.0;
+            for (size_t m = 0; m < dim; m++) // not sure about the dimensions
+               for (size_t k = 0; k < dim; k++) // not sure about the dimensions
+               {
+                  for (size_t n = 0; n < dof; n++) // not sure about the dimensions
+                  {
+                     GPU_gshape(n, m) += GPU_TransInvJ(i, n, k) * GPU_dshape(i, k, m);
+                  }
+               }
+            
+            DEBUG("gshape values :\n");
+            for (size_t m = 0; m < dim; m++)
+            {
+               for (size_t n = 0; n < dof; n++)
+               {
+                  DEBUG("%lf ", GPU_gshape(n, m));
+               }
+               DEBUG("\n");
+            }
+            DEBUG("\n");
+            
+
+            // MultAAt(gshape, pelmat);
+            for (size_t l = 0; l < dof; l++)
+            {
+               for (size_t m = 0; m <= l; m++)
+               {
+                  double temp = 0;
+                  for (size_t k = 0; k < dof; k++)
+                     temp += GPU_gshape(l, k) * GPU_gshape(k, m);
+                  
+                  GPU_pelmat(l, m) = GPU_pelmat(m, l) = temp;
+               }
+               
+            }
+            
+            // gshape.GradToDiv (divshape);
+            for (size_t j = 0; j < dim*dof; j++) {
+               GPU_divshape(j) = GPU_gshape[i];
+            }
+
+
+            for (int ll = 0; ll < dof * dim; ll++)
+            {
+               SHOW("%lf ", GPU_divshape(ll));
+            }
+            SHOW("\n");
+         
+
+            SHOW("\n\n");
+            for (int ii = 0; ii < dim; ii++)
+               for (int jj = 0; jj < dim; jj++)
+               {            
+               SHOW("[row %d %d]\n", ii, jj);
+                  for (int kk = 0; kk < dof; kk++)
+                  {
+                     for (int ll = 0; ll < dof; ll++)
+                     {
+                        SHOW("%lf ", GPU_elmat(dof*ii+kk, dof*jj+ll));
+                     }
+                     SHOW("\n");
+                  }
+                  SHOW("\n");
+               }
+
+            SHOW("Addmult_a_VVT\n");
+
+            if (GPU_L(i) != 0.0)
+            {
+               // MFEM_ASSERT(elmat.Height() == v.Size() && elmat.Width() == v.Size(), "incompatible dimensions!");
+               
+               double a = GPU_L(i) * GPU_w(i);
+               
+               for (int i=0; i<dim*dof; i++)
+               {
+                  double avi = a * GPU_divshape(i);
+                  for (int j=0; j<i; j++)
+                  {
+                     const double avivj = avi * GPU_divshape(j);
+                     GPU_elmat(i, j) += avivj;
+                     GPU_elmat(j, i) += avivj;
+                     SHOW("%lf ", GPU_divshape(j));
+                     // SHOW("(%lf, %lf) ", GPU_elmat(j, i), GPU_elmat(i, j));
+                  }
+                  GPU_elmat(i, i) += avi * GPU_divshape(i);
+                  SHOW("## %lf \n", GPU_elmat(i, i));
+               }
+            }
+
+            SHOW("\n\n");
+            for (int ii = 0; ii < dim; ii++)
+               for (int jj = 0; jj < dim; jj++)
+               {            
+                  SHOW("[row %d %d]\n", ii, jj);
+                  for (int kk = 0; kk < dof; kk++)
+                  {
+                     for (int ll = 0; ll < dof; ll++)
+                     {
+                        SHOW("%lf ", GPU_elmat(dof*ii+kk, dof*jj+ll));
+                     }
+                     SHOW("\n");
+                  }
+                  SHOW("\n");
+               }
+            SHOW("elmat (dof*d+k, dof*d+l) += (M * w) * pelmat(k, l)\n");
+               
+
+            if (GPU_M[i] != 0.0)
+            {
+               for (int d = 0; d < dim; d++)
+               {
+                  for (int k=0; k<dof; k++)
+                  {
+                     for (int l=0; l<dof; l++)
+                     {
+                        GPU_elmat (dof*d+k, dof*d+l) += (GPU_M(i) * GPU_w(i)) * GPU_pelmat(k, l);
+                        SHOW("(%lf, %lf, %lf) ", GPU_M(i), GPU_w(i), GPU_pelmat(k, l));
+                     }
+                     SHOW("\n");
+                  }
+                  SHOW("\n");
+               }
+
+
+               SHOW("\n\n");
+               for (int ii = 0; ii < dim; ii++)
+                  for (int jj = 0; jj < dim; jj++)
+                  {            
+                  SHOW("[row %d %d]\n", ii, jj);
+                     for (int kk = 0; kk < dof; kk++)
+                     {
+                        for (int ll = 0; ll < dof; ll++)
+                        {
+                           SHOW("%lf ", GPU_elmat(dof*ii+kk, dof*jj+ll));
+                        }
+                        SHOW("\n");
+                     }
+                     SHOW("\n");
+                  }
+
+               SHOW("elmat(dof*ii+kk, dof*jj+ll) += (M * w) * gshape(kk, jj) * gshape(ll, ii);\n");
+
+
+               for (int ii = 0; ii < dim; ii++)
+               {
+                  for (int jj = 0; jj < dim; jj++)
+                  {
+                     SHOW("[row %d %d]\n", ii, jj);
+
+                     for (int kk=0; kk<dof; kk++) 
+                     {
+                        for (int ll=0; ll<dof; ll++)
+                        {
+                           GPU_elmat(dof*ii+kk, dof*jj+ll) +=
+                           (GPU_M(i) * GPU_w(i)) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
+                           SHOW("%lf ", GPU_elmat(dof*ii+kk, dof*jj+ll));
+                        }
+                        SHOW("\n");
+                     }
+                     SHOW("\n");
+                  }
+               }
+            }
+
+
+            SHOW("\n\n");
+            for (int ii = 0; ii < dim; ii++)
+               for (int jj = 0; jj < dim; jj++)
+               {            
+               SHOW("[row %d %d]\n", ii, jj);
+                  for (int kk = 0; kk < dof; kk++)
+                  {
+                     for (int ll = 0; ll < dof; ll++)
+                     {
+                        SHOW("%lf ", GPU_elmat(dof*ii+kk, dof*jj+ll));
+                     }
+                     SHOW("\n");
+                  }
+                  SHOW("\n");
+               }
+         }
+      };
+
+      auto host_kernel = [&] MFEM_LAMBDA (int) { 
+         // printf("this part is to be done on the GPU\n");
+      };
+
+
+      ForallWrap<3>(true, 1, device_kernel, host_kernel, 1, 1, 1);
+      
+      cudaMemcpy(elmat.GetData(), GPU_elmat, dof*dim*dof*dim*sizeof(double), cudaMemcpyDeviceToHost);
+
+#else
+
    for (int i = 0; i < ir -> GetNPoints(); i++)
    {
       const IntegrationPoint &ip = ir->IntPoint(i);
 
       el.CalcDShape(ip, dshape);
+      // dshape = newval 
 
       Trans.SetIntPoint(&ip);
       // ???
@@ -3967,6 +4239,19 @@ void ElasticityIntegrator::AssembleElementMatrix(
       w = ip.weight * Trans.Weight();
       Mult(dshape, Trans.InverseJacobian(), gshape);
       // kernels::Mult(ah,aw,bw,bd,cd,ad);
+      // gshape += Trans.InverseJacobian() * dshape
+
+
+      DEBUG("gshape values :\n");
+      for (size_t m = 0; m < dim; m++)
+      {
+         for (size_t k = 0; k < dof; k++)
+         {
+            DEBUG("%lf ", gshape(m, k));
+         }
+         DEBUG("\n");
+      }
+      DEBUG("\n");
 
 
       MultAAt(gshape, pelmat);
@@ -4001,17 +4286,41 @@ void ElasticityIntegrator::AssembleElementMatrix(
          M = q_mu * M;
       }
 
+
+      for (int ll = 0; ll < dof * dim; ll++)
+      {
+         SHOW("%lf ", divshape(ll));
+      }
+      SHOW("\n");
+
+
 #ifdef MFEM_USE_CUDA
       auto GPU_elmat = Reshape(elmat.ReadWrite(), dof*dim, dof*dim);
       auto GPU_pelmat = Reshape(pelmat.Read(), dof, dof);
       auto GPU_divshape = Reshape(divshape.Read(), dim*dof);
-      auto GPU_gshape = Reshape(gshape.Read(), dof*dim, dof*dim);
+      auto GPU_gshape = Reshape(gshape.Read(), dof, dim);
 
       const int n = divshape.Size();
 
 
+      for (int ll = 0; ll < dof * dim; ll++)
+      {
+         SHOW("%lf ", divshape(ll));
+      }
+      SHOW("\n");
+
+
       auto device_kernel = [=] MFEM_DEVICE (int)
       {
+
+
+      for (int ll = 0; ll < dof * dim; ll++)
+      {
+         SHOW("%lf ", GPU_divshape(ll));
+      }
+      SHOW("\n");
+      
+
          SHOW("\n\n");
          for (int ii = 0; ii < dim; ii++)
             for (int jj = 0; jj < dim; jj++)
@@ -4029,10 +4338,11 @@ void ElasticityIntegrator::AssembleElementMatrix(
             }
 
       SHOW("Addmult_a_VVT\n");
+      SHOW("%lf %lf %d %d \n", L, w, dof, dim);
 
          if (L != 0.0)
          {
-            MFEM_ASSERT(elmat.Height() == v.Size() && elmat.Width() == v.Size(), "incompatible dimensions!");
+            // MFEM_ASSERT(elmat.Height() == v.Size() && elmat.Width() == v.Size(), "incompatible dimensions!");
             
             double a = L * w;
             
@@ -4044,7 +4354,8 @@ void ElasticityIntegrator::AssembleElementMatrix(
                   const double avivj = avi * GPU_divshape(j);
                   GPU_elmat(i, j) += avivj;
                   GPU_elmat(j, i) += avivj;
-                  SHOW("(%lf, %lf) ", GPU_elmat(j, i), GPU_elmat(i, j));
+                  SHOW("%lf ", GPU_divshape(j));
+                  // SHOW("(%lf, %lf) ", GPU_elmat(j, i), GPU_elmat(i, j));
                }
                GPU_elmat(i, i) += avi * GPU_divshape(i);
                SHOW("## %lf \n", GPU_elmat(i, i));
@@ -4069,9 +4380,6 @@ void ElasticityIntegrator::AssembleElementMatrix(
                }
                SHOW("\n");
             }
-
-
-
          SHOW("elmat (dof*d+k, dof*d+l) += (M * w) * pelmat(k, l)\n");
             
 
@@ -4164,15 +4472,20 @@ void ElasticityIntegrator::AssembleElementMatrix(
 #else 
    // printf("this is done on the CPU");
 
+
+      for (int ll = 0; ll < dof * dim; ll++)
+      {
+         SHOW("%lf ", divshape(ll));
+      }
+      SHOW("\n");
+
       SHOW("\n\n");
       for (int ii = 0; ii < dim; ii++)
          for (int jj = 0; jj < dim; jj++)
          {            
          SHOW("[row %d %d]\n", ii, jj);
-            for (int kk = 0; kk < dof; kk++)
-            {
-               for (int ll = 0; ll < dof; ll++)
-               {
+            for (int kk = 0; kk < dof; kk++) {
+               for (int ll = 0; ll < dof; ll++) {
                   SHOW("%lf ", elmat(dof*ii+kk, dof*jj+ll));
                }
                SHOW("\n");
@@ -4181,6 +4494,7 @@ void ElasticityIntegrator::AssembleElementMatrix(
          }
 
       SHOW("Addmult_a_VVT\n");
+      SHOW("%lf %lf %d %d \n", L, w, dof, dim);
 
       if (L != 0.0)
       {
@@ -4279,6 +4593,9 @@ void ElasticityIntegrator::AssembleElementMatrix(
 #endif
 
    }
+
+#endif
+
 
 #ifdef MFEM_USE_CUDA
    nvtxRangePop();
