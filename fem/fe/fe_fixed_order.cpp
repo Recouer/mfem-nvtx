@@ -36,7 +36,20 @@ void PointFiniteElement::CalcShape(const IntegrationPoint &ip,
 void PointFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                     DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " PointFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    // dshape is (1 x 0) - nothing to compute
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 Linear1DFiniteElement::Linear1DFiniteElement()
@@ -56,8 +69,21 @@ void Linear1DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void Linear1DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                        DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " Linear1DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) = -1.;
    dshape(1,0) =  1.;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 Linear2DFiniteElement::Linear2DFiniteElement()
@@ -82,9 +108,22 @@ void Linear2DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void Linear2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                        DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " Linear2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) = -1.; dshape(0,1) = -1.;
    dshape(1,0) =  1.; dshape(1,1) =  0.;
    dshape(2,0) =  0.; dshape(2,1) =  1.;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -113,10 +152,23 @@ void BiLinear2DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void BiLinear2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                          DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " BiLinear2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) = -1. + ip.y; dshape(0,1) = -1. + ip.x ;
    dshape(1,0) =  1. - ip.y; dshape(1,1) = -ip.x ;
    dshape(2,0) =  ip.y ;     dshape(2,1) = ip.x ;
    dshape(3,0) = -ip.y ;     dshape(3,1) = 1. - ip.x ;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void BiLinear2DFiniteElement::CalcHessian(
@@ -153,9 +205,22 @@ void GaussLinear2DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void GaussLinear2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                             DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " GaussLinear2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) = -2.;  dshape(0,1) = -2.;
    dshape(1,0) =  2.;  dshape(1,1) =  0.;
    dshape(2,0) =  0.;  dshape(2,1) =  2.;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void GaussLinear2DFiniteElement::ProjectDelta(int vertex, Vector &dofs) const
@@ -197,12 +262,25 @@ void GaussBiLinear2DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void GaussBiLinear2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                               DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " GaussBiLinear2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    const double x = ip.x, y = ip.y;
 
    dshape(0,0) = 3. * (y - p[1]);  dshape(0,1) = 3. * (x - p[1]);
    dshape(1,0) = 3. * (p[1] - y);  dshape(1,1) = 3. * (p[0] - x);
    dshape(2,0) = 3. * (y - p[0]);  dshape(2,1) = 3. * (x - p[0]);
    dshape(3,0) = 3. * (p[0] - y);  dshape(3,1) = 3. * (p[1] - x);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void GaussBiLinear2DFiniteElement::ProjectDelta(int vertex, Vector &dofs) const
@@ -240,9 +318,22 @@ void P1OnQuadFiniteElement::CalcShape(const IntegrationPoint &ip,
 void P1OnQuadFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                        DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " P1OnQuadFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) = -1.; dshape(0,1) = -1.;
    dshape(1,0) =  1.; dshape(1,1) =  0.;
    dshape(2,0) =  0.; dshape(2,1) =  1.;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -268,11 +359,24 @@ void Quad1DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void Quad1DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                      DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " Quad1DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double x = ip.x;
 
    dshape(0,0) = 4. * x - 3.;
    dshape(1,0) = 4. * x - 1.;
    dshape(2,0) = 4. - 8. * x;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -310,6 +414,15 @@ void Quad2DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void Quad2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                      DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " Quad2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double x = ip.x, y = ip.y;
 
    dshape(0,0) =
@@ -329,6 +442,10 @@ void Quad2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
 
    dshape(5,0) = -4. * y;
    dshape(5,1) = -4. * (x + 2. * y - 1.);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Quad2DFiniteElement::CalcHessian (const IntegrationPoint &ip,
@@ -426,6 +543,15 @@ void GaussQuad2DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void GaussQuad2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                           DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " GaussQuad2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    const double x = ip.x, y = ip.y;
    D(0,0) = 0.;      D(0,1) = 0.;
    D(1,0) = 1.;      D(1,1) = 0.;
@@ -435,6 +561,10 @@ void GaussQuad2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    D(5,0) = 0.;      D(5,1) = 2. * y;
 
    Mult(A, D, dshape);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -488,6 +618,15 @@ void BiQuad2DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void BiQuad2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                        DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " BiQuad2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double x = ip.x, y = ip.y;
    double l1x, l2x, l3x, l1y, l2y, l3y;
    double d1x, d2x, d3x, d1y, d2y, d3y;
@@ -532,6 +671,10 @@ void BiQuad2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
 
    dshape(2,0) = d3x * l3y;
    dshape(2,1) = l3x * d3y;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void BiQuad2DFiniteElement::ProjectDelta(int vertex, Vector &dofs) const
@@ -608,6 +751,15 @@ void GaussBiQuad2DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void GaussBiQuad2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                             DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " GaussBiQuad2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    const double a = sqrt(5./3.);
    const double p1 = 0.5*(1.-sqrt(3./5.));
 
@@ -655,6 +807,10 @@ void GaussBiQuad2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
 
    dshape(2,0) = d3x * l3y;
    dshape(2,1) = l3x * d3y;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 BiCubic2DFiniteElement::BiCubic2DFiniteElement()
@@ -736,6 +892,15 @@ void BiCubic2DFiniteElement::CalcShape(
 void BiCubic2DFiniteElement::CalcDShape(
    const IntegrationPoint &ip, DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " BiCubic2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double x = ip.x, y = ip.y;
 
    double w1x, w2x, w3x, w1y, w2y, w3y;
@@ -781,6 +946,10 @@ void BiCubic2DFiniteElement::CalcDShape(
    dshape(13,0) = d2x * l1y;   dshape(13,1) = l2x * d1y;
    dshape(14,0) = d1x * l2y;   dshape(14,1) = l1x * d2y;
    dshape(15,0) = d2x * l2y;   dshape(15,1) = l2x * d2y;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void BiCubic2DFiniteElement::CalcHessian(
@@ -872,12 +1041,25 @@ void Cubic1DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void Cubic1DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                       DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " Cubic1DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double x = ip.x;
 
    dshape(0,0) = -5.5 + x * (18. - 13.5 * x);
    dshape(1,0) = 1. - x * (9. - 13.5 * x);
    dshape(2,0) = 9. - x * (45. - 40.5 * x);
    dshape(3,0) = -4.5 + x * (36. - 40.5 * x);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -929,6 +1111,15 @@ void Cubic2DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void Cubic2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                       DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " Cubic2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double x = ip.x, y = ip.y;
 
    dshape(0,0) =  0.5*(-11. + 36.*y - 9.*(x*(-4. + 3.*x) + 6.*x*y + 3.*y*y));
@@ -952,7 +1143,12 @@ void Cubic2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    dshape(7,1) = -4.5*(1. + x*(-1. + 6.*y) + y*(-8. + 9.*y));
    dshape(8,1) =  4.5*(2. + 3.*x*x + y*(-10. + 9.*y) + x*(-5. + 12.*y));
    dshape(9,1) = -27.*x*(-1. + x + 2.*y);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
+
 
 void Cubic2DFiniteElement::CalcHessian (const IntegrationPoint &ip,
                                         DenseMatrix &h) const
@@ -1097,6 +1293,15 @@ void Cubic3DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void Cubic3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                       DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " Cubic3DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double x = ip.x, y = ip.y, z = ip.z;
 
    dshape(0,0) = (-11 + 36*y + 36*z - 9*(3*pow(x,2) + 3*pow(y + z,2) +
@@ -1165,6 +1370,10 @@ void Cubic3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    dshape(3,0) = 0;
    dshape(3,1) = 0;
    dshape(3,2) = 1 + (9*z*(-2 + 3*z))/2.;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -1184,8 +1393,21 @@ void P0TriangleFiniteElement::CalcShape(const IntegrationPoint &ip,
 void P0TriangleFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                          DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " P0TriangleFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) = 0.0;
    dshape(0,1) = 0.0;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -1205,8 +1427,21 @@ void P0QuadFiniteElement::CalcShape(const IntegrationPoint &ip,
 void P0QuadFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                      DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " P0QuadFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) = 0.0;
    dshape(0,1) = 0.0;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -1239,6 +1474,15 @@ void Linear3DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void Linear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                        DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " Linear3DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    if (dshape.Height() == 4)
    {
       double *A = &dshape(0,0);
@@ -1254,6 +1498,10 @@ void Linear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
       dshape(2,0) =  0.; dshape(2,1) =  1.; dshape(2,2) =  0.;
       dshape(3,0) =  0.; dshape(3,1) =  0.; dshape(3,2) =  1.;
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void Linear3DFiniteElement::GetFaceDofs (int face, int **dofs, int *ndofs)
@@ -1304,6 +1552,15 @@ void LinearWedgeFiniteElement::CalcShape(const IntegrationPoint &ip,
 void LinearWedgeFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                           DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " LinearWedgeFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) = -1. + ip.z;
    dshape(0,1) = -1. + ip.z;
    dshape(0,2) = -1. + ip.x + ip.y;
@@ -1327,6 +1584,10 @@ void LinearWedgeFiniteElement::CalcDShape(const IntegrationPoint &ip,
    dshape(5,0) =  0.;
    dshape(5,1) =  ip.z;
    dshape(5,2) =  ip.y;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void LinearWedgeFiniteElement::GetFaceDofs (int face, int **dofs, int *ndofs)
@@ -1393,6 +1654,15 @@ void LinearPyramidFiniteElement::CalcShape(const IntegrationPoint &ip,
 void LinearPyramidFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                             DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " LinearPyramidFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double x = ip.x, y = ip.y, z = ip.z;
    double ox = 1.-x-z, oy = 1.-y-z, oz = 1.-z;
 
@@ -1425,6 +1695,10 @@ void LinearPyramidFiniteElement::CalcDShape(const IntegrationPoint &ip,
       dshape(4,1) =   0.;
       dshape(4,2) =   1.;
 
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
       return;
    }
 
@@ -1449,6 +1723,10 @@ void LinearPyramidFiniteElement::CalcDShape(const IntegrationPoint &ip,
    dshape(4,0) =   0.;
    dshape(4,1) =   0.;
    dshape(4,2) =   1.;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 void LinearPyramidFiniteElement::GetFaceDofs (int face, int **dofs, int *ndofs)
@@ -1522,6 +1800,15 @@ void Quadratic3DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void Quadratic3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                           DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " Quadratic3DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double x, y, z, L0;
 
    x = ip.x;
@@ -1539,6 +1826,10 @@ void Quadratic3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    dshape(7,0) = 4.0 * y; dshape(7,1) = 4.0 * x; dshape(7,2) = 0.0;
    dshape(8,0) = 4.0 * z; dshape(8,1) = 0.0; dshape(8,2) = 4.0 * x;
    dshape(9,0) = 0.0; dshape(9,1) = 4.0 * z; dshape(9,2) = 4.0 * y;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 TriLinear3DFiniteElement::TriLinear3DFiniteElement()
@@ -1596,6 +1887,15 @@ void TriLinear3DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void TriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                           DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " TriLinear3DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double x = ip.x, y = ip.y, z = ip.z;
    double ox = 1.-x, oy = 1.-y, oz = 1.-z;
 
@@ -1630,6 +1930,10 @@ void TriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    dshape(7,0) = -  y *  z;
    dshape(7,1) =   ox *  z;
    dshape(7,2) =   ox *  y;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -1648,7 +1952,20 @@ void P0SegmentFiniteElement::CalcShape(const IntegrationPoint &ip,
 void P0SegmentFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                         DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " P0SegmentFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) = 0.0;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 CrouzeixRaviartFiniteElement::CrouzeixRaviartFiniteElement()
@@ -1673,9 +1990,22 @@ void CrouzeixRaviartFiniteElement::CalcShape(const IntegrationPoint &ip,
 void CrouzeixRaviartFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                               DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " CrouzeixRaviartFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) =  0.0; dshape(0,1) = -2.0;
    dshape(1,0) =  2.0; dshape(1,1) =  2.0;
    dshape(2,0) = -2.0; dshape(2,1) =  0.0;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 CrouzeixRaviartQuadFiniteElement::CrouzeixRaviartQuadFiniteElement()
@@ -1707,12 +2037,25 @@ void CrouzeixRaviartQuadFiniteElement::CalcShape(const IntegrationPoint &ip,
 void CrouzeixRaviartQuadFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                                   DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " CrouzeixRaviartQuadFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    const double x2 = 2.*ip.x, y2 = 2.*ip.y;
 
    dshape(0,0) =  1. - x2; dshape(0,1) = -2. + y2;
    dshape(1,0) =       x2; dshape(1,1) =  1. - y2;
    dshape(2,0) =  1. - x2; dshape(2,1) =       y2;
    dshape(3,0) = -2. + x2; dshape(3,1) =  1. - y2;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -2725,8 +3068,21 @@ void P1SegmentFiniteElement::CalcShape(const IntegrationPoint &ip,
 void P1SegmentFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                         DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " P1SegmentFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) = -3.;
    dshape(1,0) =  3.;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -2755,6 +3111,15 @@ void P2SegmentFiniteElement::CalcShape(const IntegrationPoint &ip,
 void P2SegmentFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                         DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " P2SegmentFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    const double p = 0.11270166537925831148;
    const double w = 1./((1-2*p)*(1-2*p));
    double x = ip.x;
@@ -2762,6 +3127,10 @@ void P2SegmentFiniteElement::CalcDShape(const IntegrationPoint &ip,
    dshape(0,0) = (-3+4*x+2*p)*w;
    dshape(1,0) = (4-8*x)*w;
    dshape(2,0) = (-1+4*x-2*p)*w;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -2848,6 +3217,15 @@ void Lagrange1DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void Lagrange1DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                          DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " Lagrange1DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double s, srx, w, wk, x = ip.x;
    int i, k, m = GetOrder();
 
@@ -2903,6 +3281,10 @@ void Lagrange1DFiniteElement::CalcDShape(const IntegrationPoint &ip,
       {
          dshape(k+1,0) = wk * srx * rwk(k);
       }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -2942,10 +3324,23 @@ void P1TetNonConfFiniteElement::CalcShape(const IntegrationPoint &ip,
 void P1TetNonConfFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                            DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " P1TetNonConfFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) =  3.0; dshape(0,1) =  3.0; dshape(0,2) =  3.0;
    dshape(1,0) = -3.0; dshape(1,1) =  0.0; dshape(1,2) =  0.0;
    dshape(2,0) =  0.0; dshape(2,1) = -3.0; dshape(2,2) =  0.0;
    dshape(3,0) =  0.0; dshape(3,1) =  0.0; dshape(3,2) = -3.0;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -2966,7 +3361,20 @@ void P0TetFiniteElement::CalcShape(const IntegrationPoint &ip,
 void P0TetFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                     DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " P0TetFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) =  0.0; dshape(0,1) =  0.0; dshape(0,2) = 0.0;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -2987,7 +3395,20 @@ void P0HexFiniteElement::CalcShape(const IntegrationPoint &ip,
 void P0HexFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                     DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " P0HexFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) =  0.0; dshape(0,1) =  0.0; dshape(0,2) = 0.0;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -3008,7 +3429,20 @@ void P0WdgFiniteElement::CalcShape(const IntegrationPoint &ip,
 void P0WdgFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                     DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " P0WdgFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) =  0.0; dshape(0,1) =  0.0; dshape(0,2) = 0.0;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -3029,7 +3463,20 @@ void P0PyrFiniteElement::CalcShape(const IntegrationPoint &ip,
 void P0PyrFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                     DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " P0PyrFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    dshape(0,0) =  0.0; dshape(0,1) =  0.0; dshape(0,2) = 0.0;
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -3198,6 +3645,15 @@ void LagrangeHexFiniteElement::CalcShape(const IntegrationPoint &ip,
 void LagrangeHexFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                           DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " LagrangeHexFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    IntegrationPoint ipy, ipz;
    ipy.x = ip.y;
    ipz.x = ip.z;
@@ -3221,6 +3677,10 @@ void LagrangeHexFiniteElement::CalcDShape(const IntegrationPoint &ip,
       dshape(n,1) = shape1dx(I[n])    * dshape1dy(J[n],0) * shape1dz(K[n]);
       dshape(n,2) = shape1dx(I[n])    * shape1dy(J[n])    * dshape1dz(K[n],0);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 LagrangeHexFiniteElement::~LagrangeHexFiniteElement ()
@@ -3263,6 +3723,15 @@ void RefinedLinear1DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void RefinedLinear1DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                               DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " RefinedLinear1DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    double x = ip.x;
 
    if (x <= 0.5)
@@ -3277,6 +3746,10 @@ void RefinedLinear1DFiniteElement::CalcDShape(const IntegrationPoint &ip,
       dshape(1,0) =   2.0;
       dshape(2,0) = - 2.0;
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 RefinedLinear2DFiniteElement::RefinedLinear2DFiniteElement()
@@ -3347,6 +3820,15 @@ void RefinedLinear2DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void RefinedLinear2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                               DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " RefinedLinear2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int i,j;
 
    double L0, L1, L2;
@@ -3401,6 +3883,10 @@ void RefinedLinear2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
          dshape(5,j) = - DL1[j];
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 RefinedLinear3DFiniteElement::RefinedLinear3DFiniteElement()
@@ -3528,6 +4014,15 @@ void RefinedLinear3DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void RefinedLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                               DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " RefinedLinear3DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int i,j;
 
    double L0, L1, L2, L3, L4, L5;
@@ -3632,6 +4127,10 @@ void RefinedLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
          dshape(9,j) =   DL5[j];
       }
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
@@ -3712,6 +4211,15 @@ void RefinedBiLinear2DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void RefinedBiLinear2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                                 DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " RefinedBiLinear2DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int i,j;
    double x = ip.x, y = ip.y;
    double Lx, Ly;
@@ -3780,6 +4288,10 @@ void RefinedBiLinear2DFiniteElement::CalcDShape(const IntegrationPoint &ip,
       dshape(3,0) = -2.0 * (1.0 - Ly);
       dshape(3,1) =  2.0 * (Lx - 1.0);
    }
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 RefinedTriLinear3DFiniteElement::RefinedTriLinear3DFiniteElement()
@@ -3974,6 +4486,15 @@ void RefinedTriLinear3DFiniteElement::CalcShape(const IntegrationPoint &ip,
 void RefinedTriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
                                                  DenseMatrix &dshape) const
 {
+#ifdef MFEM_USE_CUDA
+  char str_nvtx[256];
+  sprintf(str_nvtx, "%d ", __LINE__);
+  strcat(str_nvtx, __FILE__);
+  strcat(str_nvtx, " RefinedTriLinear3DFiniteElement::");
+  strcat(str_nvtx, __FUNCTION__);
+  nvtxRangePush(str_nvtx);
+#endif
+
    int i, j, N[8];
    double Lx, Ly, Lz;
    double x = ip.x, y = ip.y, z = ip.z;
@@ -3986,6 +4507,7 @@ void RefinedTriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
 
    if ((x <= 0.5) && (y <= 0.5) && (z <= 0.5))   // T0
    {
+      printf("T0\n");
       Lx = 1.0 - 2.0 * x;
       Ly = 1.0 - 2.0 * y;
       Lz = 1.0 - 2.0 * z;
@@ -4001,6 +4523,7 @@ void RefinedTriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    }
    else if ((x >= 0.5) && (y <= 0.5) && (z <= 0.5))   // T1
    {
+      printf("T1\n");
       Lx = 2.0 - 2.0 * x;
       Ly = 1.0 - 2.0 * y;
       Lz = 1.0 - 2.0 * z;
@@ -4016,6 +4539,7 @@ void RefinedTriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    }
    else if ((x <= 0.5) && (y >= 0.5) && (z <= 0.5))   // T2
    {
+      printf("T2\n");
       Lx = 2.0 - 2.0 * x;
       Ly = 2.0 - 2.0 * y;
       Lz = 1.0 - 2.0 * z;
@@ -4031,6 +4555,7 @@ void RefinedTriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    }
    else if ((x >= 0.5) && (y >= 0.5) && (z <= 0.5))   // T3
    {
+      printf("T3\n");
       Lx = 1.0 - 2.0 * x;
       Ly = 2.0 - 2.0 * y;
       Lz = 1.0 - 2.0 * z;
@@ -4046,6 +4571,7 @@ void RefinedTriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    }
    else if ((x <= 0.5) && (y <= 0.5) && (z >= 0.5))   // T4
    {
+      printf("T4\n");
       Lx = 1.0 - 2.0 * x;
       Ly = 1.0 - 2.0 * y;
       Lz = 2.0 - 2.0 * z;
@@ -4061,6 +4587,7 @@ void RefinedTriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    }
    else if ((x >= 0.5) && (y <= 0.5) && (z >= 0.5))   // T5
    {
+      printf("T5\n");
       Lx = 2.0 - 2.0 * x;
       Ly = 1.0 - 2.0 * y;
       Lz = 2.0 - 2.0 * z;
@@ -4076,6 +4603,7 @@ void RefinedTriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    }
    else if ((x <= 0.5) && (y >= 0.5) && (z >= 0.5))   // T6
    {
+      printf("T6\n");
       Lx = 2.0 - 2.0 * x;
       Ly = 2.0 - 2.0 * y;
       Lz = 2.0 - 2.0 * z;
@@ -4091,6 +4619,7 @@ void RefinedTriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    }
    else   // T7
    {
+      printf("T7\n");
       Lx = 1.0 - 2.0 * x;
       Ly = 2.0 - 2.0 * y;
       Lz = 2.0 - 2.0 * z;
@@ -4136,6 +4665,10 @@ void RefinedTriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    dshape(N[7],0) = -2.0 * (1 - Ly) * (1 - Lz);
    dshape(N[7],1) =  2.0 * Lx       * (1 - Lz);
    dshape(N[7],2) =  2.0 * Lx       * (1 - Ly);
+
+#ifdef MFEM_USE_CUDA
+  nvtxRangePop();
+#endif
 }
 
 
