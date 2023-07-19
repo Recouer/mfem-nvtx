@@ -53,6 +53,9 @@ public:
 
    using NonlinearFormIntegrator::AssemblePA;
 
+
+   virtual void AssembleGPU(const FiniteElementSpace &fes);
+   bool has_GPU_support = false;
    /// Method defining partial assembly.
    /** The result of the partial assembly is stored internally so that it can be
        used later in the methods AddMultPA() and AddMultTransposePA(). */
@@ -135,6 +138,10 @@ public:
    /// Given a particular Finite Element computes the element matrix elmat.
    virtual void AssembleElementMatrix(const FiniteElement &el,
                                       ElementTransformation &Trans,
+                                      DenseMatrix &elmat);
+
+   /// Given a particular Finite Element computes the element matrix elmat.
+   virtual void DeviceAssembleElementMatrix(FiniteElementSpace &fes,
                                       DenseMatrix &elmat);
 
    /** Compute the local matrix representation of a bilinear form
@@ -2913,6 +2920,9 @@ public:
        if dim * q_l + 2 * q_m = 0 then trace(sigma) = 0. */
    ElasticityIntegrator(Coefficient &m, double q_l, double q_m)
    { lambda = NULL; mu = &m; q_lambda = q_l; q_mu = q_m; }
+
+   virtual void AssembleGPU(const FiniteElementSpace &fes);
+   bool has_GPU_support = true;
 
    virtual void AssembleElementMatrix(const FiniteElement &,
                                       ElementTransformation &,

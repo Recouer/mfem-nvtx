@@ -349,8 +349,10 @@ void Mult(const int Aheight, const int Awidth, const int Bwidth,
       {
          for (int i = 0; i < Aheight; i++)
          {
+            // printf("A(%d, %d) <- B(%d, %d) * C(%d, %d)\n", i, j, i, k, k, j);
             Adata[i+j*Aheight] += Bdata[i+k*Aheight] * Cdata[k+j*Bwidth];
          }
+         printf("\n");
       }
    }
 }

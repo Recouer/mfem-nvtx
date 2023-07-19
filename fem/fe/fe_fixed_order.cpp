@@ -1899,6 +1899,8 @@ void TriLinear3DFiniteElement::CalcDShape(const IntegrationPoint &ip,
    double x = ip.x, y = ip.y, z = ip.z;
    double ox = 1.-x, oy = 1.-y, oz = 1.-z;
 
+   printf("\nintegration point values: %lf %lf %lf \n", x, y, z);
+
    dshape(0,0) = - oy * oz;
    dshape(0,1) = - ox * oz;
    dshape(0,2) = - ox * oy;

@@ -1543,6 +1543,16 @@ public:
    /// Return the attribute of element i.
    int GetAttribute(int i) const { return elements[i]->GetAttribute(); }
 
+   Array<int> GetAttributes() const {
+        int size = elements.size();
+        array<int, size> Attributes;
+        for (int i=0; i < size; i++) {
+            elements[i]->GetAttribute() >> Attributes.at(i);
+        }
+
+        return Attributes;
+   }
+
    /// Set the attribute of element i.
    void SetAttribute(int i, int attr) { elements[i]->SetAttribute(attr); }
 

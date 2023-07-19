@@ -3616,7 +3616,7 @@ void SparseMatrix::AddSubMatrix(const Array<int> &rows, const Array<int> &cols,
 	nvtxRangePush(str_nvtx);
 #endif
 
-    int i, j, gi, gj, s, t;
+   int i, j, gi, gj, s, t;
    double a;
 
    if (Finalized())

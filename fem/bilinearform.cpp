@@ -659,6 +659,8 @@ namespace mfem {
 	nvtxRangePush(str_nvtx);
 #endif
 
+    os << ext << std::endl;
+
         if (ext) {
             ext->Assemble();
 
@@ -696,26 +698,60 @@ namespace mfem {
                                         << k << ", counting from zero");
                 }
             }
+#if 1
+
+            if (element_matrices) {
+                for (int i = 0; i < fes->GetNE(); i++) {
+                    elmat_p = &(*element_matrices)(i);
+                
+                doftrans = fes->GetElementVDofs(i, vdofs);
+                if (doftrans) {
+                    doftrans->TransformDual(elmat);
+                }
+
+                if (static_cond) {
+                    static_cond->AssembleMatrix(i, *elmat_p);
+                } else {
+                    mat->AddSubMatrix(vdofs, vdofs, *elmat_p, skip_zeros);
+                    if (hybridization) {
+                        hybridization->AssembleMatrix(i, *elmat_p);
+                    }
+                }
+                }
+            }
+            else {
+                for (int k = 0; k<domain_integs.Size(); k++) {
+                    if (domain_integs_marker[k] == NULL || 
+                        (*(domain_integs_marker[k]))[elem_attr - 1] == 1)
+                    {
+                        if (domain_integs[k]->has_GPU_support) 
+                            domain_integs[k]->AssembleGPU(fes, mat);
+                    }
+                }
+            }
+
 
             for (int i = 0; i < fes->GetNE(); i++) {
                 int elem_attr = fes->GetMesh()->GetAttribute(i);
-                doftrans = fes->GetElementVDofs(i, vdofs);
+                doftrans = fes->GetElementVDofs(i, vdofs); // not used by domain integs
                 if (element_matrices) {
                     elmat_p = &(*element_matrices)(i);
                 } else {
                     elmat.SetSize(0);
                     for (int k = 0; k < domain_integs.Size(); k++) {
-                        if (domain_integs_marker[k] == NULL ||
+                        if (domain_integs_marker[k] == NULL || 
                             (*(domain_integs_marker[k]))[elem_attr - 1] == 1) {
-                            const FiniteElement &fe = *fes->GetFE(i);
-                            eltrans = fes->GetElementTransformation(i);
-                            domain_integs[k]->AssembleElementMatrix(fe, *eltrans, elemmat);
-                            if (elmat.Size() == 0) {
-                                elmat = elemmat;
-                            } else {
-                                elmat += elemmat;
-                            }
-                            // elemmat.Print(os, elemmat.Height());
+                            
+                               if (domain_integs[k]->has_GPU_support) {
+                                    const FiniteElement &fe = *fes->GetFE(i);
+                                    eltrans = fes->GetElementTransformation(i);
+                                    domain_integs[k]->AssembleElementMatrix(fe, *eltrans, elemmat);
+                                    if (elmat.Size() == 0) {
+                                        elmat = elemmat;
+                                    } else {
+                                        elmat += elemmat;
+                                    }
+                               }
                         }
                     }
                     if (elmat.Size() == 0) {
@@ -731,6 +767,53 @@ namespace mfem {
                 if (static_cond) {
                     static_cond->AssembleMatrix(i, *elmat_p);
                 } else {
+                    os << vdofs << std::endl;
+                    os << mat << std::endl;
+                    os << elmat_p << std::endl;
+                    mat->AddSubMatrix(vdofs, vdofs, *elmat_p, skip_zeros);
+                    if (hybridization) {
+                        hybridization->AssembleMatrix(i, *elmat_p);
+                    }
+                }
+            }
+
+#else
+            for (int i = 0; i < fes->GetNE(); i++) {
+                int elem_attr = fes->GetMesh()->GetAttribute(i);
+                doftrans = fes->GetElementVDofs(i, vdofs); // not used by domain integs
+                if (element_matrices) {
+                    elmat_p = &(*element_matrices)(i);
+                } else {
+                    elmat.SetSize(0);
+                    for (int k = 0; k < domain_integs.Size(); k++) {
+                        if (domain_integs_marker[k] == NULL || 
+                            (*(domain_integs_marker[k]))[elem_attr - 1] == 1) {
+                            const FiniteElement &fe = *fes->GetFE(i);
+                            eltrans = fes->GetElementTransformation(i);
+                            domain_integs[k]->AssembleElementMatrix(fe, *eltrans, elemmat);
+                            if (elmat.Size() == 0) {
+                                elmat = elemmat;
+                            } else {
+                                elmat += elemmat;
+                            }
+                        }
+                    }
+                    if (elmat.Size() == 0) {
+                        continue;
+                    } else {
+                        elmat_p = &elmat;
+                    }
+                    if (doftrans) {
+                        doftrans->TransformDual(elmat);
+                    }
+                    elmat_p = &elmat;
+                }
+                if (static_cond) {
+                    static_cond->AssembleMatrix(i, *elmat_p);
+                } else {
+                    os << vdofs << std::endl;
+                    os << mat << std::endl;
+                    os << elmat_p << std::endl;
                     mat->AddSubMatrix(vdofs, vdofs, *elmat_p, skip_zeros);
                     if (hybridization) {
                         hybridization->AssembleMatrix(i, *elmat_p);
@@ -738,6 +821,9 @@ namespace mfem {
                 }
             }
         }
+#endif
+
+
 
         if (boundary_integs.Size()) {
             // Which boundary attributes need to be processed?

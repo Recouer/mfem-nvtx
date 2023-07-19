@@ -3244,7 +3244,8 @@ void AddMult_a_VVt(const double a, const Vector &v, DenseMatrix &VVt)
          const double avivj = avi * v(j);
          VVt(i, j) += avivj;
          VVt(j, i) += avivj;
-         printf("(%lf, %lf) ", VVt(j, i), VVt(i, j));
+         printf("%lf ", v(j));
+         // printf("(%lf, %lf) ", VVt(j, i), VVt(i, j));
       }
       VVt(i, i) += avi * v(i);
       printf("## %lf \n", VVt(i, i));
