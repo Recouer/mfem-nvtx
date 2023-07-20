@@ -3914,9 +3914,15 @@ void VectorDiffusionIntegrator::AssembleElementVector(
 #endif
 }
 
-#if 0
+#if 1
 
-void ElasticityIntegrator::AssembleGPU(const FiniteElementSpace &fes, SparseMatrix &mat) {
+void ElasticityIntegrator::AssembleGPU(
+   const FiniteElementSpace &fes, 
+   SparseMatrix &mat,
+   StaticCondensation *static_cond,
+   int skip_zeros,
+   Hybridization *hybridization
+   ) {
 #ifdef MFEM_USE_CUDA
    char str[256];
 	sprintf(str, "%d ", __LINE__);
@@ -3929,14 +3935,9 @@ void ElasticityIntegrator::AssembleGPU(const FiniteElementSpace &fes, SparseMatr
 
 //region initialisation
 
-   auto Trans = fes->GetElementTransformation(0);
 
-   const IntegrationRule *ir = IntRule;
-   if (ir == NULL)
-   {
-      int order = 2 * Trans.OrderGrad(&el); // correct order ?
-      ir = &IntRules.Get(el.GetGeomType(), order);
-   }
+   int dof = fes->GetFE(0).GetDof();
+   int dim = fes->GetFE(0).GetDim();
 
    int number_of_elements = fes->GetNE();
    int IntRule_TotalPoints = 0;
@@ -3953,27 +3954,198 @@ void ElasticityIntegrator::AssembleGPU(const FiniteElementSpace &fes, SparseMatr
          int order = 2 * Trans.OrderGrad(&el); // correct order ?
          ir = &IntRules.Get(el.GetGeomType(), order);
       }
+
       IntRule_Sizes(i, 0) = ir->GetNPoints();
-      IntRule_Sizes(i, 1) = ir->GetNPoints();
+      IntRule_Sizes(i, 1) = IntRule_TotalPoints;
       IntRule_TotalPoints += ir->GetNPoints();
    }
-   
-   
 
+   Vector w_values(IntRule_TotalPoints);
+   Vector M_values(IntRule_TotalPoints);
+   Vector L_values(IntRule_TotalPoints);
 
+   DenseTensor TransInvJ_values(IntRule_TotalPoints, dim, dim);
+   DenseTensor dshape_values(IntRule_TotalPoints, dof*dim, dof*dim);
+   DenseTensor elmat(IntRule_TotalPoints, dof, dim);
+   elmat = 0;
 
+   for (size_t i = 0; i < number_of_elements; i++) 
+   {
+      auto Trans = fes->GetElementTransformation(i);
+      const FiniteElement &el = *fes->GetFE(i);
+      const IntegrationRule *ir = IntRule;
+      if (ir == NULL)
+      {
+         int order = 2 * Trans.OrderGrad(&el); // correct order ?
+         ir = &IntRules.Get(el.GetGeomType(), order);
+      }
 
+      for (size_t j = 0; j < IntRule_Sizes(i, 1); j++)
+      {
+         int index = IntRule_Sizes(i, 0) + j;
+
+         const IntegrationPoint &ip = ir->IntPoint(j);
+         Trans.SetIntPoint(&ip);
+         w_values[index] = ip.weight * Trans.Weight();
+
+         auto InvJacobian = Trans.InverseJacobian();
+         for (size_t k = 0; k < dim; k++)
+            for (size_t l = 0; l < dim; l++)
+               TransInvJ_values(index, k, l) = InvJacobian(k, l);
+         
+         
+
+         el.CalcDShape(ip, dshape);
+         for (size_t k = 0; k < dim; k++)
+            for (size_t l = 0; l < dof; l++)
+               dshape_values(index, l, k) = dshape(l, k);
+         
+
+         M_values[index] = mu->Eval(Trans, ip);
+         if (lambda)
+         {
+            L_values[index] = lambda->Eval(Trans, ip);
+         }
+         else
+         {
+            L_values[index] = q_lambda * M_values[index];
+            M_values[index] = q_mu * M_values[index];
+         }
+      }
+   }
 
 //endregion
 
 
 //region kernel
 
+   auto GPU_TransInvJ = Reshape(TransInvJ_values.Read(), IntRule_TotalPoints, dim, dim);
+   auto GPU_dshape = Reshape(dshape_values.Read(), IntRule_TotalPoints, dof, dim);
+
+   auto GPU_elmat = Reshape(elmat.ReadWrite(), IntRule_TotalPoints, dof*dim, dof*dim);
+
+   auto GPU_w = Reshape(w_values.Read(), IntRule_TotalPoints);
+   auto GPU_L = Reshape(M_values.Read(), IntRule_TotalPoints);
+   auto GPU_M = Reshape(L_values.Read(), IntRule_TotalPoints);
+
+   auto GPU_IntRule_Sizes = Reshape(IntRule_Sizes.Read(), IntRule_TotalPoints, 2);
+
+   auto device_kernel = [=] MFEM_DEVICE (int) {
+      // need to add intanciation for pelmat, divshape and gshape
+
+      double GPU_gshape[dim*dof];
+      double GPU_divshape[dim*dof];
+      double GPU_pelmat[dof*dof];
+
+      for (size_t p = 0; p < number_of_elements; p++)
+      {
+         
+
+         for (size_t i = 0; i < numberOfPoints; i++)
+         {
+            // Mult(dshape, Trans.InverseJacobian(), gshape);
+            for (size_t n = 0; n < dim*dof; n++) GPU_gshape[n] = 0.0;
+            for (size_t m = 0; m < dof; m++) 
+               for (size_t k = 0; k < dim; k++) 
+                  for (size_t n = 0; n < dim; n++) 
+                     GPU_gshape(m, n) += GPU_dshape(i, m, k) * GPU_TransInvJ(i, k, n);
+            
+
+            // MultAAt(gshape, pelmat);
+            for (size_t l = 0; l < dof; l++)
+               for (size_t m = 0; m <= l; m++)
+               {
+                  double temp = 0;
+                  for (size_t k = 0; k < dim; k++)
+                     temp += GPU_gshape(l, k) * GPU_gshape(m, k);
+                  
+                  GPU_pelmat(l, m) = GPU_pelmat(m, l) = temp;
+               }
+
+            
+            // gshape.GradToDiv (divshape);
+            for (size_t j = 0; j < dim*dof; j++) {
+               GPU_divshape(j) = GPU_gshape[j];
+            }
+
+            // Addmult_a_VVT
+            if (GPU_L(i) != 0.0)
+            {
+               // MFEM_ASSERT(elmat.Height() == v.Size() && elmat.Width() == v.Size(), 
+               //             "incompatible dimensions!");
+               
+               double a = GPU_L(i) * GPU_w(i);
+               
+               for (int i = 0; i < dim*dof; i++)
+               {
+                  double avi = a * GPU_divshape(i);
+                  for (int j = 0; j < i; j++)
+                  {
+                     const double avivj = avi * GPU_divshape(j);
+                     GPU_elmat(i, j) += avivj;
+                     GPU_elmat(j, i) += avivj;
+                  }
+                  GPU_elmat(i, i) += avi * GPU_divshape(i);
+               }
+            }
+               
+            // elmat (dof*d+k, dof*d+l) += (M * w) * pelmat(k, l)
+            if (GPU_M[i] != 0.0)
+            {
+               for (int d = 0; d < dim; d++)
+                  for (int k=0; k<dof; k++)
+                     for (int l=0; l<dof; l++)
+                        GPU_elmat (dof*d+k, dof*d+l) += (GPU_M(i) * GPU_w(i)) * GPU_pelmat(k, l);
+
+
+               // elmat(dof*ii+kk, dof*jj+ll) += (M * w) * gshape(kk, jj) * gshape(ll, ii);
+               for (int ii = 0; ii < dim; ii++)
+                  for (int jj = 0; jj < dim; jj++)                  
+                     for (int kk=0; kk<dof; kk++) 
+                        for (int ll=0; ll<dof; ll++)
+                           GPU_elmat(dof*ii+kk, dof*jj+ll) +=
+                           (GPU_M(i) * GPU_w(i)) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
+            }
+         }
+      }
+   };
+
+   auto host_kernel = [&] MFEM_LAMBDA (int) { 
+      // printf("this part is to be done on the GPU\n");
+   };
+
+   ForallWrap<3>(true, 1, device_kernel, host_kernel, 1, 1, 1);
+   cudaMemcpy( elmat.GetData(), GPU_elmat, 
+               IntRule_TotalPoints*dof*dim*dof*dim*sizeof(double), 
+               cudaMemcpyDeviceToHost);
 
 //endregion
 
 
 //region copy to sparse matrix
+   
+
+   // should we just return the whole matrix elmat and do that after ?
+
+   DofTransformation *doftrans;
+   for (int i = 0; i < fes->GetNE(); i++) {
+      int elem_attr = fes->GetMesh()->GetAttribute(i);
+      doftrans = fes->GetElementVDofs(i, vdofs);
+
+      auto elmat_p = &elmat;
+      
+      if (doftrans) doftrans->TransformDual(elmat);
+      if (static_cond) static_cond->AssembleMatrix(i, *elmat_p);
+      
+      else {
+         os << vdofs << std::endl;
+         os << mat << std::endl;
+         os << elmat_p << std::endl;
+
+         mat->AddSubMatrix(vdofs, vdofs, *elmat_p, skip_zeros);
+         if (hybridization) hybridization->AssembleMatrix(i, *elmat_p);
+      }
+   }
 
 
 //endregion
@@ -4016,9 +4188,6 @@ void ElasticityIntegrator::AssembleElementMatrix(
    gshape.SetSize(dof, dim);
    pelmat.SetSize(dof);
    divshape.SetSize(dim*dof);
-
-   printf("we are not thread safe\n");
-
 #endif
 
    elmat.SetSize(dof * dim);
@@ -4155,12 +4324,11 @@ void ElasticityIntegrator::AssembleElementMatrix(
                for (size_t m = 0; m <= l; m++)
                {
                   double temp = 0;
-                  for (size_t k = 0; k < dof; k++)
+                  for (size_t k = 0; k < dim; k++)
                      temp += GPU_gshape(l, k) * GPU_gshape(m, k);
                   
                   GPU_pelmat(l, m) = GPU_pelmat(m, l) = temp;
                }
-               
             }
 
 
