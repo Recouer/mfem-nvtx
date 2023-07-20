@@ -4039,16 +4039,16 @@ void ElasticityIntegrator::AssembleGPU(
 
       for (size_t p = 0; p < number_of_elements; p++)
       {
-         
-
-         for (size_t i = 0; i < numberOfPoints; i++)
+         for (size_t i = 0; i < GPU_IntRule_Sizes(p, 1); i++)
          {
+            int index = GPU_IntRule_Sizes(p, 0) + i;
+
             // Mult(dshape, Trans.InverseJacobian(), gshape);
             for (size_t n = 0; n < dim*dof; n++) GPU_gshape[n] = 0.0;
             for (size_t m = 0; m < dof; m++) 
                for (size_t k = 0; k < dim; k++) 
                   for (size_t n = 0; n < dim; n++) 
-                     GPU_gshape(m, n) += GPU_dshape(i, m, k) * GPU_TransInvJ(i, k, n);
+                     GPU_gshape(m, n) += GPU_dshape(index, m, k) * GPU_TransInvJ(index, k, n);
             
 
             // MultAAt(gshape, pelmat);
@@ -4069,33 +4069,33 @@ void ElasticityIntegrator::AssembleGPU(
             }
 
             // Addmult_a_VVT
-            if (GPU_L(i) != 0.0)
+            if (GPU_L(index) != 0.0)
             {
                // MFEM_ASSERT(elmat.Height() == v.Size() && elmat.Width() == v.Size(), 
                //             "incompatible dimensions!");
                
-               double a = GPU_L(i) * GPU_w(i);
+               double a = GPU_L(index) * GPU_w(index);
                
-               for (int i = 0; i < dim*dof; i++)
+               for (int j = 0; j < dim*dof; j++)
                {
-                  double avi = a * GPU_divshape(i);
-                  for (int j = 0; j < i; j++)
+                  double avi = a * GPU_divshape(j);
+                  for (int k = 0; k < i; k++)
                   {
-                     const double avivj = avi * GPU_divshape(j);
-                     GPU_elmat(i, j) += avivj;
-                     GPU_elmat(j, i) += avivj;
+                     const double avivj = avi * GPU_divshape(k);
+                     GPU_elmat(j, k) += avivj;
+                     GPU_elmat(k, j) += avivj;
                   }
-                  GPU_elmat(i, i) += avi * GPU_divshape(i);
+                  GPU_elmat(j, j) += avi * GPU_divshape(j);
                }
             }
                
             // elmat (dof*d+k, dof*d+l) += (M * w) * pelmat(k, l)
-            if (GPU_M[i] != 0.0)
+            if (GPU_M[index] != 0.0)
             {
                for (int d = 0; d < dim; d++)
                   for (int k=0; k<dof; k++)
                      for (int l=0; l<dof; l++)
-                        GPU_elmat (dof*d+k, dof*d+l) += (GPU_M(i) * GPU_w(i)) * GPU_pelmat(k, l);
+                        GPU_elmat (dof*d+k, dof*d+l) += (GPU_M(index) * GPU_w(index)) * GPU_pelmat(k, l);
 
 
                // elmat(dof*ii+kk, dof*jj+ll) += (M * w) * gshape(kk, jj) * gshape(ll, ii);
@@ -4104,7 +4104,7 @@ void ElasticityIntegrator::AssembleGPU(
                      for (int kk=0; kk<dof; kk++) 
                         for (int ll=0; ll<dof; ll++)
                            GPU_elmat(dof*ii+kk, dof*jj+ll) +=
-                           (GPU_M(i) * GPU_w(i)) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
+                           (GPU_M(index) * GPU_w(index)) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
             }
          }
       }
@@ -4383,19 +4383,19 @@ void ElasticityIntegrator::AssembleElementMatrix(
                
                double a = GPU_L(i) * GPU_w(i);
                
-               for (int i=0; i<dim*dof; i++)
+               for (int ii=0; ii<dim*dof; ii++)
                {
-                  double avi = a * GPU_divshape(i);
+                  double avi = a * GPU_divshape(ii);
                   for (int j=0; j<i; j++)
                   {
                      const double avivj = avi * GPU_divshape(j);
-                     GPU_elmat(i, j) += avivj;
-                     GPU_elmat(j, i) += avivj;
+                     GPU_elmat(ii, j) += avivj;
+                     GPU_elmat(j, ii) += avivj;
                      SHOW("%lf ", GPU_divshape(j));
                      // SHOW("(%lf, %lf) ", GPU_elmat(j, i), GPU_elmat(i, j));
                   }
-                  GPU_elmat(i, i) += avi * GPU_divshape(i);
-                  SHOW("## %lf \n", GPU_elmat(i, i));
+                  GPU_elmat(ii, ii) += avi * GPU_divshape(ii);
+                  SHOW("## %lf \n", GPU_elmat(ii, ii));
                }
             }
 
