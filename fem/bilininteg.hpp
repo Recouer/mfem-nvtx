@@ -54,7 +54,8 @@ public:
    using NonlinearFormIntegrator::AssemblePA;
 
 
-   virtual void AssembleGPU(const FiniteElementSpace &fes);
+   virtual void AssembleGPU(FiniteElementSpace &fes, DenseTensor &tensor);
+
    bool has_GPU_support = false;
    /// Method defining partial assembly.
    /** The result of the partial assembly is stored internally so that it can be
@@ -2921,7 +2922,7 @@ public:
    ElasticityIntegrator(Coefficient &m, double q_l, double q_m)
    { lambda = NULL; mu = &m; q_lambda = q_l; q_mu = q_m; }
 
-   virtual void AssembleGPU(const FiniteElementSpace &fes);
+   virtual void AssembleGPU(FiniteElementSpace &fes, DenseTensor &tensor);
    bool has_GPU_support = true;
 
    virtual void AssembleElementMatrix(const FiniteElement &,

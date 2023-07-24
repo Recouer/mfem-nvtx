@@ -675,6 +675,7 @@ namespace mfem {
         DofTransformation *doftrans;
         Mesh *mesh = fes->GetMesh();
         DenseMatrix elmat, *elmat_p;
+        DenseTensor elmat_tensor;
 
         if (mat == NULL) {
             AllocMat();
@@ -703,29 +704,23 @@ namespace mfem {
             if (element_matrices) {
                 for (int i = 0; i < fes->GetNE(); i++) {
                     elmat_p = &(*element_matrices)(i);
-                
-                doftrans = fes->GetElementVDofs(i, vdofs);
-                if (doftrans) {
-                    doftrans->TransformDual(elmat);
-                }
 
-                if (static_cond) {
-                    static_cond->AssembleMatrix(i, *elmat_p);
-                } else {
-                    mat->AddSubMatrix(vdofs, vdofs, *elmat_p, skip_zeros);
-                    if (hybridization) {
-                        hybridization->AssembleMatrix(i, *elmat_p);
+                    if (static_cond) {
+                        static_cond->AssembleMatrix(i, *elmat_p);
+                    } else {
+                        mat->AddSubMatrix(vdofs, vdofs, *elmat_p, skip_zeros);
+                        if (hybridization) {
+                            hybridization->AssembleMatrix(i, *elmat_p);
+                        }
                     }
-                }
                 }
             }
             else {
                 for (int k = 0; k<domain_integs.Size(); k++) {
-                    if (domain_integs_marker[k] == NULL || 
-                        (*(domain_integs_marker[k]))[elem_attr - 1] == 1)
+                    if (domain_integs_marker[k] == NULL)
                     {
                         if (domain_integs[k]->has_GPU_support) 
-                            domain_integs[k]->AssembleGPU(fes, mat);
+                            domain_integs[k]->AssembleGPU(*fes, elmat_tensor);
                     }
                 }
             }
@@ -737,12 +732,12 @@ namespace mfem {
                 if (element_matrices) {
                     elmat_p = &(*element_matrices)(i);
                 } else {
-                    elmat.SetSize(0);
+                    elmat = elmat_tensor(i);
                     for (int k = 0; k < domain_integs.Size(); k++) {
                         if (domain_integs_marker[k] == NULL || 
                             (*(domain_integs_marker[k]))[elem_attr - 1] == 1) {
                             
-                               if (domain_integs[k]->has_GPU_support) {
+                               if (!domain_integs[k]->has_GPU_support) {
                                     const FiniteElement &fe = *fes->GetFE(i);
                                     eltrans = fes->GetElementTransformation(i);
                                     domain_integs[k]->AssembleElementMatrix(fe, *eltrans, elemmat);
@@ -767,9 +762,6 @@ namespace mfem {
                 if (static_cond) {
                     static_cond->AssembleMatrix(i, *elmat_p);
                 } else {
-                    os << vdofs << std::endl;
-                    os << mat << std::endl;
-                    os << elmat_p << std::endl;
                     mat->AddSubMatrix(vdofs, vdofs, *elmat_p, skip_zeros);
                     if (hybridization) {
                         hybridization->AssembleMatrix(i, *elmat_p);
@@ -820,10 +812,9 @@ namespace mfem {
                     }
                 }
             }
-        }
 #endif
 
-
+        }
 
         if (boundary_integs.Size()) {
             // Which boundary attributes need to be processed?

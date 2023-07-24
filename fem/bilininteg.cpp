@@ -3917,11 +3917,8 @@ void VectorDiffusionIntegrator::AssembleElementVector(
 #if 1
 
 void ElasticityIntegrator::AssembleGPU(
-   const FiniteElementSpace &fes, 
-   SparseMatrix &mat,
-   StaticCondensation *static_cond,
-   int skip_zeros,
-   Hybridization *hybridization
+   FiniteElementSpace &fes, 
+   DenseTensor &tensor
    ) {
 #ifdef MFEM_USE_CUDA
    char str[256];
@@ -3935,23 +3932,24 @@ void ElasticityIntegrator::AssembleGPU(
 
 //region initialisation
 
+   // should we use a list of dimensions instead ??
+   int dof = fes.GetFE(0)->GetDof();
+   int dim = fes.GetFE(0)->GetDim();
 
-   int dof = fes->GetFE(0).GetDof();
-   int dim = fes->GetFE(0).GetDim();
-
-   int number_of_elements = fes->GetNE();
+   int number_of_elements = fes.GetNE();
    int IntRule_TotalPoints = 0;
    DenseMatrix IntRule_Sizes(number_of_elements, 2);
 
    for (size_t i = 0; i < number_of_elements; i++)
    {
-      const FiniteElement &el = *fes->GetFE(i);
+      auto Trans = fes.GetElementTransformation(i);
+      const FiniteElement &el = *fes.GetFE(i);
       // ElementTransformation *elTrans = fes->GetElementTransformation(i);
 
       const IntegrationRule *ir = IntRule;
       if (ir == NULL)
       {
-         int order = 2 * Trans.OrderGrad(&el); // correct order ?
+         int order = 2 * Trans->OrderGrad(&el); // correct order ?
          ir = &IntRules.Get(el.GetGeomType(), order);
       }
 
@@ -3966,17 +3964,17 @@ void ElasticityIntegrator::AssembleGPU(
 
    DenseTensor TransInvJ_values(IntRule_TotalPoints, dim, dim);
    DenseTensor dshape_values(IntRule_TotalPoints, dof*dim, dof*dim);
-   DenseTensor elmat(IntRule_TotalPoints, dof, dim);
-   elmat = 0;
+   if (tensor.TotalSize() == 0)
+      tensor.SetSize(IntRule_TotalPoints, dof, dim);
 
    for (size_t i = 0; i < number_of_elements; i++) 
    {
-      auto Trans = fes->GetElementTransformation(i);
-      const FiniteElement &el = *fes->GetFE(i);
+      auto Trans = fes.GetElementTransformation(i);
+      const FiniteElement &el = *fes.GetFE(i);
       const IntegrationRule *ir = IntRule;
       if (ir == NULL)
       {
-         int order = 2 * Trans.OrderGrad(&el); // correct order ?
+         int order = 2 * Trans->OrderGrad(&el); // correct order ?
          ir = &IntRules.Get(el.GetGeomType(), order);
       }
 
@@ -3985,10 +3983,10 @@ void ElasticityIntegrator::AssembleGPU(
          int index = IntRule_Sizes(i, 0) + j;
 
          const IntegrationPoint &ip = ir->IntPoint(j);
-         Trans.SetIntPoint(&ip);
-         w_values[index] = ip.weight * Trans.Weight();
+         Trans->SetIntPoint(&ip);
+         w_values[index] = ip.weight * Trans->Weight();
 
-         auto InvJacobian = Trans.InverseJacobian();
+         auto InvJacobian = Trans->InverseJacobian();
          for (size_t k = 0; k < dim; k++)
             for (size_t l = 0; l < dim; l++)
                TransInvJ_values(index, k, l) = InvJacobian(k, l);
@@ -4001,10 +3999,10 @@ void ElasticityIntegrator::AssembleGPU(
                dshape_values(index, l, k) = dshape(l, k);
          
 
-         M_values[index] = mu->Eval(Trans, ip);
+         M_values[index] = mu->Eval(*Trans, ip);
          if (lambda)
          {
-            L_values[index] = lambda->Eval(Trans, ip);
+            L_values[index] = lambda->Eval(*Trans, ip);
          }
          else
          {
@@ -4022,7 +4020,7 @@ void ElasticityIntegrator::AssembleGPU(
    auto GPU_TransInvJ = Reshape(TransInvJ_values.Read(), IntRule_TotalPoints, dim, dim);
    auto GPU_dshape = Reshape(dshape_values.Read(), IntRule_TotalPoints, dof, dim);
 
-   auto GPU_elmat = Reshape(elmat.ReadWrite(), IntRule_TotalPoints, dof*dim, dof*dim);
+   auto GPU_elmat = Reshape(tensor.ReadWrite(), IntRule_TotalPoints, dof*dim, dof*dim);
 
    auto GPU_w = Reshape(w_values.Read(), IntRule_TotalPoints);
    auto GPU_L = Reshape(M_values.Read(), IntRule_TotalPoints);
@@ -4031,8 +4029,8 @@ void ElasticityIntegrator::AssembleGPU(
    auto GPU_IntRule_Sizes = Reshape(IntRule_Sizes.Read(), IntRule_TotalPoints, 2);
 
    auto device_kernel = [=] MFEM_DEVICE (int) {
-      // need to add intanciation for pelmat, divshape and gshape
-
+      
+      double GPU_elmat_local[dim*dof * dim*dof];
       double GPU_gshape[dim*dof];
       double GPU_divshape[dim*dof];
       double GPU_pelmat[dof*dof];
@@ -4048,7 +4046,7 @@ void ElasticityIntegrator::AssembleGPU(
             for (size_t m = 0; m < dof; m++) 
                for (size_t k = 0; k < dim; k++) 
                   for (size_t n = 0; n < dim; n++) 
-                     GPU_gshape(m, n) += GPU_dshape(index, m, k) * GPU_TransInvJ(index, k, n);
+                     GPU_gshape[m * dim + n] += GPU_dshape(index, m, k) * GPU_TransInvJ(index, k, n);
             
 
             // MultAAt(gshape, pelmat);
@@ -4057,15 +4055,15 @@ void ElasticityIntegrator::AssembleGPU(
                {
                   double temp = 0;
                   for (size_t k = 0; k < dim; k++)
-                     temp += GPU_gshape(l, k) * GPU_gshape(m, k);
+                     temp += GPU_gshape[l * dim + k] * GPU_gshape[m * dim + k];
                   
-                  GPU_pelmat(l, m) = GPU_pelmat(m, l) = temp;
+                  GPU_pelmat[l * dof + m] = GPU_pelmat[m * dof + l] = temp;
                }
 
             
             // gshape.GradToDiv (divshape);
             for (size_t j = 0; j < dim*dof; j++) {
-               GPU_divshape(j) = GPU_gshape[j];
+               GPU_divshape[j] = GPU_gshape[j];
             }
 
             // Addmult_a_VVT
@@ -4078,14 +4076,14 @@ void ElasticityIntegrator::AssembleGPU(
                
                for (int j = 0; j < dim*dof; j++)
                {
-                  double avi = a * GPU_divshape(j);
+                  double avi = a * GPU_divshape[j];
                   for (int k = 0; k < i; k++)
                   {
-                     const double avivj = avi * GPU_divshape(k);
-                     GPU_elmat(j, k) += avivj;
-                     GPU_elmat(k, j) += avivj;
+                     const double avivj = avi * GPU_divshape[k];
+                     GPU_elmat_local[j * dim*dof + k] += avivj;
+                     GPU_elmat_local[k * dim*dof + j] += avivj;
                   }
-                  GPU_elmat(j, j) += avi * GPU_divshape(j);
+                  GPU_elmat_local[j * dim*dof + j] += avi * GPU_divshape[j];
                }
             }
                
@@ -4095,7 +4093,7 @@ void ElasticityIntegrator::AssembleGPU(
                for (int d = 0; d < dim; d++)
                   for (int k=0; k<dof; k++)
                      for (int l=0; l<dof; l++)
-                        GPU_elmat (dof*d+k, dof*d+l) += (GPU_M(index) * GPU_w(index)) * GPU_pelmat(k, l);
+                        GPU_elmat_local[dof*d+k * dim*dof + dof*d+l] += (GPU_M(index) * GPU_w(index)) * GPU_pelmat[k * dof + l];
 
 
                // elmat(dof*ii+kk, dof*jj+ll) += (M * w) * gshape(kk, jj) * gshape(ll, ii);
@@ -4103,8 +4101,16 @@ void ElasticityIntegrator::AssembleGPU(
                   for (int jj = 0; jj < dim; jj++)                  
                      for (int kk=0; kk<dof; kk++) 
                         for (int ll=0; ll<dof; ll++)
-                           GPU_elmat(dof*ii+kk, dof*jj+ll) +=
-                           (GPU_M(index) * GPU_w(index)) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
+                           GPU_elmat_local[dof*ii+kk * dim*dof + dof*jj+ll] +=
+                           (GPU_M(index) * GPU_w(index)) * GPU_gshape[kk * dim + jj] * GPU_gshape[ll * dim + ii];
+            }
+
+
+            for (size_t m = 0; m < dim*dof; m++) {
+               for (size_t n = 0; n < dim*dof; n++)
+               {
+                  GPU_elmat(i, m, n) = GPU_elmat_local[m * dim*dof + n];
+               }
             }
          }
       }
@@ -4115,38 +4121,9 @@ void ElasticityIntegrator::AssembleGPU(
    };
 
    ForallWrap<3>(true, 1, device_kernel, host_kernel, 1, 1, 1);
-   cudaMemcpy( elmat.GetData(), GPU_elmat, 
+   cudaMemcpy( tensor.Data(), GPU_elmat, 
                IntRule_TotalPoints*dof*dim*dof*dim*sizeof(double), 
                cudaMemcpyDeviceToHost);
-
-//endregion
-
-
-//region copy to sparse matrix
-   
-
-   // should we just return the whole matrix elmat and do that after ?
-
-   DofTransformation *doftrans;
-   for (int i = 0; i < fes->GetNE(); i++) {
-      int elem_attr = fes->GetMesh()->GetAttribute(i);
-      doftrans = fes->GetElementVDofs(i, vdofs);
-
-      auto elmat_p = &elmat;
-      
-      if (doftrans) doftrans->TransformDual(elmat);
-      if (static_cond) static_cond->AssembleMatrix(i, *elmat_p);
-      
-      else {
-         os << vdofs << std::endl;
-         os << mat << std::endl;
-         os << elmat_p << std::endl;
-
-         mat->AddSubMatrix(vdofs, vdofs, *elmat_p, skip_zeros);
-         if (hybridization) hybridization->AssembleMatrix(i, *elmat_p);
-      }
-   }
-
 
 //endregion
 
@@ -4508,69 +4485,16 @@ void ElasticityIntegrator::AssembleElementMatrix(
 
    for (int i = 0; i < ir -> GetNPoints(); i++)
    {
-
       const IntegrationPoint &ip = ir->IntPoint(i);
-      
-
       el.CalcDShape(ip, dshape);
       // dshape = newval 
-
-
-      // for (size_t j = 0; j < dim; j++)
-      // {
-      //    for (size_t k = 0; k < dof; k++)
-      //    {
-      //       DEBUG("%lf ", dshape(k, j));
-      //    }
-      //    DEBUG("\n");
-      // }
-      // DEBUG("\n");
-
-
       Trans.SetIntPoint(&ip);
-      // ???
-      
-
       auto jac = Trans.InverseJacobian();
       w = ip.weight * Trans.Weight();
       Mult(dshape, Trans.InverseJacobian(), gshape);
       // kernels::Mult(ah,aw,bw,bd,cd,ad);
       // gshape += Trans.InverseJacobian() * dshape
-
-
-
-
       MultAAt(gshape, pelmat);
-      /*
-         const int height = gshape.Height();
-         const int width = gshape.Width();
-         for (int i = 0; i < height; i++)
-         {
-            for (int j = 0; j <= i; j++)
-            {
-               double temp = 0.;
-               for (int k = 0; k < width; k++)
-               {
-                  temp += a(i,k) * a(j,k);
-               }
-               aat(j,i) = aat(i,j) = temp;
-            }
-         }
-      */
-
-
-
-      // DEBUG("pelmat values :\n");
-      // for (size_t m = 0; m < dof; m++)
-      // {
-      //    for (size_t k = 0; k < dof; k++)
-      //    {
-      //       DEBUG("%lf ", pelmat(k, m));
-      //    }
-      //    DEBUG("\n");
-      // }
-      // DEBUG("\n");
-
       gshape.GradToDiv (divshape); 
       // divshape[i] = gshape[i] for i in dim*dof
 
