@@ -4026,14 +4026,17 @@ void ElasticityIntegrator::AssembleGPU(
    auto GPU_L = Reshape(M_values.Read(), IntRule_TotalPoints);
    auto GPU_M = Reshape(L_values.Read(), IntRule_TotalPoints);
 
+   DenseMatrix elmat_local(dim, dof), gshape(dim, dof), pelmat(dof, dof);
+   Vector divshape(dim*dof);
+      
+   DeviceMatrix GPU_elmat_local = Reshape(elmat_local.ReadWrite(), dim, dof);
+   DeviceMatrix GPU_gshape = Reshape(gshape.ReadWrite(), dim, dof);
+   auto GPU_divshape = Reshape(divshape.ReadWrite(), dim*dof);
+   DeviceMatrix GPU_pelmat = Reshape(pelmat.ReadWrite(), dof, dof);
+
    auto GPU_IntRule_Sizes = Reshape(IntRule_Sizes.Read(), IntRule_TotalPoints, 2);
 
    auto device_kernel = [=] MFEM_DEVICE (int) {
-      
-      double GPU_elmat_local[dim*dof * dim*dof];
-      double GPU_gshape[dim*dof];
-      double GPU_divshape[dim*dof];
-      double GPU_pelmat[dof*dof];
 
       for (size_t p = 0; p < number_of_elements; p++)
       {
@@ -4046,7 +4049,7 @@ void ElasticityIntegrator::AssembleGPU(
             for (size_t m = 0; m < dof; m++) 
                for (size_t k = 0; k < dim; k++) 
                   for (size_t n = 0; n < dim; n++) 
-                     GPU_gshape[m * dim + n] += GPU_dshape(index, m, k) * GPU_TransInvJ(index, k, n);
+                     GPU_gshape(m, n) += GPU_dshape(index, m, k) * GPU_TransInvJ(index, k, n);
             
 
             // MultAAt(gshape, pelmat);
@@ -4055,15 +4058,15 @@ void ElasticityIntegrator::AssembleGPU(
                {
                   double temp = 0;
                   for (size_t k = 0; k < dim; k++)
-                     temp += GPU_gshape[l * dim + k] * GPU_gshape[m * dim + k];
+                     temp += GPU_gshape(l, k) * GPU_gshape(m, k);
                   
-                  GPU_pelmat[l * dof + m] = GPU_pelmat[m * dof + l] = temp;
+                  GPU_pelmat(l, m) = GPU_pelmat(m, l) = temp;
                }
 
             
             // gshape.GradToDiv (divshape);
             for (size_t j = 0; j < dim*dof; j++) {
-               GPU_divshape[j] = GPU_gshape[j];
+               GPU_divshape(j) = GPU_gshape[j];
             }
 
             // Addmult_a_VVT
@@ -4076,14 +4079,14 @@ void ElasticityIntegrator::AssembleGPU(
                
                for (int j = 0; j < dim*dof; j++)
                {
-                  double avi = a * GPU_divshape[j];
+                  double avi = a * GPU_divshape(j);
                   for (int k = 0; k < i; k++)
                   {
-                     const double avivj = avi * GPU_divshape[k];
-                     GPU_elmat_local[j * dim*dof + k] += avivj;
-                     GPU_elmat_local[k * dim*dof + j] += avivj;
+                     const double avivj = avi * GPU_divshape(k);
+                     GPU_elmat_local(j, k) += avivj;
+                     GPU_elmat_local(k, j) += avivj;
                   }
-                  GPU_elmat_local[j * dim*dof + j] += avi * GPU_divshape[j];
+                  GPU_elmat_local(j, j) += avi * GPU_divshape(j);
                }
             }
                
@@ -4093,7 +4096,7 @@ void ElasticityIntegrator::AssembleGPU(
                for (int d = 0; d < dim; d++)
                   for (int k=0; k<dof; k++)
                      for (int l=0; l<dof; l++)
-                        GPU_elmat_local[dof*d+k * dim*dof + dof*d+l] += (GPU_M(index) * GPU_w(index)) * GPU_pelmat[k * dof + l];
+                        GPU_elmat_local (dof*d+k, dof*d+l) += (GPU_M(index) * GPU_w(index)) * GPU_pelmat(k, l);
 
 
                // elmat(dof*ii+kk, dof*jj+ll) += (M * w) * gshape(kk, jj) * gshape(ll, ii);
@@ -4101,17 +4104,17 @@ void ElasticityIntegrator::AssembleGPU(
                   for (int jj = 0; jj < dim; jj++)                  
                      for (int kk=0; kk<dof; kk++) 
                         for (int ll=0; ll<dof; ll++)
-                           GPU_elmat_local[dof*ii+kk * dim*dof + dof*jj+ll] +=
-                           (GPU_M(index) * GPU_w(index)) * GPU_gshape[kk * dim + jj] * GPU_gshape[ll * dim + ii];
+                           GPU_elmat_local (dof*ii+kk, dof*jj+ll) +=
+                           (GPU_M(index) * GPU_w(index)) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
             }
-
 
             for (size_t m = 0; m < dim*dof; m++) {
                for (size_t n = 0; n < dim*dof; n++)
                {
-                  GPU_elmat(i, m, n) = GPU_elmat_local[m * dim*dof + n];
+                  GPU_elmat(i, m, n) = GPU_elmat_local(m, n);
                }
             }
+
          }
       }
    };
@@ -4185,7 +4188,7 @@ void ElasticityIntegrator::AssembleElementMatrix(
 #endif
 
 
-#if 1
+#if 0
 
    // initialisation of values
    
