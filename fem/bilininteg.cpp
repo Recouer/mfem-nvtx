@@ -36,6 +36,12 @@ using namespace std;
 namespace mfem
 {
 
+void BilinearFormIntegrator::AssembleGPU(const FiniteElementSpace &fes, DenseTensor &tensor)
+{
+   mfem_error ("BilinearFormIntegrator::AssembleGPU(fes, tensor)\n"
+     "   is not implemented for this class.");
+}
+
 void BilinearFormIntegrator::AssemblePA(const FiniteElementSpace&)
 {
    mfem_error ("BilinearFormIntegrator::AssemblePA(fes)\n"
@@ -3917,7 +3923,7 @@ void VectorDiffusionIntegrator::AssembleElementVector(
 #if 1
 
 void ElasticityIntegrator::AssembleGPU(
-   FiniteElementSpace &fes, 
+   const FiniteElementSpace &fes, 
    DenseTensor &tensor
    ) {
 #ifdef MFEM_USE_CUDA
@@ -4108,7 +4114,8 @@ void ElasticityIntegrator::AssembleGPU(
                            (GPU_M(index) * GPU_w(index)) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
             }
 
-            for (size_t m = 0; m < dim*dof; m++) {
+            for (size_t m = 0; m < dim*dof; m++) 
+            {
                for (size_t n = 0; n < dim*dof; n++)
                {
                   GPU_elmat(i, m, n) = GPU_elmat_local(m, n);
