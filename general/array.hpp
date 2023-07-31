@@ -428,6 +428,10 @@ public:
    void Load(int new_size0,int new_size1, std::istream &in)
    { SetSize(new_size0,new_size1); Load(in, 1); }
 
+   /// Shortcut for mfem::Read(a.GetMemory(), a.Size(), on_dev).
+   const T *Read(bool on_dev = true) const
+   { return array1d.Read(on_dev); }
+
    void Copy(Array2D &copy) const
    { copy.M = M; copy.N = N; array1d.Copy(copy.array1d); }
 

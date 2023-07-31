@@ -55,7 +55,7 @@ public:
 
 
    virtual void AssembleGPU(const FiniteElementSpace &fes, DenseTensor &tensor);
-   bool has_GPU_support = false;
+   virtual bool has_GPU_support();
 
    /// Method defining partial assembly.
    /** The result of the partial assembly is stored internally so that it can be
@@ -2919,7 +2919,8 @@ public:
    { lambda = NULL; mu = &m; q_lambda = q_l; q_mu = q_m; }
 
    virtual void AssembleGPU(const FiniteElementSpace &fes, DenseTensor &tensor);
-   bool has_GPU_support = true;
+   //bool BilinearFormIntegrator::has_GPU_support = true;
+   virtual bool has_GPU_support();
 
    virtual void AssembleElementMatrix(const FiniteElement &,
                                       ElementTransformation &,

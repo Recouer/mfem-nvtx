@@ -659,8 +659,6 @@ namespace mfem {
 	nvtxRangePush(str_nvtx);
 #endif
 
-    os << ext << std::endl;
-
         if (ext) {
             ext->Assemble();
 
@@ -719,8 +717,13 @@ namespace mfem {
                 for (int k = 0; k<domain_integs.Size(); k++) {
                     if (domain_integs_marker[k] == NULL)
                     {
-                        if (domain_integs[k]->has_GPU_support) 
+                        printf("has gpu support : %d \n", domain_integs[k]->has_GPU_support());
+   printf("tensor address: %p\n", elmat_tensor);
+                        if (domain_integs[k]->has_GPU_support()) 
                             domain_integs[k]->AssembleGPU(*fes, elmat_tensor);
+
+                        elmat_tensor.Print(std::cout);
+   printf("tensor address: %p\n", elmat_tensor);
                     }
                 }
             }
@@ -732,12 +735,17 @@ namespace mfem {
                 if (element_matrices) {
                     elmat_p = &(*element_matrices)(i);
                 } else {
-                    elmat = elmat_tensor(i);
+                    printf("tensor size: %d \n", elmat_tensor.SizeK());
+                    auto intermediate_values = elmat_tensor(i);
+                    if (intermediate_values.Size() > 0)
+                        elmat = intermediate_values;
+                    else
+                        elmat.SetSize(0);
                     for (int k = 0; k < domain_integs.Size(); k++) {
                         if (domain_integs_marker[k] == NULL || 
                             (*(domain_integs_marker[k]))[elem_attr - 1] == 1) {
                             
-                               if (!domain_integs[k]->has_GPU_support) {
+                               if (!domain_integs[k]->has_GPU_support()) {
                                     const FiniteElement &fe = *fes->GetFE(i);
                                     eltrans = fes->GetElementTransformation(i);
                                     domain_integs[k]->AssembleElementMatrix(fe, *eltrans, elemmat);
@@ -803,9 +811,6 @@ namespace mfem {
                 if (static_cond) {
                     static_cond->AssembleMatrix(i, *elmat_p);
                 } else {
-                    os << vdofs << std::endl;
-                    os << mat << std::endl;
-                    os << elmat_p << std::endl;
                     mat->AddSubMatrix(vdofs, vdofs, *elmat_p, skip_zeros);
                     if (hybridization) {
                         hybridization->AssembleMatrix(i, *elmat_p);
