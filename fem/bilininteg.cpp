@@ -3982,8 +3982,6 @@ namespace mfem
 
       for (size_t i = 0; i < number_of_elements; i++)
       {
-         // printf("dim: %d, dof: %d\n", fes.GetFE(i)->GetDof(), fes.GetFE(i)->GetDim());
-
          auto Trans = fes.GetElementTransformation(i);
          const FiniteElement &el = *fes.GetFE(i);
          // ElementTransformation *elTrans = fes->GetElementTransformation(i);
@@ -3998,8 +3996,6 @@ namespace mfem
          IntRule_Sizes(i, 1) = ir->GetNPoints();
          IntRule_Sizes(i, 0) = IntRule_TotalPoints;
          IntRule_TotalPoints += ir->GetNPoints();
-
-         // SHOW("%d %d || ", ir->GetNPoints(), IntRule_TotalPoints);
       }
 
       Vector w_values(IntRule_TotalPoints);
@@ -4018,7 +4014,7 @@ namespace mfem
          const IntegrationRule *ir = IntRule;
          if (ir == NULL)
          {
-            int order = 2 * Trans->OrderGrad(&el); // correct order ?
+            int order = 2 * Trans->OrderGrad(&el);
             ir = &IntRules.Get(el.GetGeomType(), order);
          }
 
@@ -4050,31 +4046,6 @@ namespace mfem
                L_values[index] = q_lambda * M_values[index];
                M_values[index] = q_mu * M_values[index];
             }
-
-            // SHOW("%lf ", w_values[index]);
-            // SHOW("%lf ", L_values[index]);
-            // SHOW("%lf ", M_values[index]);
-
-            // SHOW("\n\n\n");
-            // for (size_t m = 0; m < dof; m++) {
-            //    for (size_t k = 0; k < dim; k++) {
-            //       for (size_t n = 0; n < dim; n++) 
-            //          SHOW("%lf ", dshape_values(m, n, index));
-            //       SHOW("\n");
-            //    }
-            //    SHOW("\n");
-            // }
-
-            // SHOW("\n\n\n");
-            // for (size_t m = 0; m < dim; m++) {
-            //    for (size_t k = 0; k < dim; k++) {
-            //       for (size_t n = 0; n < dim; n++) 
-            //          SHOW("%lf ", TransInvJ_values(m, n, index));
-            //       SHOW("\n");
-            //    }
-            //    SHOW("\n");
-            // }
-            // SHOW("\n\n\n");
          }
       }
 
@@ -4115,32 +4086,6 @@ namespace mfem
                int index = GPU_IntRule_Sizes(p * 2) + i;
 
 
-               // SHOW("%lf ", GPU_w[index]);
-               // SHOW("%lf ", GPU_L[index]);
-               // SHOW("%lf ", GPU_M[index]);
-
-               // SHOW("\n\n\n");
-               // for (size_t m = 0; m < dof; m++) {
-               //    for (size_t k = 0; k < dim; k++) {
-               //       for (size_t n = 0; n < dim; n++) 
-               //          SHOW("%lf ", GPU_dshape(m, n, index));
-               //       SHOW("\n");
-               //    }
-               //    SHOW("\n");
-               // }
-
-               // SHOW("\n\n\n");
-               // for (size_t m = 0; m < dim; m++) {
-               //    for (size_t k = 0; k < dim; k++) {
-               //       for (size_t n = 0; n < dim; n++) 
-               //          SHOW("%lf ", GPU_TransInvJ(m, n, index));
-               //       SHOW("\n");
-               //    }
-               //    SHOW("\n");
-               // }
-               // SHOW("\n\n\n");
-
-
                // Mult(dshape, Trans.InverseJacobian(), gshape);
                for (size_t n = 0; n < dim * dof; n++)
                {
@@ -4153,28 +4098,9 @@ namespace mfem
                      for (size_t n = 0; n < dof; n++)
                      {
                         GPU_gshape(n, m) += GPU_dshape(n, y, index) * GPU_TransInvJ(y, m, index);
-                        // SHOW("|| %d %d %d | %lf ", n, m, y, GPU_gshape(n, m));
                      }
                   }
-                  // SHOW("\n");
-                  // for (size_t n = 0; n < dof; n++)
-                  // {
-                  //    printf("%lf ", GPU_gshape(n, m));
-                  // }
-                  // printf("\n");
-                  // SHOW("\n");
                }
-               // SHOW("\n\n\n");
-
-               // for (size_t m = 0; m < dim; m++)
-               // {
-               //    for (size_t n = 0; n < dof; n++)
-               //    {
-               //       printf("%lf ", GPU_gshape(n, m));
-               //    }
-               //    printf("\n");
-               // }
-               // printf("\n");
                
 
                // MultAAt(gshape, pelmat);
@@ -4213,15 +4139,11 @@ namespace mfem
                         const double avivj = avi * GPU_divshape(k);
                         GPU_elmat_local(j, k) += avivj;
                         GPU_elmat_local(k, j) += avivj;
-                        // SHOW("%lf ", avivj);
                      }
                      GPU_elmat_local(j, j) += avi * GPU_divshape(j);
-                     // SHOW("## %lf\n", GPU_elmat_local(j, j));
                   }
-                  // SHOW("\n\n\n");
                }
 
-               // elmat (dof*d+k, dof*d+l) += (M * w) * pelmat(k, l)
                if (GPU_M[index] != 0.0)
                {
                   for (int d = 0; d < dim; d++)
@@ -4229,22 +4151,15 @@ namespace mfem
                         for (int l = 0; l < dof; l++)
                         {
                            GPU_elmat_local(dof * d + k, dof * d + l) += (GPU_M(index) * GPU_w(index)) * GPU_pelmat(k, l);
-                           // SHOW("elmat: %lf, M: %lf, w: %lf, pelmat: %lf", GPU_elmat_local(dof * d + k, dof * d + l), (GPU_M(index), GPU_w(index)), GPU_pelmat(k, l));
-                        }
-                  // SHOW("\n");
+                        } 
 
-                  // elmat(dof*ii+kk, dof*jj+ll) += (M * w) * gshape(kk, jj) * gshape(ll, ii);
                   for (int ii = 0; ii < dim; ii++)
                      for (int jj = 0; jj < dim; jj++)
                         for (int kk = 0; kk < dof; kk++)
                            for (int ll = 0; ll < dof; ll++)
                            {
                               GPU_elmat_local(dof * ii + kk, dof * jj + ll) += (GPU_M(index) * GPU_w(index)) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
-                              // SHOW("elmat: %lf, M: %lf, w: %lf, gshape: %lf, gshape: %lf", 
-                              //       GPU_elmat_local(dof * ii + kk, dof * jj + ll), GPU_M(index), GPU_w(index), 
-                              //       GPU_gshape(kk, jj), GPU_gshape(ll, ii));
                            }
-                  // SHOW("\n\n\n");
                }
 
                for (size_t m = 0; m < dim * dof; m++)

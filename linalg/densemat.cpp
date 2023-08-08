@@ -2730,10 +2730,7 @@ void MultAAt(const DenseMatrix &a, DenseMatrix &aat)
             temp += a(i,k) * a(j,k);
          }
          aat(j,i) = aat(i,j) = temp;
-         // ### added a printf ###
-         printf("%lf %lf %lf\n", aat(j,i), aat(i,j), temp);
       }
-      printf("\n\n\n");
    }
 }
 
