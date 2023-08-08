@@ -3960,9 +3960,6 @@ namespace mfem
 #endif
 
 
-
-
-      printf("tensor address: %p\n", tensor);
       // region initialisation
 
       // should we use a list of dimensions instead ??
@@ -4002,7 +3999,7 @@ namespace mfem
          IntRule_Sizes(i, 0) = IntRule_TotalPoints;
          IntRule_TotalPoints += ir->GetNPoints();
 
-         SHOW("%d %d || ", ir->GetNPoints(), IntRule_TotalPoints);
+         // SHOW("%d %d || ", ir->GetNPoints(), IntRule_TotalPoints);
       }
 
       Vector w_values(IntRule_TotalPoints);
@@ -4053,6 +4050,31 @@ namespace mfem
                L_values[index] = q_lambda * M_values[index];
                M_values[index] = q_mu * M_values[index];
             }
+
+            // SHOW("%lf ", w_values[index]);
+            // SHOW("%lf ", L_values[index]);
+            // SHOW("%lf ", M_values[index]);
+
+            // SHOW("\n\n\n");
+            // for (size_t m = 0; m < dof; m++) {
+            //    for (size_t k = 0; k < dim; k++) {
+            //       for (size_t n = 0; n < dim; n++) 
+            //          SHOW("%lf ", dshape_values(m, n, index));
+            //       SHOW("\n");
+            //    }
+            //    SHOW("\n");
+            // }
+
+            // SHOW("\n\n\n");
+            // for (size_t m = 0; m < dim; m++) {
+            //    for (size_t k = 0; k < dim; k++) {
+            //       for (size_t n = 0; n < dim; n++) 
+            //          SHOW("%lf ", TransInvJ_values(m, n, index));
+            //       SHOW("\n");
+            //    }
+            //    SHOW("\n");
+            // }
+            // SHOW("\n\n\n");
          }
       }
 
@@ -4078,44 +4100,96 @@ namespace mfem
       Vector divshape(dim * dof);
 
       DeviceMatrix GPU_elmat_local = Reshape(elmat_local.ReadWrite(), dim * dof, dim * dof);
-      DeviceMatrix GPU_gshape = Reshape(gshape.ReadWrite(), dim, dof);
+      DeviceMatrix GPU_gshape = Reshape(gshape.ReadWrite(), dof, dim);
       auto GPU_divshape = Reshape(divshape.ReadWrite(), dim * dof);
       DeviceMatrix GPU_pelmat = Reshape(pelmat.ReadWrite(), dof, dof);
       // endregion
 
-
-      SHOW("we managed to generate all values\n");
-
       auto device_kernel = [=] MFEM_DEVICE(int)
       {
+
          for (size_t p = 0; p < number_of_elements; p++)
          {
             for (size_t i = 0; i < GPU_IntRule_Sizes(p * 2 + 1); i++)
             {
                int index = GPU_IntRule_Sizes(p * 2) + i;
 
+
+               // SHOW("%lf ", GPU_w[index]);
+               // SHOW("%lf ", GPU_L[index]);
+               // SHOW("%lf ", GPU_M[index]);
+
+               // SHOW("\n\n\n");
+               // for (size_t m = 0; m < dof; m++) {
+               //    for (size_t k = 0; k < dim; k++) {
+               //       for (size_t n = 0; n < dim; n++) 
+               //          SHOW("%lf ", GPU_dshape(m, n, index));
+               //       SHOW("\n");
+               //    }
+               //    SHOW("\n");
+               // }
+
+               // SHOW("\n\n\n");
+               // for (size_t m = 0; m < dim; m++) {
+               //    for (size_t k = 0; k < dim; k++) {
+               //       for (size_t n = 0; n < dim; n++) 
+               //          SHOW("%lf ", GPU_TransInvJ(m, n, index));
+               //       SHOW("\n");
+               //    }
+               //    SHOW("\n");
+               // }
+               // SHOW("\n\n\n");
+
+
                // Mult(dshape, Trans.InverseJacobian(), gshape);
                for (size_t n = 0; n < dim * dof; n++)
                {
                   GPU_gshape[n] = 0.0;
                }
-               for (size_t m = 0; m < dof; m++)
-                  for (size_t k = 0; k < dim; k++)
-                     for (size_t n = 0; n < dim; n++)
+               for (size_t m = 0; m < dim; m++) 
+               {
+                  for (size_t y = 0; y < dim; y++) 
+                  {
+                     for (size_t n = 0; n < dof; n++)
                      {
-                        GPU_gshape(m, n) += GPU_dshape(m, k, index) * GPU_TransInvJ(k, n, index);
+                        GPU_gshape(n, m) += GPU_dshape(n, y, index) * GPU_TransInvJ(y, m, index);
+                        // SHOW("|| %d %d %d | %lf ", n, m, y, GPU_gshape(n, m));
                      }
+                  }
+                  // SHOW("\n");
+                  // for (size_t n = 0; n < dof; n++)
+                  // {
+                  //    printf("%lf ", GPU_gshape(n, m));
+                  // }
+                  // printf("\n");
+                  // SHOW("\n");
+               }
+               // SHOW("\n\n\n");
+
+               // for (size_t m = 0; m < dim; m++)
+               // {
+               //    for (size_t n = 0; n < dof; n++)
+               //    {
+               //       printf("%lf ", GPU_gshape(n, m));
+               //    }
+               //    printf("\n");
+               // }
+               // printf("\n");
+               
 
                // MultAAt(gshape, pelmat);
                for (size_t l = 0; l < dof; l++)
                   for (size_t m = 0; m <= l; m++)
                   {
                      double temp = 0;
-                     for (size_t k = 0; k < dim; k++)
+                     for (size_t k = 0; k < dim; k++) 
                         temp += GPU_gshape(l, k) * GPU_gshape(m, k);
 
                      GPU_pelmat(l, m) = GPU_pelmat(m, l) = temp;
+                     SHOW("%lf %lf %lf\n", GPU_pelmat(l, m), GPU_pelmat(m, l), temp);
                   }
+               SHOW("\n\n\n");
+               
 
                // gshape.GradToDiv (divshape);
                for (size_t j = 0; j < dim * dof; j++)
@@ -4139,9 +4213,12 @@ namespace mfem
                         const double avivj = avi * GPU_divshape(k);
                         GPU_elmat_local(j, k) += avivj;
                         GPU_elmat_local(k, j) += avivj;
+                        // SHOW("%lf ", avivj);
                      }
                      GPU_elmat_local(j, j) += avi * GPU_divshape(j);
+                     // SHOW("## %lf\n", GPU_elmat_local(j, j));
                   }
+                  // SHOW("\n\n\n");
                }
 
                // elmat (dof*d+k, dof*d+l) += (M * w) * pelmat(k, l)
@@ -4152,7 +4229,9 @@ namespace mfem
                         for (int l = 0; l < dof; l++)
                         {
                            GPU_elmat_local(dof * d + k, dof * d + l) += (GPU_M(index) * GPU_w(index)) * GPU_pelmat(k, l);
+                           // SHOW("elmat: %lf, M: %lf, w: %lf, pelmat: %lf", GPU_elmat_local(dof * d + k, dof * d + l), (GPU_M(index), GPU_w(index)), GPU_pelmat(k, l));
                         }
+                  // SHOW("\n");
 
                   // elmat(dof*ii+kk, dof*jj+ll) += (M * w) * gshape(kk, jj) * gshape(ll, ii);
                   for (int ii = 0; ii < dim; ii++)
@@ -4161,7 +4240,11 @@ namespace mfem
                            for (int ll = 0; ll < dof; ll++)
                            {
                               GPU_elmat_local(dof * ii + kk, dof * jj + ll) += (GPU_M(index) * GPU_w(index)) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
+                              // SHOW("elmat: %lf, M: %lf, w: %lf, gshape: %lf, gshape: %lf", 
+                              //       GPU_elmat_local(dof * ii + kk, dof * jj + ll), GPU_M(index), GPU_w(index), 
+                              //       GPU_gshape(kk, jj), GPU_gshape(ll, ii));
                            }
+                  // SHOW("\n\n\n");
                }
 
                for (size_t m = 0; m < dim * dof; m++)
@@ -4227,9 +4310,15 @@ namespace mfem
       gshape.SetSize(dof, dim);
       pelmat.SetSize(dof);
       divshape.SetSize(dim * dof);
+      
+      divshape.GetMemory().SetHostPtrOwner(true);
+      dshape.GetMemory().SetHostPtrOwner(true);
+      gshape.GetMemory().SetHostPtrOwner(true);
+      pelmat.GetMemory().SetHostPtrOwner(true);
 #endif
 
       elmat.SetSize(dof * dim);
+      elmat.GetMemory().SetHostPtrOwner(true);
 
       const IntegrationRule *ir = IntRule;
       if (ir == NULL)
@@ -4303,19 +4392,25 @@ namespace mfem
 
       auto device_kernel = [=] MFEM_DEVICE (int) {
 
+
+
+
          for (size_t i = 0; i < numberOfPoints; i++)
          {
-
             // Mult(dshape, Trans.InverseJacobian(), gshape);
             for (size_t n = 0; n < dim*dof; n++) GPU_gshape[n] = 0.0;
-            for (size_t m = 0; m < dof; m++) 
+            for (size_t m = 0; m < dof; m++) {
                for (size_t k = 0; k < dim; k++) 
                {
                   for (size_t n = 0; n < dim; n++) 
                   {
                      GPU_gshape(m, n) += GPU_dshape(i, m, k) * GPU_TransInvJ(i, k, n);
+                     SHOW("%lf ", GPU_gshape(m, n));
                   }
+                  SHOW("\n");
                }
+               SHOW("\n");
+            }
             
             
 
@@ -4377,7 +4472,7 @@ namespace mfem
                {
                   for (int jj = 0; jj < dim; jj++)
                   {
-                     SHOW("[row %d %d]\n", ii, jj);
+                     // SHOW("[row %d %d]\n", ii, jj);
 
                      for (int kk=0; kk<dof; kk++) 
                      {
@@ -4385,8 +4480,11 @@ namespace mfem
                         {
                            GPU_elmat(dof*ii+kk, dof*jj+ll) +=
                            (GPU_M(i) * GPU_w(i)) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
+                           // SHOW("%lf ", GPU_elmat(dof*ii+kk, dof*jj+ll));
                         }
+                        // SHOW("\n");
                      }
+                     // SHOW("\n");
                   }
                }
             }
@@ -4404,19 +4502,36 @@ namespace mfem
 
 #else
 
-      // SHOW("not full GPU assembly, %d %d\n", dim, dof);
+#ifdef MFEM_USE_CUDA
+      auto GPU_elmat = Reshape(elmat.ReadWrite(), dof * dim, dof * dim);
+#endif
 
       for (int i = 0; i < ir->GetNPoints(); i++)
       {
+         pelmat.GetMemory().SetDevicePtrOwner(true);
+         gshape.GetMemory().SetDevicePtrOwner(true);
+         dshape.GetMemory().SetDevicePtrOwner(true);
+
+
          const IntegrationPoint &ip = ir->IntPoint(i);
          el.CalcDShape(ip, dshape);
-         // dshape = newval
          Trans.SetIntPoint(&ip);
          auto jac = Trans.InverseJacobian();
          w = ip.weight * Trans.Weight();
          Mult(dshape, Trans.InverseJacobian(), gshape);
          // kernels::Mult(ah,aw,bw,bd,cd,ad);
          // gshape += Trans.InverseJacobian() * dshape
+
+         for (size_t m = 0; m < dof; m++)
+         {
+            for (size_t n = 0; n < dim; n++)
+            {
+               printf("%lf ", gshape(m, n));
+            }
+            printf("\n");
+         }
+         printf("\n");
+
          MultAAt(gshape, pelmat);
          gshape.GradToDiv(divshape);
          // divshape[i] = gshape[i] for i in dim*dof
@@ -4432,8 +4547,32 @@ namespace mfem
             M = q_mu * M;
          }
 
+         // SHOW("%lf ", w);
+         // SHOW("%lf ", L);
+         // SHOW("%lf ", M);
+
+         // SHOW("\n\n\n");
+         // for (size_t m = 0; m < dof; m++) {
+         //    for (size_t k = 0; k < dim; k++) {
+         //       for (size_t n = 0; n < dim; n++) 
+         //          SHOW("%lf ", dshape(m, n));
+         //       SHOW("\n");
+         //    }
+         //    SHOW("\n");
+         // }
+
+         // SHOW("\n\n\n");
+         // for (size_t m = 0; m < dim; m++) {
+         //    for (size_t k = 0; k < dim; k++) {
+         //       for (size_t n = 0; n < dim; n++) 
+         //          SHOW("%lf ", jac(m, n));
+         //       SHOW("\n");
+         //    }
+         //    SHOW("\n");
+         // }
+         // SHOW("\n\n\n");
+
 #ifdef MFEM_USE_CU
-         auto GPU_elmat = Reshape(elmat.ReadWrite(), dof * dim, dof * dim);
          auto GPU_pelmat = Reshape(pelmat.Read(), dof, dof);
          auto GPU_divshape = Reshape(divshape.Read(), dim * dof);
          auto GPU_gshape = Reshape(gshape.Read(), dof, dim);
@@ -4480,14 +4619,19 @@ namespace mfem
                {
                   for (int jj = 0; jj < dim; jj++)
                   {
-                     for (int kk = 0; kk < dof; kk++)
+                     SHOW("[row %d %d]\n", ii, jj);
+
+                     for (int kk=0; kk<dof; kk++) 
                      {
-                        for (int ll = 0; ll < dof; ll++)
+                        for (int ll=0; ll<dof; ll++)
                         {
                            GPU_elmat(dof * ii + kk, dof * jj + ll) +=
                                (M * w) * GPU_gshape(kk, jj) * GPU_gshape(ll, ii);
+                           SHOW("%lf ", GPU_elmat(dof*ii+kk, dof*jj+ll));
                         }
+                        SHOW("\n");
                      }
+                     SHOW("\n");
                   }
                }
             }
@@ -4505,10 +4649,6 @@ namespace mfem
          // elmat.Print();
 #else
          // printf("this is done on the CPU");
-
-         // regarder les in et out de la fonction matrix free
-         // faire un algo simple de comment l'algo matrix free fonctionne
-         // faire algo de ce que j'ai implémenté
 
          // SHOW("Addmult_a_VVT\n");
 
@@ -4528,29 +4668,39 @@ namespace mfem
                   for (int l = 0; l < dof; l++)
                   {
                      elmat(dof * d + k, dof * d + l) += (M * w) * pelmat(k, l);
+                     // SHOW("elmat: %lf, M: %lf, w: %lf, pelmat: %lf", elmat(dof * d + k, dof * d + l), M, w, pelmat(k, l));
                   }
                }
             }
+            // SHOW("\n");
 
             // SHOW("elmat(dof*ii+kk, dof*jj+ll) += (M * w) * gshape(kk, jj) * gshape(ll, ii);\n");
 
             for (int ii = 0; ii < dim; ii++)
                for (int jj = 0; jj < dim; jj++)
                {
+                  // SHOW("[row %d %d]\n", ii, jj);
                   for (int kk = 0; kk < dof; kk++)
                   {
                      for (int ll = 0; ll < dof; ll++)
                      {
                         elmat(dof * ii + kk, dof * jj + ll) +=
                             (M * w) * gshape(kk, jj) * gshape(ll, ii);
+                        // SHOW("elmat: %lf, M: %lf, w: %lf, gshape: %lf, gshape: %lf",
+                        //       elmat(dof * ii + kk, dof * jj + ll),
+                        //       M, w, gshape(kk, jj), gshape(ll, ii));
                      }
                   }
                }
+               // SHOW("\n\n\n");
          }
 #endif
       }
-
 #endif
+
+   // elmat.Print(std::cout);
+   // printf("\n\n\n\n");
+
 #ifdef MFEM_USE_CUDA
       nvtxRangePop();
 #endif

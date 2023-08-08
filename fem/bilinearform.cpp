@@ -697,7 +697,7 @@ namespace mfem {
                                         << k << ", counting from zero");
                 }
             }
-#if 1
+#if 0
 
             if (element_matrices) {
                 for (int i = 0; i < fes->GetNE(); i++) {
@@ -718,12 +718,12 @@ namespace mfem {
                     if (domain_integs_marker[k] == NULL)
                     {
                         printf("has gpu support : %d \n", domain_integs[k]->has_GPU_support());
-   printf("tensor address: %p\n", elmat_tensor);
+   // printf("tensor address: %p\n", elmat_tensor);
                         if (domain_integs[k]->has_GPU_support()) 
                             domain_integs[k]->AssembleGPU(*fes, elmat_tensor);
 
-                        elmat_tensor.Print(std::cout);
-   printf("tensor address: %p\n", elmat_tensor);
+                        // elmat_tensor.Print(std::cout);
+   // printf("tensor address: %p\n", elmat_tensor);
                     }
                 }
             }

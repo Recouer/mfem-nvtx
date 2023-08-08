@@ -2730,7 +2730,10 @@ void MultAAt(const DenseMatrix &a, DenseMatrix &aat)
             temp += a(i,k) * a(j,k);
          }
          aat(j,i) = aat(i,j) = temp;
+         // ### added a printf ###
+         printf("%lf %lf %lf\n", aat(j,i), aat(i,j), temp);
       }
+      printf("\n\n\n");
    }
 }
 
@@ -3244,12 +3247,12 @@ void AddMult_a_VVt(const double a, const Vector &v, DenseMatrix &VVt)
          const double avivj = avi * v(j);
          VVt(i, j) += avivj;
          VVt(j, i) += avivj;
-         printf("%lf ", v(j));
-         // printf("(%lf, %lf) ", VVt(j, i), VVt(i, j));
+         // printf("%lf ", avivj);
       }
       VVt(i, i) += avi * v(i);
-      printf("## %lf \n", VVt(i, i));
+      // printf("## %lf \n", VVt(i, i));
    }
+   // printf("\n\n\n");
 }
 
 void RAP(const DenseMatrix &A, const DenseMatrix &P, DenseMatrix & RAP)
